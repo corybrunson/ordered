@@ -2,9 +2,9 @@ Package: ordered
 Title: 'parsnip' Engines and Wrappers for Ordinal Classification Models
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Max", "Kuhn", , "max@posit.co", role = c("aut", "cre"),
+    person("Max", "Kuhn", , "max@posit.co", role = "aut",
            comment = c(ORCID = "0000-0003-2402-136X")),
-    person("Jason Cory", "Brunson", , "cornelioid@gmail.com", role = "aut",
+    person("Jason Cory", "Brunson", , "cornelioid@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-3126-9494")),
     person("Posit Software PBC", role = "cph")
   )
