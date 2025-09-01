@@ -4,12 +4,49 @@
 \name{ordered-package}
 \alias{ordered}
 \alias{ordered-package}
-\title{ordered: Wrappers for Ordinal Classification Models}
+\title{{ordered}: parsnip Engines for Ordinal Regression Models}
 \description{
-Bindings for ordinal classification models for use with the 'parsnip' package, such as ordinal random forests by Hornung R. (2020) \doi{10.1007/s00357-018-9302-x} and others.
+{ordered} provides engines for ordinal regression models for the {parsnip}
+package. The models may have cumulative, sequential, or adjacent-category
+structure, and in future these may be disaggregated into separate model
+types. A vignette will provide thorough illustrations of {ordered}
+functionality. See below for examples of fitting ordinal regression models
+with {censored}.
+}
+\examples{
+# Weighted sample
+
+set.seed(561246)
+house_sub <- MASS::housing |>
+  dplyr::sample_n(size = 120, replace = TRUE, weight = Freq) |>
+  subset(select = -Freq)
+train_inds <- sample(120, 80)
+house_train <- house_sub[train_inds, ]
+house_test <- house_sub[-train_inds, ]
+
+# Cumulative-link proportional-odds probit regression model
+
+fit_cpop <- ordinal_reg() |>
+  set_engine("polr") |>
+  set_args(method = "probit") |>
+  fit(Sat ~ Infl + Type + Cont, data = house_train)
+predict(fit_cpop, house_test, type = "prob")
+
+# Ordinal forest
+
+fit_orf <- rand_forest(mode = "classification") |>
+  set_engine("ordinalForest") |>
+  fit(Sat ~ Infl + Type + Cont, data = house_train)
+predict(fit_orf, house_test, type = "prob")
+
 }
 \author{
 \strong{Maintainer}: Max Kuhn \email{max@posit.co} (\href{https://orcid.org/0000-0003-2402-136X}{ORCID})
+
+Authors:
+\itemize{
+  \item Jason Cory Brunson \email{cornelioid@gmail.com} (\href{https://orcid.org/0000-0003-3126-9494}{ORCID})
+}
 
 Other contributors:
 \itemize{
