@@ -39,7 +39,7 @@ make_ordinal_reg_polr <- function() {
     options = list(
       predictor_indicators = "traditional",
       compute_intercept = TRUE,
-      remove_intercept = FALSE,
+      remove_intercept = TRUE,
       allow_sparse_x = FALSE
     )
   )
