@@ -9,30 +9,39 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/ordered)](https://CRAN.R-project.org/package=ordered)
-[![R-CMD-check](https://github.com/topepo/ordered/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/topepo/ordered/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/corybrunson/ordered/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/corybrunson/ordered/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/topepo/ordered/branch/main/graph/badge.svg)](https://app.codecov.io/gh/topepo/ordered?branch=main)
+coverage](https://codecov.io/gh/corybrunson/ordered/branch/main/graph/badge.svg)](https://app.codecov.io/gh/corybrunson/ordered?branch=main)
 <!-- badges: end -->
 
-The goal of ordered is to enable additional classification models for
-ordinal outcomes (e.g., “low”, “medium”, “high”). While there are
-several model/engine combinations in the parsnip package that can be
-used, this package adds:
+`ordered` is a [parsnip](https://parsnip.tidymodels.org/) extension to
+enable additional classification models for ordinal outcomes (e.g.,
+“low”, “medium”, “high”). While there are several model/engine
+combinations in the parsnip package that can be used, this package adds:
 
-- ordinal forests [Hornung R.
-  (2020)](https://scholar.google.com/scholar?hl=en&as_sdt=0%2C7&q=10.1007%2Fs00357-018-9302-x&btnG=)
+- ordinal regression via `MASS::polr()`
+- ordinal forests via `ordinalForest::ordfor()` ([Hornung,
+  2020](https://doi.org/10.1007/s00357-018-9302-x))
 
-More will be added.
+More will be added. Under consideration are:
+
+- regularized ordinal regression via `ordinalNet::ordinalNet()` ([Wurm,
+  Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
+- Bayesian ordinal regression via `ordinalbayes::ordinalbayes()` ([Zhang
+  and Archer, 2021](https://doi.org/10.1186%2Fs12859-021-04432-w))
+- ordinal classification trees via `rpartScore::rpartScore()`
+  ([Galimberti, Soffritti, and Di Maso,
+  2012](https://doi.org/10.18637/jss.v047.i10))
 
 There are some existing features in tidymodels packages that are useful
 for ordinal outcomes:
 
-- The “partykit” engines for \[parsnip::decision_tree()\] and
-  \[parsnip:: rand_forest()\] use the ordered nature of the factors to
-  train the model.
-- The yardstick package has \[yardstick::kap()\] for weighted and
+- The [partykit](https://cran.r-project.org/package=partykit) engines
+  for `parsnip::decision_tree()` and `parsnip:: rand_forest()` use the
+  ordered nature of the factors to train the model.
+- The yardstick package has `yardstick::kap()` for weighted and
   unweighted Kappa statistics (the former being of more interest). Also,
-  \[yardstick::classification_cost()\] can utilize more complex cost
+  `yardstick::classification_cost()` can utilize more complex cost
   structures and uses the class probabilities for estimation.
 
 ## Installation
@@ -40,7 +49,16 @@ for ordinal outcomes:
 You can install the development version of ordered like so:
 
 ``` r
-pak::pak("topepo/ordered")
+# install.packages("pak")
+pak::pak("corybrunson/ordered", dependencies = FALSE)
+```
+
+Currently, ordered relies on engine and dial registration in the
+following forks:
+
+``` r
+pak::pak("corybrunson/parsnip@ordered", dependencies = FALSE)
+pak::pak("corybrunson/dials@ordered", dependencies = FALSE)
 ```
 
 ## Example
@@ -51,6 +69,8 @@ the permeability of a molecule:
 ``` r
 library(ordered)
 #> Loading required package: parsnip
+#> Warning: S3 method 'tunable.multinomial_reg' was declared in NAMESPACE but not
+#> found
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -81,7 +101,7 @@ ord_rf_fit <- ord_rf_spec %>% fit(class ~ ., data = caco_train)
 augment(ord_rf_fit, caco_test)
 #> # A tibble: 5 × 8
 #>   .pred_class .pred_L .pred_M .pred_H class mol_weight volume ClogP
-#>   <fct>         <dbl>   <dbl>   <dbl> <ord>      <dbl>  <dbl> <dbl>
+#>   <ord>         <dbl>   <dbl>   <dbl> <ord>      <dbl>  <dbl> <dbl>
 #> 1 M             0.346   0.404  0.250  M           123.   445. 0.799
 #> 2 M             0.362   0.514  0.124  L           290.   856. 0.534
 #> 3 M             0.204   0.786  0.01   M           519.  1576. 1.02 
