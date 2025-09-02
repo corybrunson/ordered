@@ -1,4 +1,4 @@
-# These functions define the ordinal regression models.
+# These functions define the decision tree models.
 # They are executed when this package is loaded via `.onLoad()`
 # and modify the {parsnip} package's model environment.
 
@@ -9,82 +9,80 @@
 # nocov start
 
 # ------------------------------------------------------------------------------
-# `MASS::polr` components
+# `rpartScore::rpartScore` components
 
-make_ordinal_reg_polr <- function() {
+make_decision_tree_rpartScore <- function() {
 
-  parsnip::set_model_engine("ordinal_reg", "classification", "polr")
+  parsnip::set_model_engine("decision_tree", "classification", "rpartScore")
   parsnip::set_dependency(
-    "ordinal_reg",
-    eng = "polr",
-    pkg = "ordered",
+    "decision_tree",
+    eng = "rpartScore",
+    pkg = "rpartScore",
     mode = "classification"
   )
 
   parsnip::set_fit(
-    model = "ordinal_reg",
-    eng = "polr",
+    model = "decision_tree",
+    eng = "rpartScore",
     mode = "classification",
     value = list(
       interface = "formula",
       protect = c("formula", "data", "weights"),
-      func = c(pkg = "MASS", fun = "polr"),
+      func = c(pkg = "rpartScore", fun = "rpartScore"),
       defaults = list(
-        method = "logistic"
+        split = "abs",
+        prune = "mc"
       )
     )
   )
 
   parsnip::set_encoding(
-    model = "ordinal_reg",
-    eng = "polr",
+    model = "decision_tree",
+    eng = "rpartScore",
     mode = "classification",
     options = list(
-      predictor_indicators = "traditional",
-      compute_intercept = TRUE,
-      remove_intercept = TRUE,
+      predictor_indicators = "none",
+      compute_intercept = FALSE,
+      remove_intercept = FALSE,
       allow_sparse_x = FALSE
     )
   )
 
   parsnip::set_pred(
-    model = "ordinal_reg",
-    eng = "polr",
+    model = "decision_tree",
+    eng = "rpartScore",
     mode = "classification",
     type = "class",
     value = list(
       pre = NULL,
       post = NULL,
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "class"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "class"
+      )
     )
   )
 
   parsnip::set_pred(
-    model = "ordinal_reg",
-    eng = "polr",
+    model = "decision_tree",
+    eng = "rpartScore",
     mode = "classification",
     type = "prob",
     value = list(
       pre = NULL,
-      post = function(x, object) {
-        tibble::as_tibble(x)
-      },
+      # TODO: Test nullifying this if `type` is removed below.
+      post = function(x, object) { as_tibble(x) },
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "probs"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        # TODO: Test removing this per {parsnip} specification.
+        type = "prob"
+      )
     )
   )
-
 }
 
 # nocov end

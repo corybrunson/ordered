@@ -17,7 +17,7 @@ ordinal_forest_wrapper <- function(x, y, ...) {
 }
 
 # ------------------------------------------------------------------------------
-# ordinalForest components
+# `ordinalForest::ordfor` components
 
 make_rand_forest_ordinalForest <- function() {
 
