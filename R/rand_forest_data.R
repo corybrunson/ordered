@@ -1,4 +1,4 @@
-#' A wrapper for ordinalForest
+#' A wrapper for `ordinalForest`
 #'
 #' A wrapper is needed since they have a non-standard model interface that
 #' required the data set and the column name (character string) for the
@@ -15,6 +15,16 @@ ordinal_forest_wrapper <- function(x, y, ...) {
                      depvar = ".outcome", data = expr(x), ...)
   rlang::eval_tidy(cl)
 }
+
+# These functions define the random forest models.
+# They are executed when this package is loaded via `.onLoad()`
+# and modify the {parsnip} package's model environment.
+
+# These functions are tested indirectly when the models are used.
+# Since they are added to the parsnip model database on startup execution,
+# they can't be test-executed so are excluded from coverage stats.
+
+# nocov start
 
 # ------------------------------------------------------------------------------
 # `ordinalForest::ordfor` components
