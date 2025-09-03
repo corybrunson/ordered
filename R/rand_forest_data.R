@@ -20,7 +20,7 @@ ordinal_forest_wrapper <- function(x, y, ...) {
 
 # These functions define the random forest models.
 # They are executed when this package is loaded via `.onLoad()`
-# and modify the {parsnip} package's model environment.
+# and modify the parsnip package's model environment.
 
 # These functions are tested indirectly when the models are used.
 # Since they are added to the parsnip model database on startup execution,

@@ -4,7 +4,7 @@
 \alias{rpart_score_wrapper}
 \title{A wrapper for \code{rpartScore}}
 \usage{
-rpart_score_wrapper(formula, data, ...)
+rpart_score_wrapper(formula, data, split_func = "abs", prune_func = "mc", ...)
 }
 \arguments{
 \item{formula}{The formula to pass.}
@@ -14,7 +14,11 @@ rpart_score_wrapper(formula, data, ...)
 \item{...}{Additional arguments to pass.}
 }
 \description{
-A wrapper is used because the model interface requires the response variable
-to be numeric rather than ordered or factor.
+A wrapper is used for two reasons: First, the model interface requires the
+response variable to be numeric rather than ordered or factor; the wrapper
+edits the input \code{data} accordingly. Second, the engine argument \code{split} is
+unclear and possibly overloaded; the wrapper instead uses the more suggestive
+\code{split_func} and, for consistency, handles the other engine argument
+analogously.
 }
 \keyword{internal}
