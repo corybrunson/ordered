@@ -4,16 +4,18 @@
 \name{ordered-package}
 \alias{ordered}
 \alias{ordered-package}
-\title{{ordered}: parsnip Engines for Ordinal Regression Models}
+\title{ordered: parsnip Engines for Ordinal Regression Models}
 \description{
-{ordered} provides engines for ordinal regression models for the {parsnip}
+ordered provides engines for ordinal regression models for the parsnip
 package. The models may have cumulative, sequential, or adjacent-category
 structure, and in future these may be disaggregated into separate model
-types. A vignette will provide thorough illustrations of {ordered}
+types. A vignette will provide thorough illustrations of ordered
 functionality. See below for examples of fitting ordinal regression models
-with {censored}.
+with ordered.
 }
 \examples{
+if (rlang::is_installed("MASS")) {
+
 # Weighted sample
 
 set.seed(561246)
@@ -32,6 +34,8 @@ fit_cpop <- ordinal_reg() |>
   fit(Sat ~ Infl + Type + Cont, data = house_train)
 predict(fit_cpop, house_test, type = "prob")
 
+if (rlang::is_installed("ordinalForest")) {
+
 # Ordinal forest
 
 fit_orf <- rand_forest(mode = "classification") |>
@@ -40,12 +44,15 @@ fit_orf <- rand_forest(mode = "classification") |>
 predict(fit_orf, house_test, type = "prob")
 
 }
+}
+
+}
 \author{
-\strong{Maintainer}: Max Kuhn \email{max@posit.co} (\href{https://orcid.org/0000-0003-2402-136X}{ORCID})
+\strong{Maintainer}: Jason Cory Brunson \email{cornelioid@gmail.com} (\href{https://orcid.org/0000-0003-3126-9494}{ORCID})
 
 Authors:
 \itemize{
-  \item Jason Cory Brunson \email{cornelioid@gmail.com} (\href{https://orcid.org/0000-0003-3126-9494}{ORCID})
+  \item Max Kuhn \email{max@posit.co} (\href{https://orcid.org/0000-0003-2402-136X}{ORCID})
 }
 
 Other contributors:
