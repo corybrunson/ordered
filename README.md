@@ -20,24 +20,28 @@ enable additional classification models for ordinal outcomes (e.g.,
 combinations in the parsnip package that can be used, this package adds:
 
 - ordinal regression via `MASS::polr()`
+- ordinal classification trees via `rpartScore::rpartScore()`
+  ([Galimberti, Soffritti, and Di Maso,
+  2012](https://doi.org/10.18637/jss.v047.i10))
 - ordinal forests via `ordinalForest::ordfor()` ([Hornung,
   2020](https://doi.org/10.1007/s00357-018-9302-x))
 
 More will be added. Under consideration are:
 
-- regularized ordinal regression via `ordinalNet::ordinalNet()` ([Wurm,
-  Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
+- ordinal regression via `VGAM::vglm()` ([Yee,
+  2015](https://doi.org/10.1007%2F978-1-4939-2818-7))
+- ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and
+  Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
 - Bayesian ordinal regression via `ordinalbayes::ordinalbayes()` ([Zhang
   and Archer, 2021](https://doi.org/10.1186%2Fs12859-021-04432-w))
-- ordinal classification trees via `rpartScore::rpartScore()`
-  ([Galimberti, Soffritti, and Di Maso,
-  2012](https://doi.org/10.18637/jss.v047.i10))
+- ordinal regression via `ordinal::clm()` ([Christensen,
+  2023](https://cran.uni-muenster.de/web/packages/ordinal/vignettes/clm_article.pdf))
 
 There are some existing features in tidymodels packages that are useful
 for ordinal outcomes:
 
 - The [partykit](https://cran.r-project.org/package=partykit) engines
-  for `parsnip::decision_tree()` and `parsnip:: rand_forest()` use the
+  for `parsnip::decision_tree()` and `parsnip::rand_forest()` use the
   ordered nature of the factors to train the model.
 - The yardstick package has `yardstick::kap()` for weighted and
   unweighted Kappa statistics (the former being of more interest). Also,

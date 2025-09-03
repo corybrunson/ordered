@@ -30,14 +30,14 @@ knitr::opts_chunk$set(
 
 More will be added. Under consideration are:
 
- - ordinal regression via `ordinal::clm()` ([GitHub](https://github.com/runehaubo/ordinal))
- - ordinal regression via `VGAM::vglm()` ([website](https://www.stat.auckland.ac.nz/~yee/VGAM/))
- - regularized ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
+ - ordinal regression via `VGAM::vglm()` ([Yee, 2015](https://doi.org/10.1007%2F978-1-4939-2818-7))
+ - ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
  - Bayesian ordinal regression via `ordinalbayes::ordinalbayes()` ([Zhang and Archer, 2021](https://doi.org/10.1186%2Fs12859-021-04432-w))
+ - ordinal regression via `ordinal::clm()` ([Christensen, 2023](https://cran.uni-muenster.de/web/packages/ordinal/vignettes/clm_article.pdf))
 
 There are some existing features in tidymodels packages that are useful for ordinal outcomes: 
 
- - The [partykit](https://cran.r-project.org/package=partykit) engines for `parsnip::decision_tree()` and `parsnip:: rand_forest()` use the ordered nature of the factors to train the model. 
+ - The [partykit](https://cran.r-project.org/package=partykit) engines for `parsnip::decision_tree()` and `parsnip::rand_forest()` use the ordered nature of the factors to train the model. 
  - The yardstick package has `yardstick::kap()` for weighted and unweighted Kappa statistics (the former being of more interest). Also, `yardstick::classification_cost()` can utilize more complex cost structures and uses the class probabilities for estimation. 
 
 ## Installation
