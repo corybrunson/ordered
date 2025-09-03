@@ -29,6 +29,8 @@ knitr::opts_chunk$set(
 
 More will be added. Under consideration are:
 
+ - ordinal regression via `ordinal::clm()` ([GitHub](https://github.com/runehaubo/ordinal))
+ - ordinal regression via `VGAM::vglm()` ([website](https://www.stat.auckland.ac.nz/~yee/VGAM/))
  - ordinal classification trees via `rpartScore::rpartScore()` ([Galimberti, Soffritti, and Di Maso, 2012](https://doi.org/10.18637/jss.v047.i10))
  - regularized ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
  - Bayesian ordinal regression via `ordinalbayes::ordinalbayes()` ([Zhang and Archer, 2021](https://doi.org/10.1186%2Fs12859-021-04432-w))
