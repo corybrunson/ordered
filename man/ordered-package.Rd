@@ -4,14 +4,14 @@
 \name{ordered-package}
 \alias{ordered}
 \alias{ordered-package}
-\title{{ordered}: parsnip Engines for Ordinal Regression Models}
+\title{ordered: parsnip Engines for Ordinal Regression Models}
 \description{
-{ordered} provides engines for ordinal regression models for the {parsnip}
+ordered provides engines for ordinal regression models for the parsnip
 package. The models may have cumulative, sequential, or adjacent-category
 structure, and in future these may be disaggregated into separate model
-types. A vignette will provide thorough illustrations of {ordered}
+types. A vignette will provide thorough illustrations of ordered
 functionality. See below for examples of fitting ordinal regression models
-with {ordered}.
+with ordered.
 }
 \examples{
 if (rlang::is_installed("MASS")) {

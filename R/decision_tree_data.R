@@ -91,7 +91,9 @@ make_decision_tree_rpartScore <- function() {
     type = "class",
     value = list(
       pre = NULL,
-      post = function(x, object) as_tibble(ordered(object$lvl[x], object$lvl)),
+      post = function(x, object) {
+        tibble::as_tibble(ordered(object$lvl[x], object$lvl))
+      },
       func = c(fun = "predict"),
       args = list(
         object = quote(object$fit),

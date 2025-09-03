@@ -134,7 +134,7 @@ make_rand_forest_ordinalForest <- function() {
       post = function(x, object) {
         x <- x$classprobs
         colnames(x) <- object$lvl
-        dplyr::as_tibble(x)
+        tibble::as_tibble(x)
       },
       func = c(fun = "predict"),
       args =
