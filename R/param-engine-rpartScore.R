@@ -9,6 +9,9 @@
 #' @details `split_func` and `prune_func` are aliases for `split` and `prune`,
 #'   respectively. See `?rpartScore::rpartScore` for how those parameters are
 #'   used.
+#'
+#'   These parameters are engine-specific, not general to decision tree models,
+#'   so are provided here rather than in `dials`.
 #' @examples
 #' split_func()
 #' prune_func()

@@ -22,6 +22,9 @@ specified using \code{set_engine("rpartScore", ...)}.
 \code{split_func} and \code{prune_func} are aliases for \code{split} and \code{prune},
 respectively. See \code{?rpartScore::rpartScore} for how those parameters are
 used.
+
+These parameters are engine-specific, not general to decision tree models,
+so are provided here rather than in \code{dials}.
 }
 \examples{
 split_func()
