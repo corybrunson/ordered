@@ -11,8 +11,10 @@
 ordinal_forest_wrapper <- function(x, y, ...) {
   rlang::check_installed("ordinalForest")
   x$.outcome <- y
-  cl <- rlang::call2(.fn = "ordfor", .ns = "ordinalForest",
-                     depvar = ".outcome", data = expr(x), ...)
+  cl <- rlang::call2(
+    .fn = "ordfor", .ns = "ordinalForest",
+    depvar = ".outcome", data = expr(x), ...
+  )
   rlang::eval_tidy(cl)
 }
 

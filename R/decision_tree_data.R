@@ -3,16 +3,18 @@
 #' A wrapper is used because the model interface requires the response variable
 #' to be numeric rather than ordered or factor.
 #' @param formula The formula to pass.
-#' @param x The data frame to pass.
+#' @param data The data frame to pass.
 #' @param ... Additional arguments to pass.
 #' @export
 #' @keywords internal
-rpart_score_wrapper <- function(formula, x, ...) {
+rpart_score_wrapper <- function(formula, data, ...) {
   rlang::check_installed("rpartScore")
   lhs <- rlang::f_lhs(formula)
-  x[[lhs]] <- as.integer(x[[lhs]])
-  cl <- rlang::call2(.fn = "rpartScore", .ns = "rpartScore",
-                     formula = expr(formula), data = expr(x), ...)
+  data[[lhs]] <- as.integer(data[[lhs]])
+  cl <- rlang::call2(
+    .fn = "rpartScore", .ns = "rpartScore",
+    formula = expr(formula), data = expr(data), ...
+  )
   rlang::eval_tidy(cl)
 }
 
@@ -62,8 +64,7 @@ make_decision_tree_rpartScore <- function() {
     mode = "classification",
     value = list(
       interface = "formula",
-      data = c(formula = "formula", data = "x"),
-      protect = c("formula", "x", "weights"),
+      protect = c("formula", "data", "weights"),
       # func = c(pkg = "rpartScore", fun = "rpartScore"),
       func = c(pkg = "ordered", fun = "rpart_score_wrapper"),
       defaults = list()
