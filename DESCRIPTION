@@ -1,29 +1,37 @@
 Package: ordered
-Title: Wrappers for Ordinal Classification Models
+Title: 'parsnip' Engines and Wrappers for Ordinal Classification Models
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Max", "Kuhn", , "max@posit.co", role = c("aut", "cre"),
+    person("Max", "Kuhn", , "max@posit.co", role = "aut",
            comment = c(ORCID = "0000-0003-2402-136X")),
+    person("Jason Cory", "Brunson", , "cornelioid@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-3126-9494")),
     person("Posit Software PBC", role = "cph")
   )
 Description: Bindings for ordinal classification models for use with the
-    'parsnip' package, such as ordinal random forests by Hornung R. (2020) 
-    <doi:10.1007/s00357-018-9302-x> and others.
+    'parsnip' package, such as the proportional odds logistic regression
+    implemented in 'MASS' and the ordinal random forests of Hornung (2020)
+    <doi:10.1007/s00357-018-9302-x>.
 License: MIT + file LICENSE
 Depends: 
-    parsnip (>= 1.2.1.9003)
+    parsnip (>= 1.3.2.9001)
 Imports: 
     cli,
     dplyr,
     purrr,
-    rlang (>= 1.1.4)
+    rlang (>= 1.1.4),
+    tibble
 Suggests: 
+    MASS,
+    rpartScore,
     ordinalForest,
     QSARdata,
+    spelling,
     testthat (>= 3.0.0)
 Remotes: 
-    tidymodels/parsnip#1217
+    tidymodels/parsnip
 Config/testthat/edition: 3
 Encoding: UTF-8
+Language: en-US
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

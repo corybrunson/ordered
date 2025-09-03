@@ -5,8 +5,9 @@
 # been loaded.
 
 .onLoad <- function(libname, pkgname) {
+  make_ordinal_reg_polr()
+  make_decision_tree_rpartScore()
   make_rand_forest_ordinalForest()
 }
 
 # nocov end
-

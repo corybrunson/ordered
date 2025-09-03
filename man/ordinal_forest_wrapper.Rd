@@ -2,7 +2,7 @@
 % Please edit documentation in R/rand_forest_data.R
 \name{ordinal_forest_wrapper}
 \alias{ordinal_forest_wrapper}
-\title{A wrapper for ordinalForest}
+\title{A wrapper for \code{ordinalForest}}
 \usage{
 ordinal_forest_wrapper(x, y, ...)
 }
