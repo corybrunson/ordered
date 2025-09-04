@@ -22,6 +22,7 @@ Imports:
     tibble
 Suggests: 
     MASS,
+    ordinalNet,
     rpartScore,
     ordinalForest,
     QSARdata,
