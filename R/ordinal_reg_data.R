@@ -21,6 +21,15 @@ make_ordinal_reg_polr <- function() {
     mode = "classification"
   )
 
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "polr",
+    parsnip = "ordinal_link",
+    original = "method",
+    func = list(pkg = "dials", fun = "ordinal_link"),
+    has_submodel = FALSE
+  )
+
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "polr",
@@ -29,9 +38,7 @@ make_ordinal_reg_polr <- function() {
       interface = "formula",
       protect = c("formula", "data", "weights"),
       func = c(pkg = "MASS", fun = "polr"),
-      defaults = list(
-        method = "logistic"
-      )
+      defaults = list()
     )
   )
 
