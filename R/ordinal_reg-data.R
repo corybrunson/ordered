@@ -1,3 +1,64 @@
+#' A wrapper for `ordinalNet`
+#'
+#' This wrapper converts the `family` options of [ordinalNet::ordinalNet()] to
+#' the standardized `odds_link` options encoded in [dials::values_odds_link].
+#' @param formula The formula to pass.
+#' @param data The data frame to pass.
+#' @param ... Additional arguments to pass.
+#' @export
+#' @keywords internal
+ordinal_net_wrapper <- function(
+    x, y,
+    # QUESTION: Is this the preferred way to handle differences in parameter
+    # names? See the commented alternative in `parsnip::translate.ordinal_reg`.
+    # This solution `translate()`s to `ordered::ordinal_net_wrapper(...)`, which
+    # is certainly disfavored against `ordinalNet::ordinalNet(...)`.
+    # TODO: Test whether defaults can be omitted.
+    family = "cumulative_logits", link = "logistic",
+    ...
+) {
+  rlang::check_installed("ordinalNet")
+  family <- match.arg(
+    family,
+    c(
+      "cumulative_logits",
+      "adjacent_categories",
+      "continuation_ratio",
+      "stopping_ratio"
+    )
+  )
+  family <- switch(
+    family,
+    cumulative_logits = "cumulative",
+    adjacent_categories = "acat",
+    continuation_ratio = "cratio",
+    stopping_ratio = "sratio"
+  )
+  # QUESTION: There must be a better way to do this. In particular, can this be
+  # robust to upgrades in {ordinalNet}? How can errors and duplication be
+  # prevented in tuning routines?
+  link <- match.arg(
+    link,
+    c("logistic", "probit", "loglog", "cloglog", "cauchit")
+  )
+  if (link == "logistic") link <- "logit"
+  if (link == "loglog") {
+    cli::cli_abort(
+      c(
+        "The `ordinalNet` engine does not provide a log-log ordinal link.",
+        "i" = "See `?ordinalNet::ordinalNet` for provided link functions."
+      )
+    )
+  }
+  cl <- rlang::call2(
+    .fn = "ordinalNet", .ns = "ordinalNet",
+    x = expr(x), y = expr(y),
+    family = expr(family),
+    ...
+  )
+  rlang::eval_tidy(cl)
+}
+
 # These functions define the ordinal regression models.
 # They are executed when this package is loaded via `.onLoad()`
 # and modify the parsnip package's model environment.
@@ -123,14 +184,13 @@ make_ordinal_reg_ordinalNet <- function() {
     func = list(pkg = "dials", fun = "mixture"),
     has_submodel = FALSE
   )
-  # TODO: Translate between parsnip (standardized) and original values of these
-  # parameters and ensure that engine limitations are handled correctly.
+  # TODO: Ensure that engine features and limitations are handled correctly.
   # FIXME: (Pre-emptive tag for an expected error.)
   parsnip::set_model_arg(
     model = "ordinal_reg",
     eng = "ordinalNet",
     parsnip = "ordinal_link",
-    original = "family",
+    original = "link",
     func = list(pkg = "dials", fun = "ordinal_link"),
     has_submodel = FALSE
   )
@@ -138,7 +198,7 @@ make_ordinal_reg_ordinalNet <- function() {
     model = "ordinal_reg",
     eng = "ordinalNet",
     parsnip = "odds_link",
-    original = "link",
+    original = "family",
     func = list(pkg = "dials", fun = "odds_link"),
     has_submodel = FALSE
   )
@@ -151,11 +211,9 @@ make_ordinal_reg_ordinalNet <- function() {
     value = list(
       interface = "matrix",
       protect = c("x", "y"),
-      func = c(pkg = "ordinalNet", fun = "ordinalNet"),
-      defaults = list(
-        ordinal_link = "logit",
-        odds_link = "cumulative_logit"
-      )
+      # func = c(pkg = "ordinalNet", fun = "ordinalNet"),
+      func = c(pkg = "ordered", fun = "ordinal_net_wrapper"),
+      defaults = list()
     )
   )
 
@@ -164,7 +222,7 @@ make_ordinal_reg_ordinalNet <- function() {
     eng = "ordinalNet",
     mode = "classification",
     options = list(
-      predictor_indicators = "traditional",
+      predictor_indicators = "one_hot",
       # REVIEW
       compute_intercept = TRUE,
       # REVIEW
@@ -180,7 +238,9 @@ make_ordinal_reg_ordinalNet <- function() {
     type = "class",
     value = list(
       pre = NULL,
-      post = NULL,
+      post = function(x, object) {
+        ordered(object$lvl[x], object$lvl)
+      },
       func = c(fun = "predict"),
       args =
         list(
@@ -198,7 +258,11 @@ make_ordinal_reg_ordinalNet <- function() {
     type = "prob",
     value = list(
       pre = NULL,
-      post = NULL,
+      post = function(x, object) {
+        x <- tibble::as_tibble(x)
+        x <- set_names(x, paste0(".pred_", object$lvl))
+        x
+      },
       func = c(fun = "predict"),
       args =
         list(
