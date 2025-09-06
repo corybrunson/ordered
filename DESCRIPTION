@@ -17,11 +17,12 @@ Depends:
     parsnip (>= 1.3.2.9001)
 Imports: 
     cli,
-    dplyr,
+    dials,
     purrr,
     rlang (>= 1.1.4),
     tibble
 Suggests: 
+    dplyr,
     MASS,
     rpartScore,
     ordinalForest,

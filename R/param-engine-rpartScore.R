@@ -19,7 +19,7 @@
 #' @export
 #' @rdname rpartScore_parameters
 split_func <- function(values = c("abs", "quad")) {
-  new_qual_param(
+  dials::new_qual_param(
     type = "character",
     values = values,
     label = c(split_func = "Splitting Function"),
@@ -30,7 +30,7 @@ split_func <- function(values = c("abs", "quad")) {
 #' @export
 #' @rdname rpartScore_parameters
 prune_func <- function(values = c("mr", "mc")) {
-  new_qual_param(
+  dials::new_qual_param(
     type = "character",
     values = values,
     label = c(prune_func = "Pruning Function"),

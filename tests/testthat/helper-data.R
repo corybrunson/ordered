@@ -2,7 +2,7 @@
 
 if (rlang::is_installed("QSARdata")) {
   library(dplyr)
-  data(caco, package = "QSARdata")
+  data(caco, package = "QSARdata", envir = rlang::current_env())
 
   set.seed(1)
   caco_dat <-

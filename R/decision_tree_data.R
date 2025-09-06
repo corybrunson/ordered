@@ -51,23 +51,23 @@ make_decision_tree_rpartScore <- function() {
     mode = "classification"
   )
 
-  # # NOTE: Adopting `*_func` as a naming convention for named function options.
-  # parsnip::set_model_arg(
-  #   model = "decision_tree",
-  #   eng = "rpartScore",
-  #   parsnip = "split_func",
-  #   original = "split",
-  #   func = list(pkg = "dials", fun = "split_func"),
-  #   has_submodel = FALSE
-  # )
-  # parsnip::set_model_arg(
-  #   model = "decision_tree",
-  #   eng = "rpartScore",
-  #   parsnip = "prune_func",
-  #   original = "prune",
-  #   func = list(pkg = "dials", fun = "prune_func"),
-  #   has_submodel = FALSE
-  # )
+  # NOTE: Adopting `*_func` as a naming convention for named function options.
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "split_func",
+    original = "split",
+    func = list(pkg = "ordered", fun = "split_func"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "prune_func",
+    original = "prune",
+    func = list(pkg = "ordered", fun = "prune_func"),
+    has_submodel = FALSE
+  )
 
   parsnip::set_fit(
     model = "decision_tree",
