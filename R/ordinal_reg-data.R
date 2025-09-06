@@ -9,7 +9,7 @@
 #' @keywords internal
 ordinal_net_wrapper <- function(
     x, y,
-    # QUESTION: Is this the preferred way to handle differences in parameter
+    # REVIEW: Is this the preferred way to handle differences in parameter
     # names? See the commented alternative in `parsnip::translate.ordinal_reg`.
     # This solution `translate()`s to `ordered::ordinal_net_wrapper(...)`, which
     # is certainly disfavored against `ordinalNet::ordinalNet(...)`.
@@ -34,7 +34,7 @@ ordinal_net_wrapper <- function(
     continuation_ratio = "cratio",
     stopping_ratio = "sratio"
   )
-  # QUESTION: There must be a better way to do this. In particular, can this be
+  # REVIEW: There must be a better way to do this. In particular, can this be
   # robust to upgrades in {ordinalNet}? How can errors and duplication be
   # prevented in tuning routines?
   link <- match.arg(

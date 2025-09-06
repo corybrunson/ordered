@@ -7,7 +7,7 @@ test_that("ordinal_link", {
 
   # a legitimate ordinal link function not recognized by `polr()`
   tidy_spec <- ordinal_reg(engine = "polr", ordinal_link = "Aranda-Ordaz")
-  # QUESTION: Should this be a parsnip-level error message?
+  # REVIEW: Should this be a parsnip-level error message?
   expect_error(fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub))
 })
 
