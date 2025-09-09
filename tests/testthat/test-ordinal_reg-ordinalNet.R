@@ -133,7 +133,7 @@ test_that("case weights", {
   house_resp <- house_nums[, 4:6]
   house_resp <- as.matrix(house_resp)
   house_resp[is.na(house_resp)] <- 0L
-  dimnames(house_resp) <- NULL
+  rownames(house_resp) <- NULL
 
   set.seed(seed)
   orig_fit <- ordinalNet::ordinalNet(

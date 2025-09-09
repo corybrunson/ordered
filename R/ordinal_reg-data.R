@@ -18,6 +18,7 @@ ordinal_net_wrapper <- function(
     ...
 ) {
   rlang::check_installed("ordinalNet")
+
   # match and convert odds link options
   family <- match.arg(
     family,
@@ -51,11 +52,12 @@ ordinal_net_wrapper <- function(
       )
     )
   }
-  # restructure based on weights
+  # restructure based on weights (requires `y` to be a factor)
   if (! is.null(weights)) {
-    y_uniq <- sort(unique(y))
-    y <- lapply(y_uniq, function(u) (y == u) * weights)
+    y_levs <- levels(y)
+    y <- lapply(y_levs, function(u) (y == u) * weights)
     y <- do.call(cbind, y)
+    colnames(y) <- y_levs
   }
   # execute call on modified inputs
   cl <- rlang::call2(
@@ -209,7 +211,6 @@ make_ordinal_reg_ordinalNet <- function() {
     has_submodel = FALSE
   )
 
-  # TODO: Work around `ordinalNet`'s handling of weights.
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "ordinalNet",
