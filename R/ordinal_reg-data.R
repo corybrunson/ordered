@@ -192,8 +192,6 @@ make_ordinal_reg_ordinalNet <- function() {
     func = list(pkg = "dials", fun = "mixture"),
     has_submodel = FALSE
   )
-  # TODO: Ensure that engine features and limitations are handled correctly.
-  # FIXME: (Pre-emptive tag for an expected error.)
   parsnip::set_model_arg(
     model = "ordinal_reg",
     eng = "ordinalNet",
