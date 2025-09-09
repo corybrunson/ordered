@@ -2,13 +2,13 @@
 #'
 #' This wrapper converts the `family` options of [ordinalNet::ordinalNet()] to
 #' the standardized `odds_link` options encoded in [dials::values_odds_link].
-#' @param formula The formula to pass.
-#' @param data The data frame to pass.
+#' @param x The predictor data.
+#' @param y The outcome vector.
 #' @param ... Additional arguments to pass.
 #' @export
 #' @keywords internal
 ordinal_net_wrapper <- function(
-    x, y,
+    x, y, weights = NULL,
     # REVIEW: Is this the preferred way to handle differences in parameter
     # names? See the commented alternative in `parsnip::translate.ordinal_reg`.
     # This solution `translate()`s to `ordered::ordinal_net_wrapper(...)`, which
@@ -18,6 +18,7 @@ ordinal_net_wrapper <- function(
     ...
 ) {
   rlang::check_installed("ordinalNet")
+  # match and convert odds link options
   family <- match.arg(
     family,
     c(
@@ -34,7 +35,7 @@ ordinal_net_wrapper <- function(
     continuation_ratio = "cratio",
     stopping_ratio = "sratio"
   )
-  # REVIEW: There must be a better way to do this. In particular, can this be
+  # REVIEW: There may be a standard way to do this. In particular, can this be
   # robust to upgrades in {ordinalNet}? How can errors and duplication be
   # prevented in tuning routines?
   link <- match.arg(
@@ -50,10 +51,17 @@ ordinal_net_wrapper <- function(
       )
     )
   }
+  # restructure based on weights
+  if (! is.null(weights)) {
+    y_uniq <- sort(unique(y))
+    y <- lapply(y_uniq, function(u) (y == u) * weights)
+    y <- do.call(cbind, y)
+  }
+  # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "ordinalNet", .ns = "ordinalNet",
     x = expr(x), y = expr(y),
-    family = expr(family),
+    family = expr(family), link = expr(link),
     ...
   )
   rlang::eval_tidy(cl)
@@ -210,7 +218,7 @@ make_ordinal_reg_ordinalNet <- function() {
     mode = "classification",
     value = list(
       interface = "matrix",
-      protect = c("x", "y"),
+      protect = c("x", "y", "weights"),
       # func = c(pkg = "ordinalNet", fun = "ordinalNet"),
       func = c(pkg = "ordered", fun = "ordinal_net_wrapper"),
       defaults = list()

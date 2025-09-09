@@ -17,8 +17,10 @@ rpart_score_wrapper <- function(
     ...
 ) {
   rlang::check_installed("rpartScore")
+  # convert response variable in `data` from ordinal to integer
   lhs <- rlang::f_lhs(formula)
   data[[lhs]] <- as.integer(data[[lhs]])
+  # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "rpartScore", .ns = "rpartScore",
     formula = expr(formula), data = expr(data),
