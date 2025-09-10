@@ -41,6 +41,7 @@ make_rand_forest_ordinalForest <- function() {
     mode = "classification"
   )
 
+  # dials provided in {dials}
   parsnip::set_model_arg(
     model = "rand_forest",
     eng = "ordinalForest",
@@ -63,6 +64,55 @@ make_rand_forest_ordinalForest <- function() {
     parsnip = "min_n",
     original = "min.node.size",
     func = list(pkg = "dials", fun = "min_n"),
+    has_submodel = FALSE
+  )
+  # dials provided in {ordered}
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "naive_scores",
+    original = "naive",
+    func = list(pkg = "ordered", fun = "naive_scores"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "num_scores",
+    original = "nsets",
+    func = list(pkg = "ordered", fun = "num_scores"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "num_scores_perm",
+    original = "npermtrial",
+    func = list(pkg = "ordered", fun = "num_scores_perm"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "num_scores_trees",
+    original = "ntreeperdiv",
+    func = list(pkg = "ordered", fun = "num_scores_trees"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "num_scores_best",
+    original = "nbest",
+    func = list(pkg = "ordered", fun = "num_scores_best"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "ord_metric",
+    original = "perffunction",
+    func = list(pkg = "ordered", fun = "ord_metric"),
     has_submodel = FALSE
   )
 
