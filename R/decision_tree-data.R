@@ -44,7 +44,31 @@ make_decision_tree_rpartScore <- function() {
     mode = "classification"
   )
 
-  # NOTE: Adopting `*_func` as a naming convention for named function options.
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "tree_depth",
+    original = "maxdepth",
+    func = list(pkg = "dials", fun = "tree_depth"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "min_n",
+    original = "minsplit",
+    func = list(pkg = "dials", fun = "min_n"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "cost_complexity",
+    original = "cp",
+    func = list(pkg = "dials", fun = "cost_complexity"),
+    has_submodel = FALSE
+  )
+  # REVIEW: Adopting `*_func` as a naming convention for named function options.
   parsnip::set_model_arg(
     model = "decision_tree",
     eng = "rpartScore",
