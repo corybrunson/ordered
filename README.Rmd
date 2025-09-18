@@ -25,13 +25,13 @@ knitr::opts_chunk$set(
 `ordered` is a [parsnip](https://parsnip.tidymodels.org/) extension to enable additional classification models for ordinal outcomes (e.g., "low", "medium", "high"). While there are several model/engine combinations in the parsnip package that can be used, this package adds:
 
  - cumulative link (cumulative logit) ordinal regression via `MASS::polr()`
+ - ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
  - ordinal classification trees via `rpartScore::rpartScore()` ([Galimberti, Soffritti, and Di Maso, 2012](https://doi.org/10.18637/jss.v047.i10))
  - latent variable ordinal forests via `ordinalForest::ordfor()` ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
 
 More will be added. Under consideration are:
 
  - cumulative link, adjacent categories, continuation ratio, and stopping ratio, ordinal regression via `VGAM::cumulative()`, `VGAM::acat()`, `VGAM::cratio()`, and `VGAM::sratio()` ([Yee, 2015](https://doi.org/10.1007%2F978-1-4939-2818-7))
- - ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
  - regularized cumulative probability (cumulative logit) ordinal regression via `rms::lrm()` and `rms::orm()` ([Harrell, 2015](https://doi.org/10.1007/978-3-319-19425-7))
  - continuation ratio (stopping ratio) ordinal regression using elastic net regularization via `glmnetcr::glmnetcr()` and using regularization path computation via `glmpathcr::glmpathcr()` ([Archer and Williams, 2012](https://doi.org/10.1002/sim.4484))
  - generalized monotone incremental forward stagewise regularized ordinal regression via `ordinalgmifs::ordinalgmifs()` ([Archer, Hou, Zhou, Ferber, Layne, and Gentry, 2014](https://doi.org/10.4137/CIN.S20806); [Gentry, Jackson-Cook, Lyon, and Archer, 2015](https://doi.org/10.4137/CIN.S17277))
@@ -64,8 +64,8 @@ pak::pak("corybrunson/dials@ordered", dependencies = FALSE)
 Here is a simple example using computational chemistry data to predict the permeability of a molecule: 
 
 ```{r}
-library(ordered)
 library(dplyr)
+library(ordered)
 
 data(caco, package = "QSARdata")
 
@@ -78,7 +78,8 @@ caco_dat <-
   caco_test  <- caco_dat[ (1:5), ]
 
 ord_rf_spec <- 
-  rand_forest(mtry = 2, trees = 100) %>% # you should really use many more trees
+  # you should really use many more trees and score sets
+  rand_forest(mtry = 2, trees = 100, num_scores = 100) %>%
   set_mode("classification") %>%
   set_engine("ordinalForest")
 

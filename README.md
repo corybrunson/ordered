@@ -19,22 +19,38 @@ enable additional classification models for ordinal outcomes (e.g.,
 “low”, “medium”, “high”). While there are several model/engine
 combinations in the parsnip package that can be used, this package adds:
 
-- ordinal regression via `MASS::polr()`
+- cumulative link (cumulative logit) ordinal regression via
+  `MASS::polr()`
+- ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and
+  Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
 - ordinal classification trees via `rpartScore::rpartScore()`
   ([Galimberti, Soffritti, and Di Maso,
   2012](https://doi.org/10.18637/jss.v047.i10))
-- ordinal forests via `ordinalForest::ordfor()` ([Hornung,
-  2020](https://doi.org/10.1007/s00357-018-9302-x))
+- latent variable ordinal forests via `ordinalForest::ordfor()`
+  ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
 
 More will be added. Under consideration are:
 
-- ordinal regression via `VGAM::vglm()` ([Yee,
+- cumulative link, adjacent categories, continuation ratio, and stopping
+  ratio, ordinal regression via `VGAM::cumulative()`, `VGAM::acat()`,
+  `VGAM::cratio()`, and `VGAM::sratio()` ([Yee,
   2015](https://doi.org/10.1007%2F978-1-4939-2818-7))
-- ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and
-  Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
-- Bayesian ordinal regression via `ordinalbayes::ordinalbayes()` ([Zhang
-  and Archer, 2021](https://doi.org/10.1186%2Fs12859-021-04432-w))
-- ordinal regression via `ordinal::clm()` ([Christensen,
+- regularized cumulative probability (cumulative logit) ordinal
+  regression via `rms::lrm()` and `rms::orm()` ([Harrell,
+  2015](https://doi.org/10.1007/978-3-319-19425-7))
+- continuation ratio (stopping ratio) ordinal regression using elastic
+  net regularization via `glmnetcr::glmnetcr()` and using regularization
+  path computation via `glmpathcr::glmpathcr()` ([Archer and Williams,
+  2012](https://doi.org/10.1002/sim.4484))
+- generalized monotone incremental forward stagewise regularized ordinal
+  regression via `ordinalgmifs::ordinalgmifs()` ([Archer, Hou, Zhou,
+  Ferber, Layne, and Gentry, 2014](https://doi.org/10.4137/CIN.S20806);
+  [Gentry, Jackson-Cook, Lyon, and Archer,
+  2015](https://doi.org/10.4137/CIN.S17277))
+- Bayesian LASSO ordinal regression via `ordinalbayes::ordinalbayes()`
+  ([Zhang and Archer,
+  2021](https://doi.org/10.1186%2Fs12859-021-04432-w))
+- cumulative link ordinal regression via `ordinal::clm()` ([Christensen,
   2023](https://cran.uni-muenster.de/web/packages/ordinal/vignettes/clm_article.pdf))
 
 There are some existing features in tidymodels packages that are useful
@@ -71,10 +87,6 @@ Here is a simple example using computational chemistry data to predict
 the permeability of a molecule:
 
 ``` r
-library(ordered)
-#> Loading required package: parsnip
-#> Warning: S3 method 'tunable.multinomial_reg' was declared in NAMESPACE but not
-#> found
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -84,6 +96,8 @@ library(dplyr)
 #> The following objects are masked from 'package:base':
 #> 
 #>     intersect, setdiff, setequal, union
+library(ordered)
+#> Loading required package: parsnip
 
 data(caco, package = "QSARdata")
 
@@ -96,7 +110,8 @@ caco_dat <-
   caco_test  <- caco_dat[ (1:5), ]
 
 ord_rf_spec <- 
-  rand_forest(mtry = 2, trees = 100) %>% # you should really use many more trees
+  # you should really use many more trees and score sets
+  rand_forest(mtry = 2, trees = 100, num_scores = 100) %>%
   set_mode("classification") %>%
   set_engine("ordinalForest")
 
@@ -106,11 +121,11 @@ augment(ord_rf_fit, caco_test)
 #> # A tibble: 5 × 8
 #>   .pred_class .pred_L .pred_M .pred_H class mol_weight volume ClogP
 #>   <ord>         <dbl>   <dbl>   <dbl> <ord>      <dbl>  <dbl> <dbl>
-#> 1 M             0.346   0.404  0.250  M           123.   445. 0.799
-#> 2 M             0.362   0.514  0.124  L           290.   856. 0.534
-#> 3 M             0.204   0.786  0.01   M           519.  1576. 1.02 
-#> 4 M             0.190   0.788  0.0221 M           533.  1606. 1.58 
-#> 5 M             0.177   0.780  0.0435 M           505.  1517. 1.71
+#> 1 M             0.267   0.420 0.313   M           123.   445. 0.799
+#> 2 M             0.325   0.453 0.222   L           290.   856. 0.534
+#> 3 M             0.157   0.841 0.00111 M           519.  1576. 1.02 
+#> 4 M             0.127   0.838 0.0353  M           533.  1606. 1.58 
+#> 5 M             0.224   0.695 0.0814  M           505.  1517. 1.71
 ```
 
 ## Code of Conduct
