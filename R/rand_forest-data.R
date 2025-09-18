@@ -88,17 +88,17 @@ make_rand_forest_ordinalForest <- function() {
   parsnip::set_model_arg(
     model = "rand_forest",
     eng = "ordinalForest",
-    parsnip = "num_scores_perm",
+    parsnip = "num_score_perms",
     original = "npermtrial",
-    func = list(pkg = "ordered", fun = "num_scores_perm"),
+    func = list(pkg = "ordered", fun = "num_score_perms"),
     has_submodel = FALSE
   )
   parsnip::set_model_arg(
     model = "rand_forest",
     eng = "ordinalForest",
-    parsnip = "num_scores_trees",
+    parsnip = "num_score_trees",
     original = "ntreeperdiv",
-    func = list(pkg = "ordered", fun = "num_scores_trees"),
+    func = list(pkg = "ordered", fun = "num_score_trees"),
     has_submodel = FALSE
   )
   parsnip::set_model_arg(

@@ -5,8 +5,8 @@
 \alias{ordinalForest_parameters}
 \alias{naive_scores}
 \alias{num_scores}
-\alias{num_scores_perm}
-\alias{num_scores_trees}
+\alias{num_score_perms}
+\alias{num_score_trees}
 \alias{num_scores_best}
 \alias{ord_metric}
 \alias{values_ord_metric}
@@ -19,9 +19,9 @@ naive_scores(values = c(FALSE, TRUE))
 
 num_scores(range = c(100L, 2000L), trans = NULL)
 
-num_scores_perm(range = c(100L, 500L), trans = NULL)
+num_score_perms(range = c(100L, 500L), trans = NULL)
 
-num_scores_trees(range = c(10L, 200L), trans = NULL)
+num_score_trees(range = c(10L, 200L), trans = NULL)
 
 num_scores_best(range = c(2L, 20L), trans = NULL)
 
@@ -30,19 +30,29 @@ ord_metric(values = values_ord_metric)
 values_ord_metric
 }
 \arguments{
-\item{values}{A character string of possible values. These functions generate
-parameters for \code{\link[parsnip:rand_forest]{parsnip::rand_forest()}} models using the \code{"ordinalForest"}
-engine.
+\item{values}{A character string of possible values. See \code{values_ord_metric}.}
+
+\item{range}{A two-element vector holding the \emph{defaults} for the smallest and
+largest possible values, respectively. If a transformation is specified,
+these values should be in the \emph{transformed units}.}
+
+\item{trans}{A \code{trans} object from the \code{scales} package, such as
+\code{scales::transform_log10()} or \code{scales::transform_reciprocal()}. If not
+provided, the default is used which matches the units used in \code{range}. If
+no transformation, \code{NULL}.
+
+These functions generate parameters for \code{\link[parsnip:rand_forest]{parsnip::rand_forest()}} models
+using the \code{"ordinalForest"} engine.
 \itemize{
 \item \code{naive_scores()}: Whether to construct only a "naive" ordinal forest using
 the scores \eqn{1,2,3,\ldots} for the ordinal values. (See the \code{naive}
 argument at \code{?ordinalForest::ordfor()}.)
 \item \code{num_scores()}: The number of score sets tried prior to optimization. (See
 the \code{nsets} argument at \code{?ordinalForest::ordfor()}.)
-\item \code{num_scores_perm()}: The number of permutations of the class width ordering
+\item \code{num_score_perms()}: The number of permutations of the class width ordering
 to try for each score set tried (after the first). (See the \code{npermtrial}
 argument at \code{?ordinalForest::ordfor()}.)
-\item \code{num_scores_trees()}: The number of trees in the score set--specific
+\item \code{num_score_trees()}: The number of trees in the score set--specific
 forests. (See the \code{ntreeperdiv} argument at \code{?ordinalForest::ordfor()}.)
 \item \code{num_scores_best()}: The number of top-performing score sets used to
 calculate the optimized score set. (See the \code{nbest} argument at
@@ -63,8 +73,8 @@ specified using \code{set_engine("ordinalForest", ...)}.
 \examples{
 naive_scores()
 num_scores()
-num_scores_perm()
-num_scores_trees()
+num_score_perms()
+num_score_trees()
 num_scores_best()
 ord_metric()
 }

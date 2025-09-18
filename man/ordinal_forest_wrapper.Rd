@@ -4,17 +4,7 @@
 \alias{ordinal_forest_wrapper}
 \title{A wrapper for \code{ordinalForest}}
 \usage{
-ordinal_forest_wrapper(
-  x,
-  y,
-  naive_scores = FALSE,
-  num_scores = 1000L,
-  num_scores_perm = 500L,
-  num_scores_trees = 100L,
-  num_scores_best = 10L,
-  ord_metric = "equal",
-  ...
-)
+ordinal_forest_wrapper(x, y, ...)
 }
 \arguments{
 \item{x}{The predictor data.}

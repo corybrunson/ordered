@@ -5,9 +5,17 @@
 #' specified using `set_engine("ordinalForest", ...)`.
 #'
 #' @name ordinalForest_parameters
-#' @param values A character string of possible values. These functions generate
-#'   parameters for [parsnip::rand_forest()] models using the `"ordinalForest"`
-#'   engine.
+#' @param values A character string of possible values. See `values_ord_metric`.
+#' @param range A two-element vector holding the _defaults_ for the smallest and
+#'   largest possible values, respectively. If a transformation is specified,
+#'   these values should be in the _transformed units_.
+#' @param trans A `trans` object from the `scales` package, such as
+#'   `scales::transform_log10()` or `scales::transform_reciprocal()`. If not
+#'   provided, the default is used which matches the units used in `range`. If
+#'   no transformation, `NULL`.
+#'
+#'   These functions generate parameters for [parsnip::rand_forest()] models
+#'   using the `"ordinalForest"` engine.
 #'
 #' * `naive_scores()`: Whether to construct only a "naive" ordinal forest using
 #'   the scores \eqn{1,2,3,\ldots} for the ordinal values. (See the `naive`
@@ -16,11 +24,11 @@
 #' * `num_scores()`: The number of score sets tried prior to optimization. (See
 #'   the `nsets` argument at `?ordinalForest::ordfor()`.)
 #'
-#' * `num_scores_perm()`: The number of permutations of the class width ordering
+#' * `num_score_perms()`: The number of permutations of the class width ordering
 #'   to try for each score set tried (after the first). (See the `npermtrial`
 #'   argument at `?ordinalForest::ordfor()`.)
 #'
-#' * `num_scores_trees()`: The number of trees in the score set--specific
+#' * `num_score_trees()`: The number of trees in the score set--specific
 #'   forests. (See the `ntreeperdiv` argument at `?ordinalForest::ordfor()`.)
 #'
 #' * `num_scores_best()`: The number of top-performing score sets used to
@@ -37,8 +45,8 @@
 #' @examples
 #' naive_scores()
 #' num_scores()
-#' num_scores_perm()
-#' num_scores_trees()
+#' num_score_perms()
+#' num_score_trees()
 #' num_scores_best()
 #' ord_metric()
 
@@ -68,26 +76,26 @@ num_scores <- function(range = c(100L, 2000L), trans = NULL) {
 
 #' @rdname ordinalForest_parameters
 #' @export
-num_scores_perm <- function(range = c(100L, 500L), trans = NULL) {
+num_score_perms <- function(range = c(100L, 500L), trans = NULL) {
   dials::new_quant_param(
     type = "integer",
     range = range,
     inclusive = c(TRUE, TRUE),
     trans = trans,
-    label = c(num_scores_perm = "# Class Width Permutations"),
+    label = c(num_score_perms = "# Class Width Permutations"),
     finalize = NULL
   )
 }
 
 #' @rdname ordinalForest_parameters
 #' @export
-num_scores_trees <- function(range = c(10L, 200L), trans = NULL) {
+num_score_trees <- function(range = c(10L, 200L), trans = NULL) {
   dials::new_quant_param(
     type = "integer",
     range = range,
     inclusive = c(TRUE, TRUE),
     trans = trans,
-    label = c(num_scores_trees = "# Trees per Score Set"),
+    label = c(num_score_trees = "# Trees per Score Set"),
     finalize = NULL
   )
 }
