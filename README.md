@@ -104,10 +104,14 @@ data(caco, package = "QSARdata")
 caco_dat <-
   inner_join(caco_Outcome, caco_Dragon, by = "Molecule") %>%
   as_tibble() %>%
-  select(class = Class, mol_weight = QikProp_mol_MW,
-         volume = QikProp_volume, ClogP)
-  caco_train <- caco_dat[-(1:5), ]
-  caco_test  <- caco_dat[ (1:5), ]
+  select(
+    class = Class,
+    mol_weight = QikProp_mol_MW,
+    volume = QikProp_volume,
+    ClogP
+  )
+caco_train <- caco_dat[-(1:10), ]
+caco_test  <- caco_dat[ (1:10), ]
 
 ord_rf_spec <- 
   # you should really use many more trees and score sets
@@ -117,15 +121,20 @@ ord_rf_spec <-
 
 set.seed(382)
 ord_rf_fit <- ord_rf_spec %>% fit(class ~ ., data = caco_train)
-augment(ord_rf_fit, caco_test)
-#> # A tibble: 5 × 8
-#>   .pred_class .pred_L .pred_M .pred_H class mol_weight volume ClogP
-#>   <ord>         <dbl>   <dbl>   <dbl> <ord>      <dbl>  <dbl> <dbl>
-#> 1 M             0.267   0.420 0.313   M           123.   445. 0.799
-#> 2 M             0.325   0.453 0.222   L           290.   856. 0.534
-#> 3 M             0.157   0.841 0.00111 M           519.  1576. 1.02 
-#> 4 M             0.127   0.838 0.0353  M           533.  1606. 1.58 
-#> 5 M             0.224   0.695 0.0814  M           505.  1517. 1.71
+augment(ord_rf_fit, new_data = caco_test)
+#> # A tibble: 10 × 8
+#>    .pred_class .pred_L .pred_M .pred_H class mol_weight volume  ClogP
+#>    <ord>         <dbl>   <dbl>   <dbl> <ord>      <dbl>  <dbl>  <dbl>
+#>  1 M            0.370    0.384  0.246  M           123.   445.  0.799
+#>  2 M            0.250    0.533  0.217  L           290.   856.  0.534
+#>  3 M            0.178    0.801  0.0212 M           519.  1576.  1.02 
+#>  4 M            0.221    0.736  0.0431 M           533.  1606.  1.58 
+#>  5 M            0.135    0.762  0.103  M           505.  1517.  1.71 
+#>  6 M            0.0698   0.913  0.0176 M           519.  1547.  2.27 
+#>  7 M            0.220    0.738  0.0417 M           517.  1600.  1.78 
+#>  8 M            0.109    0.868  0.0229 M           531.  1631.  2.34 
+#>  9 M            0.0307   0.952  0.0177 M           517.  1572.  2.81 
+#> 10 L            0.603    0.394  0.003  L           588.  1799. -1.85
 ```
 
 ## Code of Conduct

@@ -72,10 +72,14 @@ data(caco, package = "QSARdata")
 caco_dat <-
   inner_join(caco_Outcome, caco_Dragon, by = "Molecule") %>%
   as_tibble() %>%
-  select(class = Class, mol_weight = QikProp_mol_MW,
-         volume = QikProp_volume, ClogP)
-  caco_train <- caco_dat[-(1:5), ]
-  caco_test  <- caco_dat[ (1:5), ]
+  select(
+    class = Class,
+    mol_weight = QikProp_mol_MW,
+    volume = QikProp_volume,
+    ClogP
+  )
+caco_train <- caco_dat[-(1:10), ]
+caco_test  <- caco_dat[ (1:10), ]
 
 ord_rf_spec <- 
   # you should really use many more trees and score sets
@@ -85,7 +89,7 @@ ord_rf_spec <-
 
 set.seed(382)
 ord_rf_fit <- ord_rf_spec %>% fit(class ~ ., data = caco_train)
-augment(ord_rf_fit, caco_test)
+augment(ord_rf_fit, new_data = caco_test)
 ```
 
 ## Code of Conduct
