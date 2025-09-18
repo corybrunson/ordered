@@ -184,7 +184,11 @@ make_ordinal_reg_ordinalNet <- function() {
     parsnip = "penalty",
     original = "lambdaVals",
     func = list(pkg = "dials", fun = "penalty"),
-    has_submodel = TRUE
+    # NOTE: Setting `has_submodel = TRUE` has the effect of calling
+    # `multi_predict()` during tuning, even if a method doesn't exist.
+    # TODO: Once working, build out ordinalNet methods to include submodels.
+    # has_submodel = TRUE
+    has_submodel = FALSE
   )
   parsnip::set_model_arg(
     model = "ordinal_reg",
@@ -229,6 +233,16 @@ make_ordinal_reg_ordinalNet <- function() {
     eng = "ordinalNet",
     mode = "classification",
     options = list(
+      # REVIEW: Should this be left to a recipe? `ordinalNet()` only accepts
+      # numeric matrices, not data frames, so there is no "automatic" pre-
+      # processing done there for {parsnip} to emulate. However, requiring a
+      # recipe compromises the convenience of Tidymodels for comparing multiple
+      # model engines. The practical problem is that `predictor_indicators`
+      # doesn't seem to apply to `new_data` as handled within tuning workflows.
+      # https://www.tidymodels.org/learn/develop/models/
+      # "What do I do about how my model handles factors or categorical data?"
+      # https://www.tidyverse.org/blog/2020/07/parsnip-0-1-2/
+      # predictor_indicators = "none",
       predictor_indicators = "one_hot",
       # REVIEW
       compute_intercept = TRUE,
@@ -244,6 +258,9 @@ make_ordinal_reg_ordinalNet <- function() {
     mode = "classification",
     type = "class",
     value = list(
+      # https://www.tidymodels.org/learn/develop/models/
+      # "Why would I preprocess my data?"
+      # "Why would I post-process my predictions?"
       pre = NULL,
       post = function(x, object) {
         ordered(object$lvl[x], object$lvl)
