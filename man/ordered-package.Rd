@@ -30,7 +30,7 @@ house_test <- house_sub[-train_inds, ]
 
 fit_cpop <- ordinal_reg() |>
   set_engine("polr") |>
-  set_args(method = "probit") |>
+  set_args(ordinal_link = "probit") |>
   fit(Sat ~ Infl + Type + Cont, data = house_train)
 predict(fit_cpop, house_test, type = "prob")
 
@@ -40,6 +40,7 @@ if (rlang::is_installed("ordinalForest")) {
 
 fit_orf <- rand_forest(mode = "classification") |>
   set_engine("ordinalForest") |>
+  set_args(ord_metric = "probability") |>
   fit(Sat ~ Infl + Type + Cont, data = house_train)
 predict(fit_orf, house_test, type = "prob")
 

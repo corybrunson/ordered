@@ -129,8 +129,8 @@ make_rand_forest_ordinalForest <- function() {
       func = c(pkg = "ordered", fun = "ordinal_forest_wrapper"),
       defaults =
         list(
-          num.threads = 1,
-          perffunction = "probability"
+          num.threads = 1
+          # perffunction = "probability"
         )
     )
   )
@@ -175,7 +175,7 @@ make_rand_forest_ordinalForest <- function() {
           cli::cli_abort(
             c(
               "The model fit does not appear to support class probabilities.",
-              "i" = "Specify {.code perffunction = 'probability'} for
+              "i" = "Specify {.code ord_metric = 'probability'} for
                      probability predictions."
             ),
             call = rlang::call2("predict")
