@@ -1,29 +1,22 @@
 #' A wrapper for `rpartScore`
 #'
-#' A wrapper is used for two reasons: First, the model interface requires the
-#' response variable to be numeric rather than ordered or factor; the wrapper
-#' edits the input `data` accordingly. Second, the engine argument `split` is
-#' unclear and possibly overloaded; the wrapper instead uses the more suggestive
-#' `split_func` and, for consistency, handles the other engine argument
-#' analogously.
+#' A wrapper is used because the model interface requires the response variable
+#' to be numeric rather than ordered or factor; the wrapper edits the input
+#' `data` accordingly.
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.
 #' @param ... Additional arguments to pass.
 #' @export
 #' @keywords internal
-rpart_score_wrapper <- function(
-    formula, data,
-    split_func = "abs", prune_func = "mc",
-    ...
-) {
+rpart_score_wrapper <- function(formula, data, ...) {
   rlang::check_installed("rpartScore")
+  # convert response variable in `data` from ordinal to integer
   lhs <- rlang::f_lhs(formula)
   data[[lhs]] <- as.integer(data[[lhs]])
+  # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "rpartScore", .ns = "rpartScore",
-    formula = expr(formula), data = expr(data),
-    split = expr(split_func), prune = expr(prune_func),
-    ...
+    formula = expr(formula), data = expr(data), ...
   )
   rlang::eval_tidy(cl)
 }
@@ -51,7 +44,31 @@ make_decision_tree_rpartScore <- function() {
     mode = "classification"
   )
 
-  # NOTE: Adopting `*_func` as a naming convention for named function options.
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "tree_depth",
+    original = "maxdepth",
+    func = list(pkg = "dials", fun = "tree_depth"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "min_n",
+    original = "minsplit",
+    func = list(pkg = "dials", fun = "min_n"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "cost_complexity",
+    original = "cp",
+    func = list(pkg = "dials", fun = "cost_complexity"),
+    has_submodel = FALSE
+  )
+  # REVIEW: Adopting `*_func` as a naming convention for named function options.
   parsnip::set_model_arg(
     model = "decision_tree",
     eng = "rpartScore",

@@ -70,7 +70,7 @@ test_that("case weights", {
 
 # prediction: class ------------------------------------------------------------
 
-test_that("probability prediction", {
+test_that("class prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("rpartScore")
   house_sub <- get_house()$sub

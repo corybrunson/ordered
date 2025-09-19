@@ -1,4 +1,16 @@
 
+# specification: arguments -----------------------------------------------------
+
+test_that("ordinal_link", {
+  skip_if_not_installed("MASS")
+  house_sub <- get_house()$sub
+
+  # a legitimate ordinal link function not recognized by `polr()`
+  tidy_spec <- ordinal_reg(engine = "polr", ordinal_link = "Aranda-Ordaz")
+  # REVIEW: Should this be a parsnip-level error message?
+  expect_error(fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub))
+})
+
 # model: basic -----------------------------------------------------------------
 
 test_that("model object", {
@@ -61,23 +73,6 @@ test_that("case weights", {
   )
 })
 
-# prediction: probability ------------------------------------------------------
-
-test_that("probability prediction", {
-  skip_if_not_installed("MASS")
-  house_sub <- get_house()$sub
-
-  tidy_fit <- ordinal_reg() |>
-    set_engine("polr") |>
-    fit(Sat ~ Type + Cont, data = house_sub)
-
-  orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "probs")
-  orig_pred <- tibble::as_tibble(orig_pred)
-  orig_pred <- set_names(orig_pred, paste0(".pred_", names(orig_pred)))
-  tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
-  expect_equal(orig_pred, tidy_pred)
-})
-
 # prediction: class ------------------------------------------------------------
 
 test_that("class prediction", {
@@ -93,5 +88,22 @@ test_that("class prediction", {
   orig_pred <- ordered(unname(orig_pred), levels(orig_pred))
   orig_pred <- tibble::tibble(.pred_class = orig_pred)
   tidy_pred <- predict(tidy_fit, house_sub)
+  expect_equal(orig_pred, tidy_pred)
+})
+
+# prediction: probability ------------------------------------------------------
+
+test_that("probability prediction", {
+  skip_if_not_installed("MASS")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg() |>
+    set_engine("polr") |>
+    fit(Sat ~ Type + Cont, data = house_sub)
+
+  orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "probs")
+  orig_pred <- tibble::as_tibble(orig_pred)
+  orig_pred <- set_names(orig_pred, paste0(".pred_", names(orig_pred)))
+  tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
   expect_equal(orig_pred, tidy_pred)
 })
