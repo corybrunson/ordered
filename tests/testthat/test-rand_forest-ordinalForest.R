@@ -109,7 +109,9 @@ test_that("probability prediction", {
   expect_equal(orig_pred, tidy_pred)
 })
 
-test_that("interfaces agree",{
+# translation & interfaces -----------------------------------------------------
+
+test_that("interfaces agree", {
   skip_if_not_installed("ordinalForest")
   skip_if_not_installed("QSARdata")
 
@@ -118,7 +120,6 @@ test_that("interfaces agree",{
     set_mode("classification") %>%
     set_engine("ordinalForest") %>%
     set_args(ord_metric = "probability")
-
   expect_snapshot(orf_spec %>% translate())
 
   expect_no_error({
@@ -126,15 +127,6 @@ test_that("interfaces agree",{
     orf_f_fit <- fit(orf_spec, class ~ ., data = caco_train)
   })
   expect_snapshot(orf_f_fit)
-
-  # orf_f_cls <- predict(orf_f_fit, new_data = caco_test)
-  # expect_named(orf_f_cls, ".pred_class")
-  # expect_true(nrow(orf_f_cls) == nrow(caco_test))
-  # expect_s3_class(orf_f_cls$.pred_class, "ordered")
-  #
-  # orf_f_prob <- predict(orf_f_fit, new_data = caco_test, type = "prob")
-  # expect_named(orf_f_prob, c(".pred_L", ".pred_M", ".pred_H"))
-  # expect_true(nrow(orf_f_prob) == nrow(orf_f_prob))
 
   expect_no_error({
     set.seed(13)
@@ -148,15 +140,18 @@ test_that("interfaces agree",{
   )
 })
 
-test_that("translation agrees",{
+test_that("arguments agree", {
   skip_if_not_installed("ordinalForest")
   skip_if_not_installed("QSARdata")
 
   orf_arg_spec <-
-    rand_forest(mtry = 2, min_n = 11, trees = 100) %>%
+    rand_forest(
+      num_scores = 50, num_score_trees = 80, num_score_perms = 70,
+      num_scores_best = 10, mtry = 2, min_n = 11, trees = 100
+    ) %>%
     set_mode("classification") %>%
-    set_engine("ordinalForest")
-
+    set_engine("ordinalForest") %>%
+    set_args(ord_metric = "probability")
   expect_snapshot(orf_arg_spec %>% translate())
 
   # This warning is a bug that I'll report
@@ -164,7 +159,12 @@ test_that("translation agrees",{
     set.seed(13)
     orf_arg_fit <- fit(orf_arg_spec, class ~ ., data = caco_train)
   })
+  expect_equal(orf_arg_fit$fit$nsets, 50)
+  expect_equal(orf_arg_fit$fit$ntreeperdiv, 80)
+  # NB: `npermtrial` value does not seem to be recoverable from model.
+  expect_equal(orf_arg_fit$fit$nbest, 10)
   expect_equal(orf_arg_fit$fit$ntreefinal, 100)
   expect_equal(orf_arg_fit$fit$forestfinal$min.node.size, 11)
   expect_equal(orf_arg_fit$fit$forestfinal$mtry, 2)
+  expect_equal(orf_arg_fit$fit$perffunction, "probability")
 })
