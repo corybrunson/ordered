@@ -21,7 +21,7 @@ combinations in the parsnip package that can be used, this package adds:
 
 - cumulative link (cumulative logit) ordinal regression via
   `MASS::polr()`
-- ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and
+- regularized elastic net ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and
   Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
 - ordinal classification trees via `rpartScore::rpartScore()`
   ([Galimberti, Soffritti, and Di Maso,
