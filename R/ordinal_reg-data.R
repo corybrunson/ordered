@@ -88,6 +88,12 @@ make_ordinal_reg_polr <- function() {
   parsnip::set_dependency(
     "ordinal_reg",
     eng = "polr",
+    pkg = "MASS",
+    mode = "classification"
+  )
+  parsnip::set_dependency(
+    "ordinal_reg",
+    eng = "polr",
     pkg = "ordered",
     mode = "classification"
   )
@@ -177,6 +183,12 @@ make_ordinal_reg_ordinalNet <- function() {
     pkg = "ordered",
     mode = "classification"
   )
+  parsnip::set_dependency(
+    "ordinal_reg",
+    eng = "ordinalNet",
+    pkg = "ordinalNet",
+    mode = "classification"
+  )
 
   parsnip::set_model_arg(
     model = "ordinal_reg",
@@ -186,9 +198,7 @@ make_ordinal_reg_ordinalNet <- function() {
     func = list(pkg = "dials", fun = "penalty"),
     # NOTE: Setting `has_submodel = TRUE` has the effect of calling
     # `multi_predict()` during tuning, even if a method doesn't exist.
-    # TODO: Once working, build out ordinalNet methods to include submodels.
-    # has_submodel = TRUE
-    has_submodel = FALSE
+    has_submodel = TRUE
   )
   parsnip::set_model_arg(
     model = "ordinal_reg",
@@ -233,16 +243,16 @@ make_ordinal_reg_ordinalNet <- function() {
     eng = "ordinalNet",
     mode = "classification",
     options = list(
-      # REVIEW: Should this be left to a recipe? `ordinalNet()` only accepts
-      # numeric matrices, not data frames, so there is no "automatic" pre-
-      # processing done there for {parsnip} to emulate. However, requiring a
-      # recipe compromises the convenience of Tidymodels for comparing multiple
-      # model engines. The practical problem is that `predictor_indicators`
-      # doesn't seem to apply to `new_data` as handled within tuning workflows.
+      # REVIEW: Should one-hot encoding be left to a recipe? `ordinalNet()` only
+      # accepts numeric matrices, not data frames, so there is no "automatic"
+      # pre- processing done there for {parsnip} to emulate. However, requiring
+      # a recipe compromises the convenience of Tidymodels for comparing
+      # multiple model engines. The practical problem is that
+      # `predictor_indicators` doesn't seem to apply to `new_data` as handled
+      # within tuning workflows.
       # https://www.tidymodels.org/learn/develop/models/
       # "What do I do about how my model handles factors or categorical data?"
       # https://www.tidyverse.org/blog/2020/07/parsnip-0-1-2/
-      # predictor_indicators = "none",
       predictor_indicators = "one_hot",
       # REVIEW
       compute_intercept = TRUE,
@@ -270,7 +280,8 @@ make_ordinal_reg_ordinalNet <- function() {
         list(
           object = quote(object$fit),
           newx = quote(new_data),
-          type = "class"
+          type = "class",
+          whichLambda = quote(object$spec$args$penalty)
         )
     )
   )
@@ -292,7 +303,37 @@ make_ordinal_reg_ordinalNet <- function() {
         list(
           object = quote(object$fit),
           newx = quote(new_data),
-          type = "response"
+          type = "response",
+          whichLambda = quote(object$spec$args$penalty)
+        )
+    )
+  )
+
+  # REVIEW: Only {censored} also enables `type = "linear_pred"`.
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "ordinalNet",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        x <- tibble::as_tibble(x)
+        nl <- length(object$lvl)
+        x <- set_names(x, paste(
+          ".pred_link",
+          object$lvl[seq(nl - 1L)], object$lvl[seq(2L, nl)],
+          sep = "_"
+        ))
+        x
+      },
+      func = c(fun = "predict"),
+      args =
+        list(
+          object = quote(object$fit),
+          newx = quote(new_data),
+          type = "link",
+          whichLambda = quote(object$spec$args$penalty)
         )
     )
   )

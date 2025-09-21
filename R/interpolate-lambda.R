@@ -26,7 +26,7 @@ predict_ordinal_net <- function(object, new_data = NULL, penalty) {
     pred <- approx_prediction(pred, pred_high, penalties, penalty)
   }
   colnames(pred) <- paste(1:ncol(pred))
-  dplyr::as_tibble(pred)
+  tibble::as_tibble(pred)
 }
 
 mulit_predict_ordinal_net <- function(object, new_data = NULL, penalty) {

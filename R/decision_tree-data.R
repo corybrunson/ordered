@@ -43,6 +43,12 @@ make_decision_tree_rpartScore <- function() {
     pkg = "rpartScore",
     mode = "classification"
   )
+  parsnip::set_dependency(
+    "decision_tree",
+    eng = "rpartScore",
+    pkg = "ordered",
+    mode = "classification"
+  )
 
   parsnip::set_model_arg(
     model = "decision_tree",
