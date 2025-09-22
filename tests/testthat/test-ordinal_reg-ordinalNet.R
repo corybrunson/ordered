@@ -4,6 +4,7 @@ seed <- 144688L
 
 test_that("model object", {
   skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
   # https://stackoverflow.com/a/4569239
@@ -48,6 +49,7 @@ test_that("model object", {
 # NB: This test fails when the additional (commented) arguments are passed.
 test_that("multinomial formulation", {
   skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
   house_sub |>
@@ -111,6 +113,7 @@ test_that("multinomial formulation", {
 # NB: This test passes when the additional (commented) arguments are passed.
 test_that("case weights", {
   skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
   house_data <- get_house()$data
 
   house_data |>
@@ -172,6 +175,7 @@ test_that("case weights", {
 
 test_that("class prediction", {
   skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = .001) |>
@@ -197,6 +201,7 @@ test_that("class prediction", {
 
 test_that("probability prediction", {
   skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = .001) |>
@@ -216,4 +221,58 @@ test_that("probability prediction", {
   tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
 
   expect_equal(orig_pred, tidy_pred)
+})
+
+# translation & interfaces -----------------------------------------------------
+
+test_that("interfaces agree", {
+  skip_if_not_installed("ordinalNet")
+  skip_if_not_installed("QSARdata")
+
+  onet_spec <-
+    ordinal_reg(penalty = .001) %>%
+    set_mode("classification") %>%
+    set_engine("ordinalNet")
+  expect_snapshot(onet_spec %>% translate())
+
+  expect_no_error({
+    set.seed(13)
+    onet_f_fit <- fit(onet_spec, class ~ ., data = caco_train)
+  })
+  expect_snapshot(onet_f_fit)
+
+  expect_no_error({
+    set.seed(13)
+    onet_xy_fit <- fit_xy(onet_spec, x = caco_train[, -1], y = caco_train$class)
+  })
+  expect_snapshot(onet_xy_fit)
+
+  rownames(onet_f_fit$fit$args$x) <- NULL
+  expect_equal(
+    onet_f_fit$fit,
+    onet_xy_fit$fit
+  )
+})
+
+test_that("arguments agree", {
+  skip_if_not_installed("ordinalNet")
+  skip_if_not_installed("QSARdata")
+
+  onet_arg_spec <-
+    ordinal_reg(
+      penalty = .001, mixture = .25,
+      ordinal_link = "cloglog", odds_link = "stopping"
+    ) |>
+    set_mode("classification") %>%
+    set_engine("ordinalNet")
+  expect_snapshot(onet_arg_spec %>% translate())
+
+  expect_snapshot({
+    set.seed(13)
+    onet_arg_fit <- fit(onet_arg_spec, class ~ ., data = caco_train)
+  })
+  expect_equal(onet_arg_fit$fit$args$lambdaVals, .001)
+  expect_equal(onet_arg_fit$fit$args$alpha, .25)
+  expect_equal(onet_arg_fit$fit$args$link, "cloglog")
+  expect_equal(onet_arg_fit$fit$args$family, "sratio")
 })

@@ -107,3 +107,56 @@ test_that("probability prediction", {
   tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
   expect_equal(orig_pred, tidy_pred)
 })
+
+# translation & interfaces -----------------------------------------------------
+
+test_that("interfaces agree", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("QSARdata")
+
+  olpr_spec <-
+    ordinal_reg() %>%
+    set_mode("classification") %>%
+    set_engine("polr")
+  expect_snapshot(olpr_spec %>% translate())
+
+  expect_no_error({
+    set.seed(13)
+    olpr_f_fit <- fit(olpr_spec, class ~ ., data = caco_train)
+  })
+  expect_snapshot(olpr_f_fit)
+
+  expect_no_error({
+    set.seed(13)
+    olpr_xy_fit <- fit_xy(olpr_spec, x = caco_train[, -1], y = caco_train$class)
+  })
+  expect_snapshot(olpr_xy_fit)
+
+  olpr_f_fit$fit$terms <- NULL
+  olpr_xy_fit$fit$terms <- NULL
+  names(olpr_xy_fit$fit$model)[1] <- "class"
+  olpr_f_fit$fit$call <- NULL
+  olpr_xy_fit$fit$call <- NULL
+  expect_equal(
+    olpr_f_fit$fit,
+    olpr_xy_fit$fit,
+    ignore_attr = TRUE
+  )
+})
+
+test_that("arguments agree", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("QSARdata")
+
+  olpr_arg_spec <-
+    ordinal_reg(ordinal_link = "cloglog") |>
+    set_mode("classification") %>%
+    set_engine("polr")
+  expect_snapshot(olpr_arg_spec %>% translate())
+
+  expect_snapshot({
+    set.seed(13)
+    olpr_arg_fit <- fit(olpr_arg_spec, class ~ ., data = caco_train)
+  })
+  expect_equal(olpr_arg_fit$fit$method, "cloglog")
+})
