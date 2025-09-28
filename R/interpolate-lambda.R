@@ -32,6 +32,7 @@
 #                                 <-- makes and evaluates call
 #           predict.ordinalNet()
 
+#' @importFrom stats approx predict
 #' @importFrom parsnip eval_args predict_raw multi_predict
 #' @param penalty A numeric vector of penalty values.
 
@@ -135,10 +136,10 @@ multi_predict._ordinalNet <- function(
     penalty = NULL,
     ...
 ) {
-  type <- parsnip:::check_pred_type(object, type)
-  parsnip:::check_spec_pred_type(object, type)
+  type <- check_pred_type(object, type)
+  check_spec_pred_type(object, type)
   if (type == "prob") {
-    parsnip:::check_spec_levels(object)
+    check_spec_levels(object)
   }
 
   object$spec <- eval_args(object$spec)

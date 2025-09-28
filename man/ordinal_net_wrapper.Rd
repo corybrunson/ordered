@@ -8,6 +8,7 @@
 \alias{predict_class._ordinalNet}
 \alias{multi_predict._ordinalNet}
 \alias{ordinal_net_wrapper}
+\alias{predict_ordinal_net_wrapper}
 \title{Wrappers for \code{ordinalNet}}
 \usage{
 \method{predict}{`_ordinalNet`}(
@@ -50,6 +51,8 @@ ordinal_net_wrapper(
   link = "logistic",
   ...
 )
+
+predict_ordinal_net_wrapper(object, newx, type, whichLambda)
 }
 \arguments{
 \item{penalty}{A numeric vector of penalty values.}

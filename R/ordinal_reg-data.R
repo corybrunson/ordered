@@ -5,8 +5,8 @@
 #' @param x The predictor data.
 #' @param y The outcome vector.
 #' @param ... Additional arguments to pass.
-#' @export
 #' @keywords internal
+#' @export
 ordinal_net_wrapper <- function(
     x, y, weights = NULL,
     # REVIEW: Is this the preferred way to handle differences in parameter
@@ -69,8 +69,8 @@ ordinal_net_wrapper <- function(
   rlang::eval_tidy(cl)
 }
 
+#' @rdname ordinal_net_wrapper
 #' @export
-#' @keywords internal
 predict_ordinal_net_wrapper <- function(object, newx, type, whichLambda) {
   # observed penalty adjacent to passed penalty
   obs_pen <- object$lambdaVals
