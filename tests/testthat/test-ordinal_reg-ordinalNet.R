@@ -14,11 +14,14 @@ test_that("model object", {
   )
   attr(house_vars, "assign") <- NULL
   attr(house_vars, "contrasts") <- NULL
+
   set.seed(seed)
   orig_fit <- ordinalNet::ordinalNet(
     house_vars,
     y = house_sub$Sat,
-    lambdaVals = .001
+    # NB: The earlier line may be right if we implement `path_values`.
+    # lambdaVals = .001
+    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
     # , alpha = .5, family = "sratio"
   )
 
@@ -41,7 +44,7 @@ test_that("model object", {
   )
 })
 
-# model: multinomial -----------------------------------------------------------
+# model: multinomial input -----------------------------------------------------------
 
 # REVIEW: This test is necessarily approximate--the `ordinalNet()` interfaces
 # don't perfectly agree with each other--but it seems appropriate to include it
@@ -79,7 +82,8 @@ test_that("multinomial formulation", {
   orig_fit <- ordinalNet::ordinalNet(
     house_vars,
     y = house_resp,
-    lambdaVals = .001
+    # lambdaVals = .001
+    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
     # , alpha = .5, family = "sratio"
   )
 
@@ -142,7 +146,8 @@ test_that("case weights", {
   orig_fit <- ordinalNet::ordinalNet(
     house_vars,
     y = house_resp,
-    lambdaVals = .001
+    # lambdaVals = .001
+    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
     # , alpha = .5, family = "sratio"
   )
 
@@ -178,6 +183,8 @@ test_that("class prediction", {
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
+  stop("Prediction now uses a wrapper.")
+
   tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = .001) |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
@@ -203,6 +210,8 @@ test_that("probability prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
+
+  stop("Prediction now uses a wrapper.")
 
   tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = .001) |>
     fit(Sat ~ Type + Cont, data = house_sub)

@@ -1,4 +1,4 @@
-#' A wrapper for `ordinalNet`
+#' Wrappers for `ordinalNet`
 #'
 #' This wrapper converts the `family` options of [ordinalNet::ordinalNet()] to
 #' the standardized `odds_link` options encoded in [dials::values_odds_link].
@@ -47,7 +47,7 @@ ordinal_net_wrapper <- function(
   if (link == "loglog") {
     cli::cli_abort(
       c(
-        "The `ordinalNet` engine does not provide a log-log ordinal link.",
+        "The `ordinalNet` engine does not support the log-log ordinal link.",
         "i" = "See `?ordinalNet::ordinalNet` for provided link functions."
       )
     )
@@ -67,6 +67,80 @@ ordinal_net_wrapper <- function(
     ...
   )
   rlang::eval_tidy(cl)
+}
+
+#' @export
+#' @keywords internal
+predict_ordinal_net_wrapper <- function(object, newx, type, whichLambda) {
+  # observed penalty adjacent to passed penalty
+  obs_pen <- object$lambdaVals
+  pen_ind <- adjacent_penalties(object, whichLambda)
+  adj_pen <- obs_pen[pen_ind]
+
+  # probability predictions based on adjacent penalty
+  pred <- predict(
+    object,
+    newx = newx,
+    whichLambda = pen_ind[1L],
+    type = "response"
+  )
+  if (length(pen_ind) == 2L) {
+    pred_high <- predict(
+      object,
+      newx = newx,
+      whichLambda = pen_ind[2L],
+      type = "response"
+    )
+    pred <- approx_prediction(pred, pred_high, adj_pen, whichLambda)
+  }
+
+  switch(
+    type,
+    "prob" = pred,
+    # REVIEW: This "rounds down" if two probabilities are equal.
+    "class" = apply(pred, 1L, which.max)
+  )
+}
+
+# `use_extreme` is a placeholder for a policy that we need to set; do we error
+# when predicting outside of the observed penalty range or do something else
+# (such as predicting at the closest value in the path) --topepo
+
+# See `translate.ordinal_reg()` in {parsnip}. by using `nLambda` and
+# `lambdaMinRatio` together with `includeLambda0`, we ensure that any penalty
+# value can be "interpolated" (those above the maximum are equivalent to the
+# maximum). The `have_extr` variable determines whether this was done based on
+# the arguments retained in the `ordinalNet` object. --corybrunson
+
+adjacent_penalties <- function(object, penalty, use_extreme = TRUE) {
+  ref <- object$lambdaVals
+  in_rng <- penalty >= min(ref) && penalty <= max(ref)
+  have_extr <- is.null(object$args$lambdaVals) && object$args$includeLambda0
+  if (! in_rng && ! have_extr) {
+    cli::cli_abort("The penalty value {format(penalty, digits = 3)} is
+                    outside the penalty range contained in the model object.",
+                   call = rlang::call2("predict"))
+  }
+
+  above <- which.min(ifelse(ref < penalty,  Inf, ref))
+  below <- which.max(ifelse(ref > penalty, -Inf, ref))
+  unique(sort(c(below, above)))
+}
+
+approx_prediction <- function(low, high, adjacent, penalty) {
+  res <- low * NA_real_
+  num_cls <- ncol(low)
+  both <- cbind(low, high)
+  for (i in 1:num_cls) {
+    tmp <- both[, c(i, i + num_cls)]
+    res[, i] <- apply(tmp, 1, approx_prediction_row, adjacent, penalty)
+  }
+  res <- apply(res, 1, function(x) x / sum(x))
+  t(res)
+}
+
+approx_prediction_row <- function(values, adjacent, penalty) {
+  approx(adjacent, values, xout = penalty)$y
 }
 
 # These functions define the ordinal regression models.
@@ -275,7 +349,7 @@ make_ordinal_reg_ordinalNet <- function() {
       post = function(x, object) {
         ordered(object$lvl[x], object$lvl)
       },
-      func = c(fun = "predict"),
+      func = c(fun = "predict_ordinal_net_wrapper"),
       args =
         list(
           object = quote(object$fit),
@@ -298,45 +372,45 @@ make_ordinal_reg_ordinalNet <- function() {
         x <- set_names(x, paste0(".pred_", object$lvl))
         x
       },
-      func = c(fun = "predict"),
+      func = c(fun = "predict_ordinal_net_wrapper"),
       args =
         list(
           object = quote(object$fit),
           newx = quote(new_data),
-          type = "response",
+          type = "prob",
           whichLambda = quote(object$spec$args$penalty)
         )
     )
   )
 
-  # REVIEW: Only {censored} also enables `type = "linear_pred"`.
-  parsnip::set_pred(
-    model = "ordinal_reg",
-    eng = "ordinalNet",
-    mode = "classification",
-    type = "linear_pred",
-    value = list(
-      pre = NULL,
-      post = function(x, object) {
-        x <- tibble::as_tibble(x)
-        nl <- length(object$lvl)
-        x <- set_names(x, paste(
-          ".pred_link",
-          object$lvl[seq(nl - 1L)], object$lvl[seq(2L, nl)],
-          sep = "_"
-        ))
-        x
-      },
-      func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newx = quote(new_data),
-          type = "link",
-          whichLambda = quote(object$spec$args$penalty)
-        )
-    )
-  )
+  # # REVIEW: Only {censored} also enables `type = "linear_pred"`. Why is it not
+  # # made available for all GLMs? Would it be useful here?
+  # parsnip::set_pred(
+  #   model = "ordinal_reg",
+  #   eng = "ordinalNet",
+  #   mode = "classification",
+  #   type = "linear_pred",
+  #   value = list(
+  #     pre = NULL,
+  #     post = function(x, object) {
+  #       x <- tibble::as_tibble(x)
+  #       nl <- length(object$lvl)
+  #       x <- set_names(x, paste(
+  #         ".pred_link",
+  #         object$lvl[seq(nl - 1L)], object$lvl[seq(2L, nl)],
+  #         sep = "_"
+  #       ))
+  #       x
+  #     },
+  #     func = c(fun = "predict"),
+  #     args =
+  #       list(
+  #         object = quote(object$fit),
+  #         newx = quote(new_data),
+  #         type = "link"
+  #       )
+  #   )
+  # )
 
 }
 
