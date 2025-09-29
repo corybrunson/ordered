@@ -42,6 +42,12 @@ make_rand_forest_ordinalForest <- function() {
     pkg = "ordinalForest",
     mode = "classification"
   )
+  parsnip::set_dependency(
+    "rand_forest",
+    eng = "ordinalForest",
+    pkg = "ordered",
+    mode = "classification"
+  )
 
   # dials provided in {dials}
   parsnip::set_model_arg(
