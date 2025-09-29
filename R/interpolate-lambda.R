@@ -59,10 +59,6 @@ predict._ordinalNet <- function(
 .check_ordinalNet_penalty_predict <- function(
     penalty = NULL, object, multi = FALSE, call = rlang::caller_env()
 ) {
-  save(penalty, object, multi, call,
-       file = "~/Downloads/ordered-check-ordinalNet-penalty-predict.rda")
-  load(file = "~/Downloads/ordered-check-ordinalNet-penalty-predict.rda")
-
   if (is.null(penalty)) {
     penalty <- object$fit$lambdaVals
   }
