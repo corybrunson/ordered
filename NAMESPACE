@@ -3,7 +3,6 @@
 S3method(multi_predict,"_ordinalNet")
 S3method(predict,"_ordinalNet")
 S3method(predict_raw,"_ordinalNet")
-export(.check_ordinalNet_penalty_predict)
 export(naive_scores)
 export(num_score_perms)
 export(num_score_trees)

@@ -2,11 +2,10 @@
 % Please edit documentation in R/interpolate-lambda.R, R/ordinal_reg-data.R
 \name{predict._ordinalNet}
 \alias{predict._ordinalNet}
-\alias{.check_ordinalNet_penalty_predict}
+\alias{multi_predict._ordinalNet}
 \alias{predict_raw._ordinalNet}
 \alias{predict_classprob._ordinalNet}
 \alias{predict_class._ordinalNet}
-\alias{multi_predict._ordinalNet}
 \alias{ordinal_net_wrapper}
 \alias{predict_ordinal_net_wrapper}
 \title{Wrappers for \code{ordinalNet}}
@@ -21,19 +20,6 @@
   ...
 )
 
-.check_ordinalNet_penalty_predict(
-  penalty = NULL,
-  object,
-  multi = FALSE,
-  call = rlang::caller_env()
-)
-
-\method{predict_raw}{`_ordinalNet`}(object, new_data, opts = list(), ...)
-
-predict_classprob._ordinalNet(object, new_data, ...)
-
-predict_class._ordinalNet(object, new_data, ...)
-
 \method{multi_predict}{`_ordinalNet`}(
   object,
   new_data,
@@ -42,6 +28,12 @@ predict_class._ordinalNet(object, new_data, ...)
   penalty = NULL,
   ...
 )
+
+\method{predict_raw}{`_ordinalNet`}(object, new_data, opts = list(), ...)
+
+predict_classprob._ordinalNet(object, new_data, ...)
+
+predict_class._ordinalNet(object, new_data, ...)
 
 ordinal_net_wrapper(
   x,
