@@ -8,7 +8,7 @@
       Computational engine: rpartScore 
       
       Model fit template:
-      ordered::rpart_score_wrapper(formula = missing_arg(), data = missing_arg(), 
+      ordered::rpartScore_wrapper(formula = missing_arg(), data = missing_arg(), 
           weights = missing_arg())
 
 ---
@@ -65,7 +65,7 @@
       Computational engine: rpartScore 
       
       Model fit template:
-      ordered::rpart_score_wrapper(formula = missing_arg(), data = missing_arg(), 
+      ordered::rpartScore_wrapper(formula = missing_arg(), data = missing_arg(), 
           weights = missing_arg())
 
 ---
@@ -79,13 +79,15 @@
         cost_complexity = 0.01
         tree_depth = 3
         min_n = 7
-        split_func = quad
-        prune_func = mr
+      
+      Engine-Specific Arguments:
+        split = quad
+        prune = mr
       
       Computational engine: rpartScore 
       
       Model fit template:
-      ordered::rpart_score_wrapper(formula = missing_arg(), data = missing_arg(), 
+      ordered::rpartScore_wrapper(formula = missing_arg(), data = missing_arg(), 
           weights = missing_arg(), cp = 0.01, maxdepth = 3, minsplit = min_rows(7, 
               data), split = "quad", prune = "mr")
 

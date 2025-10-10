@@ -19,7 +19,7 @@ These parameters are auxiliary to decision tree models that use the
 specified using \code{set_engine("rpartScore", ...)}.
 }
 \details{
-\code{split_func} and \code{prune_func} are aliases for \code{split} and \code{prune},
+\code{split_func} and \code{prune_func} are dials for \code{split} and \code{prune},
 respectively. See \code{?rpartScore::rpartScore} for how those parameters are
 used.
 

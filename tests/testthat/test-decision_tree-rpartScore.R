@@ -133,12 +133,9 @@ test_that("arguments agree", {
   expect_snapshot(odt_def_spec %>% translate())
 
   odt_arg_spec <-
-    decision_tree(
-      cost_complexity = .01, tree_depth = 3, min_n = 7,
-      split_func = "quad", prune_func = "mr"
-    ) |>
+    decision_tree(cost_complexity = .01, tree_depth = 3, min_n = 7) |>
     set_mode("classification") %>%
-    set_engine("rpartScore")
+    set_engine("rpartScore", split = "quad", prune = "mr")
   expect_snapshot(odt_arg_spec %>% translate())
 
   expect_snapshot({

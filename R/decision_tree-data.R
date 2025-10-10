@@ -8,7 +8,7 @@
 #' @param ... Additional arguments to pass.
 #' @export
 #' @keywords internal
-rpart_score_wrapper <- function(formula, data, ...) {
+rpartScore_wrapper <- function(formula, data, ...) {
   rlang::check_installed("rpartScore")
   # convert response variable in `data` from ordinal to integer
   lhs <- rlang::f_lhs(formula)
@@ -74,23 +74,6 @@ make_decision_tree_rpartScore <- function() {
     func = list(pkg = "dials", fun = "cost_complexity"),
     has_submodel = FALSE
   )
-  # REVIEW: Adopting `*_func` as a naming convention for named function options.
-  parsnip::set_model_arg(
-    model = "decision_tree",
-    eng = "rpartScore",
-    parsnip = "split_func",
-    original = "split",
-    func = list(pkg = "ordered", fun = "split_func"),
-    has_submodel = FALSE
-  )
-  parsnip::set_model_arg(
-    model = "decision_tree",
-    eng = "rpartScore",
-    parsnip = "prune_func",
-    original = "prune",
-    func = list(pkg = "ordered", fun = "prune_func"),
-    has_submodel = FALSE
-  )
 
   parsnip::set_fit(
     model = "decision_tree",
@@ -100,7 +83,7 @@ make_decision_tree_rpartScore <- function() {
       interface = "formula",
       protect = c("formula", "data", "weights"),
       # func = c(pkg = "rpartScore", fun = "rpartScore"),
-      func = c(pkg = "ordered", fun = "rpart_score_wrapper"),
+      func = c(pkg = "ordered", fun = "rpartScore_wrapper"),
       defaults = list()
     )
   )
