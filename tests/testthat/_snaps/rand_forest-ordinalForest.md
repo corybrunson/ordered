@@ -5,13 +5,13 @@
     Output
       Random Forest Model Specification (classification)
       
-      Main Arguments:
-        ord_metric = probability
+      Engine-Specific Arguments:
+        perffunction = probability
       
       Computational engine: ordinalForest 
       
       Model fit template:
-      ordered::ordinal_forest_wrapper(x = missing_arg(), y = missing_arg(), 
+      ordered::ordinalForest_wrapper(x = missing_arg(), y = missing_arg(), 
           perffunction = "probability", num.threads = 1)
 
 ---
@@ -69,16 +69,18 @@
         mtry = 2
         trees = 100
         min_n = 11
-        num_scores = 50
-        num_score_trees = 80
-        num_score_perms = 70
-        num_scores_best = 10
-        ord_metric = probability
+      
+      Engine-Specific Arguments:
+        nsets = 50
+        ntreeperdiv = 80
+        npermtrial = 70
+        nbest = 10
+        perffunction = probability
       
       Computational engine: ordinalForest 
       
       Model fit template:
-      ordered::ordinal_forest_wrapper(x = missing_arg(), y = missing_arg(), 
+      ordered::ordinalForest_wrapper(x = missing_arg(), y = missing_arg(), 
           mtry = min_cols(~2, x), ntreefinal = 100, min.node.size = min_rows(~11, 
               x), nsets = 50, ntreeperdiv = 80, npermtrial = 70, nbest = 10, 
           perffunction = "probability", num.threads = 1)

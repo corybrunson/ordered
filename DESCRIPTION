@@ -18,8 +18,10 @@ Depends:
 Imports: 
     cli,
     dials,
+    purrr,
     rlang (>= 1.1.4),
-    tibble
+    tibble,
+    tidyr
 Suggests: 
     dplyr,
     MASS,

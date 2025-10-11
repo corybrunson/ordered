@@ -39,36 +39,34 @@ these values should be in the \emph{transformed units}.}
 \item{trans}{A \code{trans} object from the \code{scales} package, such as
 \code{scales::transform_log10()} or \code{scales::transform_reciprocal()}. If not
 provided, the default is used which matches the units used in \code{range}. If
-no transformation, \code{NULL}.
-
-These functions generate parameters for \code{\link[parsnip:rand_forest]{parsnip::rand_forest()}} models
-using the \code{"ordinalForest"} engine.
-\itemize{
-\item \code{naive_scores()}: Whether to construct only a "naive" ordinal forest using
-the scores \eqn{1,2,3,\ldots} for the ordinal values. (See the \code{naive}
-argument at \code{?ordinalForest::ordfor()}.)
-\item \code{num_scores()}: The number of score sets tried prior to optimization. (See
-the \code{nsets} argument at \code{?ordinalForest::ordfor()}.)
-\item \code{num_score_perms()}: The number of permutations of the class width ordering
-to try for each score set tried (after the first). (See the \code{npermtrial}
-argument at \code{?ordinalForest::ordfor()}.)
-\item \code{num_score_trees()}: The number of trees in the score set--specific
-forests. (See the \code{ntreeperdiv} argument at \code{?ordinalForest::ordfor()}.)
-\item \code{num_scores_best()}: The number of top-performing score sets used to
-calculate the optimized score set. (See the \code{nbest} argument at
-\code{?ordinalForest::ordfor()}.)
-\item \code{ord_metric()}: The performance function used to evaluate score
-set--specific forests. (See the \code{perffunction} argument at
-\code{?ordinalForest::ordfor()} and also \code{?ordinalForest::perff}.)
-
-These parameters are engine-specific, not general to decision tree models,
-so are provided here rather than in \code{dials}.
-}}
+no transformation, \code{NULL}.}
 }
 \description{
 These parameters are auxiliary to random forest models that use the
 "ordinalForest" engine. They correspond to tuning parameters that would be
 specified using \code{set_engine("ordinalForest", ...)}.
+}
+\details{
+These functions generate parameters for \code{\link[parsnip:rand_forest]{parsnip::rand_forest()}}
+models using the \code{"ordinalForest"} engine. See \code{?ordinalForest::ordfor()}
+for more details on the original parameters. These parameters are
+engine-specific, not general to decision tree models, so are provided here
+rather than in \code{dials}.
+\itemize{
+\item \code{naive_scores()}: Whether to construct only a "naive" ordinal forest using
+the scores \eqn{1,2,3,\ldots} for the ordinal values; tunes \code{naive}.
+\item \code{num_scores()}: The number of score sets tried prior to optimization; tunes
+\code{nsets}.
+\item \code{num_score_perms()}: The number of permutations of the class width ordering
+to try for each score set tried (after the first); tunes \code{npermtrial}.
+\item \code{num_score_trees()}: The number of trees in the score set--specific
+forests; tunes \code{ntreeperdiv}.
+\item \code{num_scores_best()}: The number of top-performing score sets used to
+calculate the optimized score set; tunes \code{nbest}.
+\item \code{ord_metric()}: The performance function used to evaluate score
+set--specific forests; tunes \code{perffunction}. See also
+\code{?ordinalForest::perff}.
+}
 }
 \examples{
 naive_scores()
