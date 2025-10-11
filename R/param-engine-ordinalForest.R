@@ -14,33 +14,31 @@
 #'   provided, the default is used which matches the units used in `range`. If
 #'   no transformation, `NULL`.
 #'
-#'   These functions generate parameters for [parsnip::rand_forest()] models
-#'   using the `"ordinalForest"` engine.
+#' @details These functions generate parameters for [parsnip::rand_forest()]
+#'   models using the `"ordinalForest"` engine. See `?ordinalForest::ordfor()`
+#'   for more details on the original parameters. These parameters are
+#'   engine-specific, not general to decision tree models, so are provided here
+#'   rather than in `dials`.
 #'
 #' * `naive_scores()`: Whether to construct only a "naive" ordinal forest using
-#'   the scores \eqn{1,2,3,\ldots} for the ordinal values. (See the `naive`
-#'   argument at `?ordinalForest::ordfor()`.)
+#'   the scores \eqn{1,2,3,\ldots} for the ordinal values; tunes `naive`.
 #'
-#' * `num_scores()`: The number of score sets tried prior to optimization. (See
-#'   the `nsets` argument at `?ordinalForest::ordfor()`.)
+#' * `num_scores()`: The number of score sets tried prior to optimization; tunes
+#'   `nsets`.
 #'
 #' * `num_score_perms()`: The number of permutations of the class width ordering
-#'   to try for each score set tried (after the first). (See the `npermtrial`
-#'   argument at `?ordinalForest::ordfor()`.)
+#'   to try for each score set tried (after the first); tunes `npermtrial`.
 #'
 #' * `num_score_trees()`: The number of trees in the score set--specific
-#'   forests. (See the `ntreeperdiv` argument at `?ordinalForest::ordfor()`.)
+#'   forests; tunes `ntreeperdiv`.
 #'
 #' * `num_scores_best()`: The number of top-performing score sets used to
-#'   calculate the optimized score set. (See the `nbest` argument at
-#'   `?ordinalForest::ordfor()`.)
+#'   calculate the optimized score set; tunes `nbest`.
 #'
 #' * `ord_metric()`: The performance function used to evaluate score
-#'   set--specific forests. (See the `perffunction` argument at
-#'   `?ordinalForest::ordfor()` and also `?ordinalForest::perff`.)
+#'   set--specific forests; tunes `perffunction`. See also
+#'   `?ordinalForest::perff`.
 #'
-#'   These parameters are engine-specific, not general to decision tree models,
-#'   so are provided here rather than in `dials`.
 #' @seealso [dials::trees()]
 #' @examples
 #' naive_scores()

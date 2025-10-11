@@ -20,8 +20,8 @@ specified using \code{set_engine("rpartScore", ...)}.
 }
 \details{
 \code{split_func} and \code{prune_func} are dials for \code{split} and \code{prune},
-respectively. See \code{?rpartScore::rpartScore} for how those parameters are
-used.
+respectively. See \code{?rpartScore::rpartScore} for more details on the
+original parameters.
 
 These parameters are engine-specific, not general to decision tree models,
 so are provided here rather than in \code{dials}.
