@@ -40,7 +40,7 @@ if (rlang::is_installed("ordinalForest")) {
 
 fit_orf <- rand_forest(mode = "classification") |>
   set_engine("ordinalForest") |>
-  set_args(ord_metric = "probability") |>
+  set_args(perffunction = "probability") |>
   fit(Sat ~ Infl + Type + Cont, data = house_train)
 predict(fit_orf, house_test, type = "prob")
 

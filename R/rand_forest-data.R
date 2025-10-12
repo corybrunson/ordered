@@ -8,7 +8,7 @@
 #' @param ... Arguments to pass to the underlying model function.
 #' @export
 #' @keywords internal
-ordinal_forest_wrapper <- function(x, y, ...) {
+ordinalForest_wrapper <- function(x, y, ...) {
   rlang::check_installed("ordinalForest")
   # append response variable as column to predictor matrix
   x$.outcome <- y
@@ -42,6 +42,12 @@ make_rand_forest_ordinalForest <- function() {
     pkg = "ordinalForest",
     mode = "classification"
   )
+  parsnip::set_dependency(
+    "rand_forest",
+    eng = "ordinalForest",
+    pkg = "ordered",
+    mode = "classification"
+  )
 
   # dials provided in {dials}
   parsnip::set_model_arg(
@@ -68,55 +74,6 @@ make_rand_forest_ordinalForest <- function() {
     func = list(pkg = "dials", fun = "min_n"),
     has_submodel = FALSE
   )
-  # dials provided in {ordered}
-  parsnip::set_model_arg(
-    model = "rand_forest",
-    eng = "ordinalForest",
-    parsnip = "naive_scores",
-    original = "naive",
-    func = list(pkg = "ordered", fun = "naive_scores"),
-    has_submodel = FALSE
-  )
-  parsnip::set_model_arg(
-    model = "rand_forest",
-    eng = "ordinalForest",
-    parsnip = "num_scores",
-    original = "nsets",
-    func = list(pkg = "ordered", fun = "num_scores"),
-    has_submodel = FALSE
-  )
-  parsnip::set_model_arg(
-    model = "rand_forest",
-    eng = "ordinalForest",
-    parsnip = "num_score_perms",
-    original = "npermtrial",
-    func = list(pkg = "ordered", fun = "num_score_perms"),
-    has_submodel = FALSE
-  )
-  parsnip::set_model_arg(
-    model = "rand_forest",
-    eng = "ordinalForest",
-    parsnip = "num_score_trees",
-    original = "ntreeperdiv",
-    func = list(pkg = "ordered", fun = "num_score_trees"),
-    has_submodel = FALSE
-  )
-  parsnip::set_model_arg(
-    model = "rand_forest",
-    eng = "ordinalForest",
-    parsnip = "num_scores_best",
-    original = "nbest",
-    func = list(pkg = "ordered", fun = "num_scores_best"),
-    has_submodel = FALSE
-  )
-  parsnip::set_model_arg(
-    model = "rand_forest",
-    eng = "ordinalForest",
-    parsnip = "ord_metric",
-    original = "perffunction",
-    func = list(pkg = "ordered", fun = "ord_metric"),
-    has_submodel = FALSE
-  )
 
   parsnip::set_fit(
     model = "rand_forest",
@@ -126,11 +83,11 @@ make_rand_forest_ordinalForest <- function() {
       interface = "data.frame",
       data = c(x = "x", y = "y"),
       protect = c("x", "y"),
-      func = c(pkg = "ordered", fun = "ordinal_forest_wrapper"),
+      func = c(pkg = "ordered", fun = "ordinalForest_wrapper"),
       defaults =
         list(
-          num.threads = 1
-          # perffunction = "probability"
+          num.threads = 1,
+          perffunction = "probability"
         )
     )
   )
@@ -175,7 +132,7 @@ make_rand_forest_ordinalForest <- function() {
           cli::cli_abort(
             c(
               "The model fit does not appear to support class probabilities.",
-              "i" = "Specify {.code ord_metric = 'probability'} for
+              "i" = "Specify {.code perffunction = 'probability'} for
                      probability predictions."
             ),
             call = rlang::call2("predict")
