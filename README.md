@@ -21,8 +21,9 @@ combinations in the parsnip package that can be used, this package adds:
 
 - cumulative link (cumulative logit) ordinal regression via
   `MASS::polr()`
-- regularized elastic net ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and
-  Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
+- regularized elastic net ordinal regression via
+  `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz,
+  2021](https://doi.org/10.18637/jss.v099.i06))
 - ordinal classification trees via `rpartScore::rpartScore()`
   ([Galimberti, Soffritti, and Di Maso,
   2012](https://doi.org/10.18637/jss.v047.i10))
@@ -52,6 +53,8 @@ More will be added. Under consideration are:
   2021](https://doi.org/10.1186%2Fs12859-021-04432-w))
 - cumulative link ordinal regression via `ordinal::clm()` ([Christensen,
   2023](https://cran.uni-muenster.de/web/packages/ordinal/vignettes/clm_article.pdf))
+- conditional probability ordered forests via `orf::orf()` ([Lechner and
+  Okasa, 2025](https://doi.org/10.1007/s00181-024-02646-4))
 
 There are some existing features in tidymodels packages that are useful
 for ordinal outcomes:
@@ -115,9 +118,9 @@ caco_test  <- caco_dat[ (1:10), ]
 
 ord_rf_spec <- 
   # you should really use many more trees and score sets
-  rand_forest(mtry = 2, trees = 100, num_scores = 100) %>%
+  rand_forest(mtry = 2, trees = 100) %>%
   set_mode("classification") %>%
-  set_engine("ordinalForest")
+  set_engine("ordinalForest", nsets = 100)
 
 set.seed(382)
 ord_rf_fit <- ord_rf_spec %>% fit(class ~ ., data = caco_train)

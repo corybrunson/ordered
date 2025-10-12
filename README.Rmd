@@ -37,6 +37,7 @@ More will be added. Under consideration are:
  - generalized monotone incremental forward stagewise regularized ordinal regression via `ordinalgmifs::ordinalgmifs()` ([Archer, Hou, Zhou, Ferber, Layne, and Gentry, 2014](https://doi.org/10.4137/CIN.S20806); [Gentry, Jackson-Cook, Lyon, and Archer, 2015](https://doi.org/10.4137/CIN.S17277))
  - Bayesian LASSO ordinal regression via `ordinalbayes::ordinalbayes()` ([Zhang and Archer, 2021](https://doi.org/10.1186%2Fs12859-021-04432-w))
  - cumulative link ordinal regression via `ordinal::clm()` ([Christensen, 2023](https://cran.uni-muenster.de/web/packages/ordinal/vignettes/clm_article.pdf))
+ - conditional probability ordered forests via `orf::orf()` ([Lechner and Okasa, 2025](https://doi.org/10.1007/s00181-024-02646-4))
 
 There are some existing features in tidymodels packages that are useful for ordinal outcomes: 
 
@@ -83,9 +84,9 @@ caco_test  <- caco_dat[ (1:10), ]
 
 ord_rf_spec <- 
   # you should really use many more trees and score sets
-  rand_forest(mtry = 2, trees = 100, num_scores = 100) %>%
+  rand_forest(mtry = 2, trees = 100) %>%
   set_mode("classification") %>%
-  set_engine("ordinalForest")
+  set_engine("ordinalForest", nsets = 100)
 
 set.seed(382)
 ord_rf_fit <- ord_rf_spec %>% fit(class ~ ., data = caco_train)
