@@ -16,7 +16,7 @@ ordinalNet_wrapper <- function(
     # This solution `translate()`s to `ordered::ordinalNet_wrapper(...)`, which
     # is certainly disfavored against `ordinalNet::ordinalNet(...)`.
     # TODO: Test whether defaults can be omitted.
-    family = "cumulative_logits", link = "logistic",
+    family = "cumulative_link", link = "logistic",
     ...
 ) {
   rlang::check_installed("ordinalNet")
@@ -25,7 +25,7 @@ ordinalNet_wrapper <- function(
   family <- match.arg(family, dials::values_odds_link)
   family <- switch(
     family,
-    cumulative_logits = "cumulative",
+    cumulative_link = "cumulative",
     adjacent_categories = "acat",
     continuation_ratio = "cratio",
     stopping_ratio = "sratio"
