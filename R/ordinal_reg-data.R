@@ -1,148 +1,3 @@
-#' Wrappers for `ordinalNet`
-#'
-#' This wrapper converts the `family` options of [ordinalNet::ordinalNet()] to
-#' the standardized `odds_link` options encoded in [dials::values_odds_link].
-#' @param x The predictor data.
-#' @param y The outcome vector.
-#' @param ... Additional arguments to pass.
-#' @keywords internal
-#' @export
-ordinal_net_wrapper <- function(
-    x, y, weights = NULL,
-    # REVIEW: Is this the preferred way to handle differences in parameter
-    # names? See the commented alternative in `parsnip::translate.ordinal_reg`.
-    # This solution `translate()`s to `ordered::ordinal_net_wrapper(...)`, which
-    # is certainly disfavored against `ordinalNet::ordinalNet(...)`.
-    # TODO: Test whether defaults can be omitted.
-    family = "cumulative_logits", link = "logistic",
-    ...
-) {
-  rlang::check_installed("ordinalNet")
-
-  # match and convert odds link options
-  family <- match.arg(
-    family,
-    c(
-      "cumulative_logits",
-      "adjacent_categories",
-      "continuation_ratio",
-      "stopping_ratio"
-    )
-  )
-  family <- switch(
-    family,
-    cumulative_logits = "cumulative",
-    adjacent_categories = "acat",
-    continuation_ratio = "cratio",
-    stopping_ratio = "sratio"
-  )
-  # REVIEW: There may be a standard way to do this. In particular, can this be
-  # robust to upgrades in {ordinalNet}? How can errors and duplication be
-  # prevented in tuning routines?
-  link <- match.arg(
-    link,
-    c("logistic", "probit", "loglog", "cloglog", "cauchit")
-  )
-  if (link == "logistic") link <- "logit"
-  if (link == "loglog") {
-    cli::cli_abort(
-      c(
-        "The `ordinalNet` engine does not support the log-log ordinal link.",
-        "i" = "See `?ordinalNet::ordinalNet` for provided link functions."
-      )
-    )
-  }
-  # restructure based on weights (requires `y` to be a factor)
-  if (! is.null(weights)) {
-    y_levs <- levels(y)
-    y <- lapply(y_levs, function(u) (y == u) * weights)
-    y <- do.call(cbind, y)
-    colnames(y) <- y_levs
-  }
-  # execute call on modified inputs
-  cl <- rlang::call2(
-    .fn = "ordinalNet", .ns = "ordinalNet",
-    x = expr(x), y = expr(y),
-    family = expr(family), link = expr(link),
-    ...
-  )
-  rlang::eval_tidy(cl)
-}
-
-#' @rdname ordinal_net_wrapper
-#' @export
-predict_ordinal_net_wrapper <- function(object, newx, type, whichLambda) {
-  # observed penalty adjacent to passed penalty
-  obs_pen <- object$lambdaVals
-  pen_ind <- adjacent_penalties(object, whichLambda)
-  adj_pen <- obs_pen[pen_ind]
-
-  # probability predictions based on adjacent penalty
-  pred <- predict(
-    object,
-    newx = newx,
-    whichLambda = pen_ind[1L],
-    type = "response"
-  )
-  if (length(pen_ind) == 2L) {
-    pred_high <- predict(
-      object,
-      newx = newx,
-      whichLambda = pen_ind[2L],
-      type = "response"
-    )
-    pred <- approx_prediction(pred, pred_high, adj_pen, whichLambda)
-  }
-
-  switch(
-    type,
-    "prob" = pred,
-    # REVIEW: This "rounds down" if two probabilities are equal.
-    "class" = apply(pred, 1L, which.max)
-  )
-}
-
-# `use_extreme` is a placeholder for a policy that we need to set; do we error
-# when predicting outside of the observed penalty range or do something else
-# (such as predicting at the closest value in the path) --topepo
-
-# See `translate.ordinal_reg()` in {parsnip}. by using `nLambda` and
-# `lambdaMinRatio` together with `includeLambda0`, we ensure that any penalty
-# value can be "interpolated" (those above the maximum are equivalent to the
-# maximum). The `have_extr` variable determines whether this was done based on
-# the arguments retained in the `ordinalNet` object. --corybrunson
-
-adjacent_penalties <- function(object, penalty, use_extreme = TRUE) {
-  ref <- object$lambdaVals
-  in_rng <- penalty >= min(ref) && penalty <= max(ref)
-  have_extr <- is.null(object$args$lambdaVals) && object$args$includeLambda0
-  if (! in_rng && ! have_extr) {
-    cli::cli_abort("The penalty value {format(penalty, digits = 3)} is
-                    outside the penalty range contained in the model object.",
-                   call = rlang::call2("predict"))
-  }
-
-  above <- which.min(ifelse(ref < penalty,  Inf, ref))
-  below <- which.max(ifelse(ref > penalty, -Inf, ref))
-  unique(sort(c(below, above)))
-}
-
-approx_prediction <- function(low, high, adjacent, penalty) {
-  res <- low * NA_real_
-  num_cls <- ncol(low)
-  both <- cbind(low, high)
-  for (i in 1:num_cls) {
-    tmp <- both[, c(i, i + num_cls)]
-    res[, i] <- apply(tmp, 1, approx_prediction_row, adjacent, penalty)
-  }
-  res <- apply(res, 1, function(x) x / sum(x))
-  t(res)
-}
-
-approx_prediction_row <- function(values, adjacent, penalty) {
-  approx(adjacent, values, xout = penalty)$y
-}
-
 # These functions define the ordinal regression models.
 # They are executed when this package is loaded via `.onLoad()`
 # and modify the parsnip package's model environment.
@@ -307,7 +162,7 @@ make_ordinal_reg_ordinalNet <- function() {
       interface = "matrix",
       protect = c("x", "y", "weights"),
       # func = c(pkg = "ordinalNet", fun = "ordinalNet"),
-      func = c(pkg = "ordered", fun = "ordinal_net_wrapper"),
+      func = c(pkg = "ordered", fun = "ordinalNet_wrapper"),
       defaults = list()
     )
   )
@@ -349,7 +204,7 @@ make_ordinal_reg_ordinalNet <- function() {
       post = function(x, object) {
         ordered(object$lvl[x], object$lvl)
       },
-      func = c(fun = "predict_ordinal_net_wrapper"),
+      func = c(fun = "predict_ordinalNet_wrapper"),
       args =
         list(
           object = quote(object$fit),
@@ -372,7 +227,7 @@ make_ordinal_reg_ordinalNet <- function() {
         x <- set_names(x, paste0(".pred_", object$lvl))
         x
       },
-      func = c(fun = "predict_ordinal_net_wrapper"),
+      func = c(fun = "predict_ordinalNet_wrapper"),
       args =
         list(
           object = quote(object$fit),

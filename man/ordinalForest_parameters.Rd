@@ -10,7 +10,7 @@
 \alias{num_scores_best}
 \alias{ord_metric}
 \alias{values_ord_metric}
-\title{Dials for ordinalForest engine parameters}
+\title{Dials for \code{ordinalForest} engine parameters}
 \format{
 An object of class \code{character} of length 4.
 }

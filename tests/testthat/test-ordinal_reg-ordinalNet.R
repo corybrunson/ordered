@@ -309,7 +309,7 @@ test_that("probability prediction", {
   # orig_pred <- set_names(orig_pred, paste0(".pred_", tidy_fit$lvl))
 
   # same penalty
-  wrap_pred <- predict_ordinal_net_wrapper(
+  wrap_pred <- predict_ordinalNet_wrapper(
     tidy_fit$fit, house_vars, type = "prob", whichLambda = .001
   )
   wrap_pred <- tibble::as_tibble(wrap_pred)
@@ -317,7 +317,7 @@ test_that("probability prediction", {
   expect_equal(wrap_pred, tidy_pred)
 
   # different penalty
-  wrap_pred <- predict_ordinal_net_wrapper(
+  wrap_pred <- predict_ordinalNet_wrapper(
     tidy_fit$fit, house_vars, type = "prob", whichLambda = .01
   )
   wrap_pred <- tibble::as_tibble(wrap_pred)

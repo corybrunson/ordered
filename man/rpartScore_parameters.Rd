@@ -4,7 +4,7 @@
 \alias{rpartScore_parameters}
 \alias{split_func}
 \alias{prune_func}
-\title{Dials for rpartScore engine parameters}
+\title{Dials for \code{rpartScore} engine parameters}
 \usage{
 split_func(values = c("abs", "quad"))
 

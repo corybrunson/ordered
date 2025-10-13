@@ -11,7 +11,7 @@
       Computational engine: ordinalNet 
       
       Model fit template:
-      ordered::ordinal_net_wrapper(x = missing_arg(), y = missing_arg(), 
+      ordered::ordinalNet_wrapper(x = missing_arg(), y = missing_arg(), 
           weights = missing_arg(), nLambda = 120L, lambdaMinRatio = 1e-08, 
           includeLambda0 = TRUE)
 
@@ -299,7 +299,7 @@
       Computational engine: ordinalNet 
       
       Model fit template:
-      ordered::ordinal_net_wrapper(x = missing_arg(), y = missing_arg(), 
+      ordered::ordinalNet_wrapper(x = missing_arg(), y = missing_arg(), 
           weights = missing_arg(), link = "cloglog", family = "stopping", 
           alpha = 0.25, nLambda = 120L, lambdaMinRatio = 1e-08, includeLambda0 = TRUE)
 

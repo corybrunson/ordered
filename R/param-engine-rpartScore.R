@@ -1,4 +1,4 @@
-#' Dials for rpartScore engine parameters
+#' Dials for `rpartScore` engine parameters
 #'
 #' These parameters are auxiliary to decision tree models that use the
 #' "rpartScore" engine. They correspond to tuning parameters that would be

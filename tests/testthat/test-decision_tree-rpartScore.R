@@ -10,7 +10,7 @@ test_that("model object", {
   set.seed(seed)
   orig_fit <- rpartScore::rpartScore(
     Sat ~ Type + Infl + Cont,
-    data = mutate(house_sub, Sat = as.integer(Sat))
+    data = transform(house_sub, Sat = as.integer(Sat))
   )
 
   tidy_spec <- decision_tree() |>
@@ -41,7 +41,7 @@ test_that("case weights", {
   set.seed(seed)
   orig_fit <- rpartScore::rpartScore(
     Sat ~ Type + Infl + Cont,
-    data = mutate(house_data, Sat = as.integer(Sat)),
+    data = transform(house_data, Sat = as.integer(Sat)),
     weights = Freq
   )
 

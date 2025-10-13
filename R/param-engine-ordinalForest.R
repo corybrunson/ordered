@@ -1,4 +1,4 @@
-#' Dials for ordinalForest engine parameters
+#' Dials for `ordinalForest` engine parameters
 #'
 #' These parameters are auxiliary to random forest models that use the
 #' "ordinalForest" engine. They correspond to tuning parameters that would be
