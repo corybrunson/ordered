@@ -56,7 +56,9 @@ predict_class._ordinalNet(object, new_data, ...)
 \item{penalty}{A numeric vector of penalty values.}
 }
 \description{
-This wrapper converts the \code{family} options of \code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}} to
-the standardized \code{odds_link} options encoded in \code{\link[dials:ordinal_link]{dials::values_odds_link}}.
+The "fit" wrapper converts the standardized \code{odds_link} options encoded in
+\code{\link[dials:ordinal_link]{dials::values_odds_link}} to the \code{family} options of
+\code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}}. The prediction wrapper interpolates between
+fitted penalties to enable submodel prediction at specified penalties.
 }
 \keyword{internal}

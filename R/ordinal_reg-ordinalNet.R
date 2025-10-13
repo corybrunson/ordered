@@ -1,7 +1,9 @@
 #' Wrappers for `ordinalNet`
 #'
-#' This wrapper converts the `family` options of [ordinalNet::ordinalNet()] to
-#' the standardized `odds_link` options encoded in [`dials::values_odds_link`].
+#' The "fit" wrapper converts the standardized `odds_link` options encoded in
+#' [`dials::values_odds_link`] to the `family` options of
+#' [ordinalNet::ordinalNet()]. The prediction wrapper interpolates between
+#' fitted penalties to enable submodel prediction at specified penalties.
 #' @param x The predictor data.
 #' @param y The outcome vector.
 #' @param ... Additional arguments to pass.
@@ -41,6 +43,7 @@ ordinalNet_wrapper <- function(
       )
     )
   }
+
   # restructure based on weights (requires `y` to be a factor)
   if (! is.null(weights)) {
     y_levs <- levels(y)
@@ -48,6 +51,7 @@ ordinalNet_wrapper <- function(
     y <- do.call(cbind, y)
     colnames(y) <- y_levs
   }
+
   # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "ordinalNet", .ns = "ordinalNet",
