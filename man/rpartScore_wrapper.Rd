@@ -18,4 +18,19 @@ A wrapper is used because the model interface requires the response variable
 to be numeric rather than ordered or factor; the wrapper edits the input
 \code{data} accordingly.
 }
+\examples{
+\dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("rpartScore")) withAutoprint(\{ # examplesIf}
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+# fit wrapper
+( fit_orig <- rpartScore::rpartScore(
+  formula = Sat ~ Infl + Type + Cont,
+  data = transform(house_data, Sat = as.integer(Sat))
+) )
+( fit_wrap <- rpartScore_wrapper(
+  formula = Sat ~ Infl + Type + Cont,
+  data = house_data
+) )
+\dontshow{\}) # examplesIf}
+}
 \keyword{internal}
