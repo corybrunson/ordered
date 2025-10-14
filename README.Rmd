@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 `ordered` is a [parsnip](https://parsnip.tidymodels.org/) extension to enable additional classification models for ordinal outcomes (e.g., "low", "medium", "high"). While there are several model/engine combinations in the parsnip package that can be used, this package adds:
 
  - cumulative link (cumulative logit) ordinal regression via `MASS::polr()`
- - regularized elastic net ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
+ - regularized elastic net ordinal regression models of cumulative link, adjacent categories, continuation ratio, and stopping ratio families via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
  - ordinal classification trees via `rpartScore::rpartScore()` ([Galimberti, Soffritti, and Di Maso, 2012](https://doi.org/10.18637/jss.v047.i10))
  - latent variable ordinal forests via `ordinalForest::ordfor()` ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
 
