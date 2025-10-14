@@ -21,7 +21,7 @@
 #' @export
 VGAM_vglm_wrapper <- function(
     formula, data,
-    family = "cumulative_logits", link = "logistic",
+    family = "cumulative_link", link = "logistic",
     parallel = TRUE,
     ...
 ) {
@@ -57,7 +57,7 @@ VGAM_vglm_wrapper <- function(
 #' @export
 VGAM_vgam_wrapper <- function(
     formula, data,
-    family = "cumulative_logits", link = "logistic",
+    family = "cumulative_link", link = "logistic",
     ...
 ) {
   rlang::check_installed("VGAM")
@@ -92,7 +92,7 @@ match_VGAM_family <- function(family) {
   family <- match.arg(family, dials::values_odds_link)
   switch(
     family,
-    cumulative_logits = "cumulative",
+    cumulative_link = "cumulative",
     adjacent_categories = "acat",
     continuation_ratio = "cratio",
     stopping_ratio = "sratio"

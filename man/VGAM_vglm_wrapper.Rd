@@ -13,7 +13,7 @@ An object of class \code{character} of length 10.
 VGAM_vglm_wrapper(
   formula,
   data,
-  family = "cumulative_logits",
+  family = "cumulative_link",
   link = "logistic",
   parallel = TRUE,
   ...
@@ -22,7 +22,7 @@ VGAM_vglm_wrapper(
 VGAM_vgam_wrapper(
   formula,
   data,
-  family = "cumulative_logits",
+  family = "cumulative_link",
   link = "logistic",
   ...
 )
