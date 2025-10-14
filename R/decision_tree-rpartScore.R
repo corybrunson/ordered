@@ -7,7 +7,6 @@
 #' @param data The data frame to pass.
 #' @param ... Additional arguments to pass.
 #' @keywords internal
-#' @export
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("rpartScore")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
@@ -20,7 +19,7 @@
 #'   formula = Sat ~ Infl + Type + Cont,
 #'   data = house_data
 #' ) )
-#'
+#' @export
 rpartScore_wrapper <- function(formula, data, ...) {
   rlang::check_installed("rpartScore")
   # convert response variable in `data` from ordinal to integer

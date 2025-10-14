@@ -18,6 +18,31 @@
 #' @examples
 #' values_ordinal_link_VGAM
 #' dials::ordinal_link(values = values_ordinal_link_VGAM)
+#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM")
+#' house_data <-
+#'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+#' # fit wrapper for linear model
+#' ( fit_orig <- VGAM::vglm(
+#'   Sat ~ Type + Infl + Cont,
+#'   family = VGAM::sratio(link = "probitlink", parallel = TRUE),
+#'   data = house_data
+#' ) )
+#' ( fit_wrap <- VGAM_vglm_wrapper(
+#'   Sat ~ Type + Infl + Cont,
+#'   family = "stopping_ratio", link = "probit",
+#'   data = house_data
+#' ) )
+#' # fit wrapper for additive model
+#' ( fit_orig <- VGAM::vgam(
+#'   Sat ~ Type + Infl + Cont,
+#'   family = VGAM::cratio(link = "clogloglink", parallel = TRUE),
+#'   data = house_data
+#' ) )
+#' ( fit_wrap <- VGAM_vgam_wrapper(
+#'   Sat ~ Type + Infl + Cont,
+#'   family = "continuation_ratio", link = "cloglog",
+#'   data = house_data
+#' ) )
 #' @export
 VGAM_vglm_wrapper <- function(
     formula, data,
@@ -58,9 +83,13 @@ VGAM_vglm_wrapper <- function(
 VGAM_vgam_wrapper <- function(
     formula, data,
     family = "cumulative_link", link = "logistic",
+    parallel = TRUE,
     ...
 ) {
   rlang::check_installed("VGAM")
+
+  # for now, require `parallel` to be logical
+  check_logical(parallel)
 
   # match and convert odds link options
   family <- match_VGAM_family(family)
@@ -69,7 +98,7 @@ VGAM_vgam_wrapper <- function(
   # execute nested call on modified inputs
   family_call <- rlang::call2(
     .fn = family, .ns = "VGAM",
-    link = link
+    link = link, parallel = parallel
   )
   cl <- rlang::call2(
     .fn = "vgam", .ns = "VGAM",

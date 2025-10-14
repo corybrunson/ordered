@@ -7,7 +7,6 @@
 #' @param y The outcome factor.
 #' @param ... Arguments to pass to the underlying model function.
 #' @keywords internal
-#' @export
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("ordinalForest")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
@@ -22,7 +21,7 @@
 #'   x = subset(house_data, select = -Sat),
 #'   y = house_data$Sat
 #' ) )
-#'
+#' @export
 ordinalForest_wrapper <- function(x, y, ...) {
   rlang::check_installed("ordinalForest")
   # append response variable as column to predictor matrix

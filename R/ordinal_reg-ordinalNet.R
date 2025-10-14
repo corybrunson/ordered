@@ -8,7 +8,6 @@
 #' @param y The outcome vector.
 #' @param ... Additional arguments to pass.
 #' @keywords internal
-#' @export
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("ordinalNet")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
@@ -54,7 +53,7 @@
 #'   type = "prob",
 #'   lambda = .01
 #' )
-#'
+#' @export
 ordinalNet_wrapper <- function(
     x, y, weights = NULL,
     # REVIEW: Is this the preferred way to handle differences in parameter

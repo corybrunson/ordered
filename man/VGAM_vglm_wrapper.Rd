@@ -24,6 +24,7 @@ VGAM_vgam_wrapper(
   data,
   family = "cumulative_link",
   link = "logistic",
+  parallel = TRUE,
   ...
 )
 
@@ -54,6 +55,32 @@ single ordinal outcome column and therefore do not accept the convenient
 \examples{
 values_ordinal_link_VGAM
 dials::ordinal_link(values = values_ordinal_link_VGAM)
+\dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("VGAM")) withAutoprint(\{ # examplesIf}
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+# fit wrapper for linear model
+( fit_orig <- VGAM::vglm(
+  Sat ~ Type + Infl + Cont,
+  family = VGAM::sratio(link = "probitlink", parallel = TRUE),
+  data = house_data
+) )
+( fit_wrap <- VGAM_vglm_wrapper(
+  Sat ~ Type + Infl + Cont,
+  family = "stopping_ratio", link = "probit",
+  data = house_data
+) )
+# fit wrapper for additive model
+( fit_orig <- VGAM::vgam(
+  Sat ~ Type + Infl + Cont,
+  family = VGAM::cratio(link = "clogloglink", parallel = TRUE),
+  data = house_data
+) )
+( fit_wrap <- VGAM_vgam_wrapper(
+  Sat ~ Type + Infl + Cont,
+  family = "continuation_ratio", link = "cloglog",
+  data = house_data
+) )
+\dontshow{\}) # examplesIf}
 }
 \keyword{datasets}
 \keyword{internal}
