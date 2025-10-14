@@ -1,12 +1,60 @@
 #' Wrappers for `ordinalNet`
 #'
-#' This wrapper converts the `family` options of [ordinalNet::ordinalNet()] to
-#' the standardized `odds_link` options encoded in [`dials::values_odds_link`].
+#' The fit wrapper converts the standardized `odds_link` options encoded in
+#' [`dials::values_odds_link`] to the `family` options of
+#' [ordinalNet::ordinalNet()]. The prediction wrapper interpolates between
+#' fitted penalties to enable submodel prediction at specified penalties.
 #' @param x The predictor data.
 #' @param y The outcome vector.
 #' @param ... Additional arguments to pass.
 #' @keywords internal
 #' @export
+#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("ordinalNet")
+#' house_data <-
+#'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+#' house_matrix <- model.matrix(
+#'   Sat ~ Type + Infl + Cont + 0,
+#'   data = house_data,
+#'   contrasts.arg = lapply(house_data[, 2:4], contrasts, contrasts = FALSE)
+#' )
+#' pen_vec <- 10 ^ seq(-2.5, -.5, 1)
+#' # fit wrapper
+#' ( fit_orig <- ordinalNet::ordinalNet(
+#'   house_matrix, y = house_data$Sat,
+#'   family = "sratio", link = "logit",
+#'   lambdaVals = pen_vec
+#' ) )
+#' ( fit_wrap <- ordinalNet_wrapper(
+#'   house_matrix, y = house_data$Sat,
+#'   family = "stopping_ratio", link = "logistic",
+#'   lambdaVals = pen_vec
+#' ) )
+#' fit_tidy <-
+#'   ordinal_reg(ordinal_link = "logistic", odds_link = "stopping_ratio") |>
+#'   set_engine("ordinalNet") |>
+#'   set_args(path_values = pen_vec, penalty = 1) |>
+#'   fit(formula = Sat ~ Type + Infl + Cont + 0, data = house_data)
+#' fit_tidy$fit
+#' # predict wrapper
+#' predict(
+#'   fit_orig,
+#'   newx = head(house_matrix),
+#'   whichLambda = 2,
+#'   type = "response"
+#' )
+#' predict_ordinalNet_wrapper(
+#'   fit_tidy$fit,
+#'   newx = head(house_matrix),
+#'   type = "prob",
+#'   lambda = pen_vec[2]
+#' )
+#' predict_ordinalNet_wrapper(
+#'   fit_tidy$fit,
+#'   newx = head(house_matrix),
+#'   type = "prob",
+#'   lambda = .01
+#' )
+#'
 ordinalNet_wrapper <- function(
     x, y, weights = NULL,
     # REVIEW: Is this the preferred way to handle differences in parameter
@@ -14,7 +62,7 @@ ordinalNet_wrapper <- function(
     # This solution `translate()`s to `ordered::ordinalNet_wrapper(...)`, which
     # is certainly disfavored against `ordinalNet::ordinalNet(...)`.
     # TODO: Test whether defaults can be omitted.
-    family = "cumulative_logits", link = "logistic",
+    family = "cumulative_link", link = "logistic",
     ...
 ) {
   rlang::check_installed("ordinalNet")
@@ -23,7 +71,7 @@ ordinalNet_wrapper <- function(
   family <- match.arg(family, dials::values_odds_link)
   family <- switch(
     family,
-    cumulative_logits = "cumulative",
+    cumulative_link = "cumulative",
     adjacent_categories = "acat",
     continuation_ratio = "cratio",
     stopping_ratio = "sratio"
@@ -42,6 +90,7 @@ ordinalNet_wrapper <- function(
       )
     )
   }
+
   # restructure based on weights (requires `y` to be a factor)
   if (! is.null(weights)) {
     y_levs <- levels(y)
@@ -49,6 +98,7 @@ ordinalNet_wrapper <- function(
     y <- do.call(cbind, y)
     colnames(y) <- y_levs
   }
+
   # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "ordinalNet", .ns = "ordinalNet",
@@ -61,10 +111,10 @@ ordinalNet_wrapper <- function(
 
 #' @rdname ordinalNet_wrapper
 #' @export
-predict_ordinalNet_wrapper <- function(object, newx, type, whichLambda) {
+predict_ordinalNet_wrapper <- function(object, newx, type, lambda) {
   # observed penalty adjacent to passed penalty
   obs_pen <- object$lambdaVals
-  pen_ind <- adjacent_penalties(object, whichLambda)
+  pen_ind <- adjacent_penalties(object, lambda)
   adj_pen <- obs_pen[pen_ind]
 
   # probability predictions based on adjacent penalty
@@ -81,7 +131,7 @@ predict_ordinalNet_wrapper <- function(object, newx, type, whichLambda) {
       whichLambda = pen_ind[2L],
       type = "response"
     )
-    pred <- approx_prediction(pred, pred_high, adj_pen, whichLambda)
+    pred <- approx_prediction(pred, pred_high, adj_pen, lambda)
   }
 
   switch(

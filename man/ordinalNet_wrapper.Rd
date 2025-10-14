@@ -14,12 +14,12 @@ ordinalNet_wrapper(
   x,
   y,
   weights = NULL,
-  family = "cumulative_logits",
+  family = "cumulative_link",
   link = "logistic",
   ...
 )
 
-predict_ordinalNet_wrapper(object, newx, type, whichLambda)
+predict_ordinalNet_wrapper(object, newx, type, lambda)
 
 \method{predict}{`_ordinalNet`}(
   object,
@@ -56,7 +56,57 @@ predict_class._ordinalNet(object, new_data, ...)
 \item{penalty}{A numeric vector of penalty values.}
 }
 \description{
-This wrapper converts the \code{family} options of \code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}} to
-the standardized \code{odds_link} options encoded in \code{\link[dials:ordinal_link]{dials::values_odds_link}}.
+The fit wrapper converts the standardized \code{odds_link} options encoded in
+\code{\link[dials:ordinal_link]{dials::values_odds_link}} to the \code{family} options of
+\code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}}. The prediction wrapper interpolates between
+fitted penalties to enable submodel prediction at specified penalties.
+}
+\examples{
+\dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("ordinalNet")) withAutoprint(\{ # examplesIf}
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_matrix <- model.matrix(
+  Sat ~ Type + Infl + Cont + 0,
+  data = house_data,
+  contrasts.arg = lapply(house_data[, 2:4], contrasts, contrasts = FALSE)
+)
+pen_vec <- 10 ^ seq(-2.5, -.5, 1)
+# fit wrapper
+( fit_orig <- ordinalNet::ordinalNet(
+  house_matrix, y = house_data$Sat,
+  family = "sratio", link = "logit",
+  lambdaVals = pen_vec
+) )
+( fit_wrap <- ordinalNet_wrapper(
+  house_matrix, y = house_data$Sat,
+  family = "stopping_ratio", link = "logistic",
+  lambdaVals = pen_vec
+) )
+fit_tidy <-
+  ordinal_reg(ordinal_link = "logistic", odds_link = "stopping_ratio") |>
+  set_engine("ordinalNet") |>
+  set_args(path_values = pen_vec, penalty = 1) |>
+  fit(formula = Sat ~ Type + Infl + Cont + 0, data = house_data)
+fit_tidy$fit
+# predict wrapper
+predict(
+  fit_orig,
+  newx = head(house_matrix),
+  whichLambda = 2,
+  type = "response"
+)
+predict_ordinalNet_wrapper(
+  fit_tidy$fit,
+  newx = head(house_matrix),
+  type = "prob",
+  lambda = pen_vec[2]
+)
+predict_ordinalNet_wrapper(
+  fit_tidy$fit,
+  newx = head(house_matrix),
+  type = "prob",
+  lambda = .01
+)
+\dontshow{\}) # examplesIf}
 }
 \keyword{internal}

@@ -310,7 +310,7 @@ test_that("probability prediction", {
 
   # same penalty
   wrap_pred <- predict_ordinalNet_wrapper(
-    tidy_fit$fit, house_vars, type = "prob", whichLambda = .001
+    tidy_fit$fit, house_vars, type = "prob", lambda = .001
   )
   wrap_pred <- tibble::as_tibble(wrap_pred)
   wrap_pred <- set_names(wrap_pred, paste0(".pred_", tidy_fit$lvl))
@@ -318,7 +318,7 @@ test_that("probability prediction", {
 
   # different penalty
   wrap_pred <- predict_ordinalNet_wrapper(
-    tidy_fit$fit, house_vars, type = "prob", whichLambda = .01
+    tidy_fit$fit, house_vars, type = "prob", lambda = .01
   )
   wrap_pred <- tibble::as_tibble(wrap_pred)
   wrap_pred <- set_names(wrap_pred, paste0(".pred_", tidy_fit$lvl))
