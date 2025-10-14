@@ -210,7 +210,7 @@ make_ordinal_reg_ordinalNet <- function() {
           object = quote(object$fit),
           newx = quote(new_data),
           type = "class",
-          whichLambda = quote(object$spec$args$penalty)
+          lambda = quote(object$spec$args$penalty)
         )
     )
   )
@@ -233,7 +233,7 @@ make_ordinal_reg_ordinalNet <- function() {
           object = quote(object$fit),
           newx = quote(new_data),
           type = "prob",
-          whichLambda = quote(object$spec$args$penalty)
+          lambda = quote(object$spec$args$penalty)
         )
     )
   )
