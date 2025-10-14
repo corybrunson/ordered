@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 
  - cumulative link (cumulative logit) ordinal regression via `MASS::polr()`
  - generalized linear and generalized additive ordinal regression models of cumulative link, adjacent categories, continuation ratio, and stopping ratio families via `VGAM::vglm()` and `VGAM::vgam()` ([Yee, 2015](https://doi.org/10.18637/jss.v032.i10))
- - regularized elastic net ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
+ - regularized elastic net ordinal regression models of cumulative link, adjacent categories, continuation ratio, and stopping ratio families via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
  - ordinal classification trees via `rpartScore::rpartScore()` ([Galimberti, Soffritti, and Di Maso, 2012](https://doi.org/10.18637/jss.v047.i10))
  - latent variable ordinal forests via `ordinalForest::ordfor()` ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
 
