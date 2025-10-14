@@ -5,9 +5,14 @@
 # been loaded.
 
 .onLoad <- function(libname, pkgname) {
+  # `ordinal_reg`
   make_ordinal_reg_polr()
   make_ordinal_reg_ordinalNet()
+  make_ordinal_reg_vglm()
+  make_ordinal_reg_vgam()
+  # `decision_tree`
   make_decision_tree_rpartScore()
+  # `rand_forest`
   make_rand_forest_ordinalForest()
 }
 

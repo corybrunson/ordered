@@ -5,9 +5,8 @@ test_that("ordinal_link", {
   skip_if_not_installed("MASS")
   house_sub <- get_house()$sub
 
-  # a legitimate ordinal link function not recognized by `polr()`
+  # a legitimate ordinal link function not recognized by {dials}
   tidy_spec <- ordinal_reg(engine = "polr", ordinal_link = "Aranda-Ordaz")
-  # REVIEW: Should this be a parsnip-level error message?
   expect_error(fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub))
 })
 

@@ -32,6 +32,7 @@ ordinalNet_wrapper <- function(
   # robust to upgrades in {ordinalNet}? How can errors and duplication be
   # prevented in tuning routines?
   link <- match.arg(link, dials::values_ordinal_link)
+  # REVIEW: Change `logistic` to `logit` in {dials}?
   if (link == "logistic") link <- "logit"
   if (link == "loglog") {
     cli::cli_abort(

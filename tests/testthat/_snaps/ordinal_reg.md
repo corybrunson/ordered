@@ -21,7 +21,7 @@
       res <- translate(set_engine(ordinal_reg(mode = "classification"), NULL))
     Condition
       Error in `set_engine()`:
-      ! Missing engine. Possible mode/engine combinations are: classification {polr, ordinalNet}.
+      ! Missing engine. Possible mode/engine combinations are: classification {polr, ordinalNet, vglm, vgam}.
 
 ---
 
