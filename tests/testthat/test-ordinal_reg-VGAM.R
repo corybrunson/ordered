@@ -63,6 +63,44 @@ test_that("model object", {
 
 # model: case weights ----------------------------------------------------------
 
+# NB: This test passes when the additional (commented) arguments are passed.
+test_that("case weights", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("VGAM")
+  house_sub <- get_house()$sub
+
+  set.seed(seed)
+  house_wts <- rpois(n = nrow(house_sub), 2) + 1L
+
+  set.seed(seed)
+  orig_fit <- VGAM::vglm(
+    Sat ~ Type + Infl + Cont,
+    family = VGAM::cumulative(parallel = TRUE),
+    data = house_sub,
+    weights = house_wts
+  )
+
+  tidy_spec <- ordinal_reg() |>
+    set_engine("vglm") |>
+    set_mode("classification")
+  set.seed(seed)
+  tidy_fit <- fit(
+    tidy_spec,
+    Sat ~ Type + Infl + Cont,
+    data = house_sub,
+    case_weights = frequency_weights(house_wts)
+  )
+
+  skip_slots <- c("call", "misc")
+  for (s in setdiff(slotNames(orig_fit), skip_slots)) {
+    expect_equal(
+      slot(orig_fit, s),
+      slot(tidy_fit$fit, s),
+      ignore_attr = TRUE, ignore_formula_env = TRUE
+    )
+  }
+})
+
 # prediction: class ------------------------------------------------------------
 
 # prediction: probability ------------------------------------------------------
