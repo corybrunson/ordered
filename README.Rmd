@@ -25,13 +25,13 @@ knitr::opts_chunk$set(
 `ordered` is a [parsnip](https://parsnip.tidymodels.org/) extension to enable additional classification models for ordinal outcomes (e.g., "low", "medium", "high"). While there are several model/engine combinations in the parsnip package that can be used, this package adds:
 
  - cumulative link (cumulative logit) ordinal regression via `MASS::polr()`
+ - generalized linear and generalized additive ordinal regression models of cumulative link, adjacent categories, continuation ratio, and stopping ratio families via `VGAM::vglm()` and `VGAM::vgam()` ([Yee, 2015](https://doi.org/10.18637/jss.v032.i10))
  - regularized elastic net ordinal regression via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz, 2021](https://doi.org/10.18637/jss.v099.i06))
  - ordinal classification trees via `rpartScore::rpartScore()` ([Galimberti, Soffritti, and Di Maso, 2012](https://doi.org/10.18637/jss.v047.i10))
  - latent variable ordinal forests via `ordinalForest::ordfor()` ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
 
 More will be added. Under consideration are:
 
- - generalized linear and generalized additive ordinal regression models of cumulative link, adjacent categories, continuation ratio, and stopping ratio families via `VGAM::vglm()` and `VGAM::vgam()` ([Yee, 2015](https://doi.org/10.18637/jss.v032.i10))
  - regularized cumulative probability (cumulative logit) ordinal regression via `rms::lrm()` and `rms::orm()` ([Harrell, 2015](https://doi.org/10.1007/978-3-319-19425-7))
  - continuation ratio (stopping ratio) ordinal regression using elastic net regularization via `glmnetcr::glmnetcr()` and using regularization path computation via `glmpathcr::glmpathcr()` ([Archer and Williams, 2012](https://doi.org/10.1002/sim.4484))
  - generalized monotone incremental forward stagewise regularized ordinal regression via `ordinalgmifs::ordinalgmifs()` ([Archer, Hou, Zhou, Ferber, Layne, and Gentry, 2014](https://doi.org/10.4137/CIN.S20806); [Gentry, Jackson-Cook, Lyon, and Archer, 2015](https://doi.org/10.4137/CIN.S17277))
