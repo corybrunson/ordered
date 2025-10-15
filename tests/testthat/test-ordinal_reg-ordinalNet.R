@@ -289,6 +289,7 @@ test_that("probability prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
+
   # NB: `newx` must contain exactly those predictors used in the fit.
   house_vars <- model.matrix(
     Sat ~ Type + Cont + 0, data = house_sub,

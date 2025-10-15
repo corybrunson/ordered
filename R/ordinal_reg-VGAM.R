@@ -145,7 +145,7 @@ match_VGAM_link <- function(link) {
 
 predict_VGAM_class_post <- function(x, object) {
   x <- apply(x, 1L, which.max)
-  x <- object$lvl[x]
+  x <- ordered(object$lvl[x], object$lvl)
   tibble::tibble(.pred_class = x)
 }
 
