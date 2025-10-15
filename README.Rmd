@@ -30,14 +30,7 @@ knitr::opts_chunk$set(
  - ordinal classification trees via `rpartScore::rpartScore()` ([Galimberti, Soffritti, and Di Maso, 2012](https://doi.org/10.18637/jss.v047.i10))
  - latent variable ordinal forests via `ordinalForest::ordfor()` ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
 
-More will be added. Under consideration are:
-
- - regularized cumulative probability (cumulative logit) ordinal regression via `rms::lrm()` and `rms::orm()` ([Harrell, 2015](https://doi.org/10.1007/978-3-319-19425-7))
- - continuation ratio (stopping ratio) ordinal regression using elastic net regularization via `glmnetcr::glmnetcr()` and using regularization path computation via `glmpathcr::glmpathcr()` ([Archer and Williams, 2012](https://doi.org/10.1002/sim.4484))
- - generalized monotone incremental forward stagewise regularized ordinal regression via `ordinalgmifs::ordinalgmifs()` ([Archer, Hou, Zhou, Ferber, Layne, and Gentry, 2014](https://doi.org/10.4137/CIN.S20806); [Gentry, Jackson-Cook, Lyon, and Archer, 2015](https://doi.org/10.4137/CIN.S17277))
- - Bayesian LASSO ordinal regression via `ordinalbayes::ordinalbayes()` ([Zhang and Archer, 2021](https://doi.org/10.1186%2Fs12859-021-04432-w))
- - cumulative link ordinal regression via `ordinal::clm()` ([Christensen, 2023](https://cran.uni-muenster.de/web/packages/ordinal/vignettes/clm_article.pdf))
- - conditional probability ordered forests via `orf::orf()` ([Lechner and Okasa, 2025](https://doi.org/10.1007/s00181-024-02646-4))
+More will be added.
 
 There are some existing features in tidymodels packages that are useful for ordinal outcomes: 
 
@@ -58,6 +51,41 @@ Currently, ordered relies on engine and dial registration in the following forks
 ``` r
 pak::pak("corybrunson/parsnip@ordered", dependencies = FALSE)
 pak::pak("corybrunson/dials@ordered", dependencies = FALSE)
+```
+
+## Available models, engines, and prediction types
+
+ordered provides new engines for several models, including all engines for `ordinal_reg()`, as summarized in the table.
+Currently only predictions of `type = "class"` and `type = "prob"` are supported.
+
+```{r, echo=FALSE, message=FALSE}
+# adapted from censored:
+# https://github.com/tidymodels/censored
+library(ordered)
+library(tibble)
+library(dplyr)
+library(purrr)
+library(tidyr)
+
+yep <- cli::symbol$tick
+nope <- cli::symbol$cross
+
+get_from_env("models") |> 
+  enframe(name = NULL, value = "model") |> 
+  mutate(dependency = map(model, get_dependency)) |> 
+  unnest(dependency) |> unnest(pkg) |> 
+  filter(pkg == "ordered") |> 
+  mutate(info = map(model, \(.x) get_from_env(paste0(.x, "_predict")))) |> 
+  nest(spec = c(model, engine, mode)) |> 
+  transmute(info = map2(info, spec, inner_join, join_by(engine, mode))) |> 
+  unnest(info) |> 
+  select(model, engine, mode, type) |> 
+  pivot_wider(
+    names_from = type, values_from = mode,
+    values_fill = nope, values_fn = function(x) yep
+  ) |> 
+  mutate(across(c(model, engine), \(.s) paste0("`", .s, "`"))) |> 
+  knitr::kable()
 ```
 
 ## Example
@@ -96,3 +124,5 @@ augment(ord_rf_fit, new_data = caco_test)
 ## Code of Conduct
 
 Please note that the ordered project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
+
+To voice support for or volunteer to contribute additional engines, please comment on [this issue](https://github.com/corybrunson/ordered/issues/15).
