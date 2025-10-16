@@ -110,7 +110,32 @@ ordinalNet_wrapper <- function(
 
 #' @rdname ordinalNet_wrapper
 #' @export
-predict_ordinalNet_wrapper <- function(object, newx, type, lambda) {
+predict_ordinalNet_wrapper <- function(
+    object, newx, type, lambda, criteria = c("aic", "bic")
+) {
+  save(object, newx, type, lambda, criteria,
+       file = "~/Downloads/ordered-predict-ordinalNet-wrapper.rda")
+  load(file = "~/Downloads/ordered-predict-ordinalNet-wrapper.rda")
+
+  # REVIEW: This is necessary in order to prevent requiring the user to pass
+  # a `penalty` value and nevertheless ignoring it.
+  if (is.null(lambda)) {
+    pred <- predict(
+      object,
+      newx = newx,
+      whichLambda = NULL,
+      criteria = criteria,
+      type = "response"
+    )
+    res <- switch(
+      type,
+      "prob" = pred,
+      # REVIEW: This "rounds down" if two probabilities are equal.
+      "class" = apply(pred, 1L, which.max)
+    )
+    return(res)
+  }
+
   # observed penalty adjacent to passed penalty
   obs_pen <- object$lambdaVals
   pen_ind <- adjacent_penalties(object, lambda)
@@ -121,6 +146,7 @@ predict_ordinalNet_wrapper <- function(object, newx, type, lambda) {
     object,
     newx = newx,
     whichLambda = pen_ind[1L],
+    criteria = criteria,
     type = "response"
   )
   if (length(pen_ind) == 2L) {
@@ -128,6 +154,7 @@ predict_ordinalNet_wrapper <- function(object, newx, type, lambda) {
       object,
       newx = newx,
       whichLambda = pen_ind[2L],
+      criteria = criteria,
       type = "response"
     )
     pred <- approx_prediction(pred, pred_high, adj_pen, lambda)
@@ -310,11 +337,12 @@ predict_class._ordinalNet <- function(object, new_data, ...) {
 .check_ordinalNet_penalty_predict <- function(
     penalty = NULL, object, multi = FALSE, call = rlang::caller_env()
 ) {
-  if (is.null(penalty)) {
-    penalty <- object$fit$lambdaVals
-  }
 
   if (multi) {
+    # ensure that there is a penalty path
+    if (is.null(penalty)) {
+      penalty <- object$fit$lambdaVals
+    }
     penalty <- sort(unique(penalty))
     # REVIEW: This code prevents `tune_grid()` from working.
     # if (length(penalty) < 2L) {
@@ -323,7 +351,8 @@ predict_class._ordinalNet <- function(object, new_data, ...) {
     #                  call = call)
     # }
   } else {
-    if (length(penalty) != 1L) {
+    # FIXME: Allow `NULL` penalty so that ordinalNet method uses criterion.
+    if (! is.null(penalty) && length(penalty) != 1L) {
       cli::cli_abort(
         c(
           "{.arg penalty} should be a single numeric value.",
@@ -335,6 +364,7 @@ predict_class._ordinalNet <- function(object, new_data, ...) {
     }
   }
 
+  # REVIEW: This might be unecessary because it lies outside the logic flow.
   if (length(object$fit$lambdaVals) == 1L && penalty != object$fit$lambdaVals) {
     cli::cli_abort(
       c(

@@ -27,7 +27,7 @@ test_that("model object (original to tidy)", {
   tidy_spec <- ordinal_reg() |>
     set_engine("ordinalNet") |>
     set_mode("classification") |>
-    set_args(penalty = .001, path_values = orig_fit$lambdaVals)
+    set_args(path_values = orig_fit$lambdaVals)
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -53,7 +53,7 @@ test_that("model object (original to tidy)", {
   tidy_spec <- ordinal_reg() |>
     set_engine("ordinalNet") |>
     set_mode("classification") |>
-    set_args(penalty = .001, path_values = orig_fit$lambdaVals) |>
+    set_args(path_values = orig_fit$lambdaVals) |>
     set_args(mixture = .5, odds_link = "stopping")
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -86,8 +86,7 @@ test_that("model object (tidy to original)", {
 
   tidy_spec <- ordinal_reg() |>
     set_engine("ordinalNet") |>
-    set_mode("classification") |>
-    set_args(penalty = .001)
+    set_mode("classification")
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -112,7 +111,6 @@ test_that("model object (tidy to original)", {
   tidy_spec <- ordinal_reg() |>
     set_engine("ordinalNet") |>
     set_mode("classification") |>
-    set_args(penalty = .001) |>
     set_args(mixture = .5, odds_link = "stopping")
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -178,7 +176,7 @@ test_that("case weights", {
   tidy_spec <- ordinal_reg() |>
     set_engine("ordinalNet") |>
     set_mode("classification") |>
-    set_args(penalty = .001, path_values = orig_fit$lambdaVals)
+    set_args(path_values = orig_fit$lambdaVals)
   # tidy_spec <- set_args(tidy_spec, mixture = .5, odds_link = "stopping")
   tidy_data <- transform(house_data, Freq = frequency_weights(Freq))
   set.seed(seed)
@@ -244,7 +242,7 @@ test_that("multinomial formulation", {
   tidy_spec <- ordinal_reg() |>
     set_engine("ordinalNet") |>
     set_mode("classification") |>
-    set_args(penalty = .001, path_values = orig_fit$lambdaVals)
+    set_args(path_values = orig_fit$lambdaVals)
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -264,7 +262,7 @@ test_that("class prediction", {
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
-  tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = .001) |>
+  tidy_fit <- ordinal_reg(engine = "ordinalNet") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
   # NB: `newx` must contain exactly those predictors used in the fit.
@@ -298,26 +296,20 @@ test_that("probability prediction", {
   attr(house_vars, "assign") <- NULL
   attr(house_vars, "contrasts") <- NULL
 
-  tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = .001) |>
+  tidy_fit <- ordinal_reg(engine = "ordinalNet") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
+  # unspecified penalty defers to criterion, as in original
   tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
 
-  # orig_pred <- predict(
-  #   tidy_fit$fit, newx = house_vars, type = "response", whichLambda = .001
-  # )
-  # orig_pred <- tibble::as_tibble(orig_pred)
-  # orig_pred <- set_names(orig_pred, paste0(".pred_", tidy_fit$lvl))
-
-  # same penalty
   wrap_pred <- predict_ordinalNet_wrapper(
-    tidy_fit$fit, house_vars, type = "prob", lambda = .001
+    tidy_fit$fit, house_vars, type = "prob", lambda = NULL, criteria = "aic"
   )
   wrap_pred <- tibble::as_tibble(wrap_pred)
   wrap_pred <- set_names(wrap_pred, paste0(".pred_", tidy_fit$lvl))
   expect_equal(wrap_pred, tidy_pred)
 
-  # different penalty
+  # specified penalty yields different predictions
   wrap_pred <- predict_ordinalNet_wrapper(
     tidy_fit$fit, house_vars, type = "prob", lambda = .01
   )
@@ -325,7 +317,7 @@ test_that("probability prediction", {
   wrap_pred <- set_names(wrap_pred, paste0(".pred_", tidy_fit$lvl))
   expect_false(identical(wrap_pred, tidy_pred))
 
-  # same penalty
+  # same specified penalty restores agreement
   tidy_pred <- predict(tidy_fit, house_sub, type = "prob", penalty = .01)
   expect_equal(wrap_pred, tidy_pred)
 })

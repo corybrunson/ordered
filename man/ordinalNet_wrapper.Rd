@@ -19,7 +19,13 @@ ordinalNet_wrapper(
   ...
 )
 
-predict_ordinalNet_wrapper(object, newx, type, lambda)
+predict_ordinalNet_wrapper(
+  object,
+  newx,
+  type,
+  lambda,
+  criteria = c("aic", "bic")
+)
 
 \method{predict}{`_ordinalNet`}(
   object,
