@@ -5,9 +5,6 @@
     Output
       Ordinal Regression Model Specification (classification)
       
-      Main Arguments:
-        penalty = 0.001
-      
       Computational engine: ordinalNet 
       
       Model fit template:
@@ -293,7 +290,6 @@
       Main Arguments:
         ordinal_link = cloglog
         odds_link = stopping
-        penalty = 0.001
         mixture = 0.25
       
       Computational engine: ordinalNet 
@@ -301,7 +297,7 @@
       Model fit template:
       ordered::ordinalNet_wrapper(x = missing_arg(), y = missing_arg(), 
           weights = missing_arg(), link = "cloglog", family = "stopping", 
-          alpha = 0.25, nLambda = 120L, lambdaMinRatio = 1e-08, includeLambda0 = TRUE)
+          alpha = 0.25, lambdaVals = 10^seq(-6, -1))
 
 ---
 

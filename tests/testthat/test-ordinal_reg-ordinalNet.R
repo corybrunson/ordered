@@ -337,7 +337,7 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
-    ordinal_reg(penalty = .001) %>%
+    ordinal_reg() %>%
     set_mode("classification") %>%
     set_engine("ordinalNet")
   expect_snapshot(onet_spec %>% translate())
@@ -367,19 +367,18 @@ test_that("arguments agree", {
 
   onet_arg_spec <-
     ordinal_reg(
-      penalty = .001, mixture = .25,
+      mixture = .25,
       ordinal_link = "cloglog", odds_link = "stopping"
     ) |>
     set_mode("classification") %>%
-    set_engine("ordinalNet")
+    set_engine("ordinalNet", path_values = 10 ^ seq(-6, -1))
   expect_snapshot(onet_arg_spec %>% translate())
 
   expect_snapshot({
     set.seed(13)
     onet_arg_fit <- fit(onet_arg_spec, class ~ ., data = caco_train)
   })
-  # NOTE: `lambdaVals` and `penalty` are revised by `translate.ordinal_reg()`.
-  # expect_equal(onet_arg_fit$fit$args$lambdaVals, .001)
+  expect_equal(onet_arg_fit$fit$args$lambdaVals, 10 ^ seq(-6, -1))
   expect_equal(onet_arg_fit$fit$args$alpha, .25)
   expect_equal(onet_arg_fit$fit$args$link, "cloglog")
   expect_equal(onet_arg_fit$fit$args$family, "sratio")
