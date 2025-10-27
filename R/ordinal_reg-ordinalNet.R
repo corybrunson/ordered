@@ -113,10 +113,6 @@ ordinalNet_wrapper <- function(
 predict_ordinalNet_wrapper <- function(
     object, newx, type, lambda, criteria = c("aic", "bic")
 ) {
-  save(object, newx, type, lambda, criteria,
-       file = "~/Downloads/ordered-predict-ordinalNet-wrapper.rda")
-  load(file = "~/Downloads/ordered-predict-ordinalNet-wrapper.rda")
-
   # REVIEW: This is necessary in order to prevent requiring the user to pass
   # a `penalty` value and nevertheless ignoring it.
   if (is.null(lambda)) {
