@@ -10,6 +10,7 @@
   make_ordinal_reg_ordinalNet()
   make_ordinal_reg_vglm()
   make_ordinal_reg_vgam()
+  make_ordinal_reg_lrm()
   # `decision_tree`
   make_decision_tree_rpartScore()
   # `rand_forest`
