@@ -1,3 +1,7 @@
+#' This is a convenience script for highlighting data sets with ordinal response
+#' variables that may be suitable for non-dependent illustration, e.g. in
+#' vignettes and the README.
+
 library(tidyverse)
 
 # working example with one package
