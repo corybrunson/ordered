@@ -55,6 +55,7 @@ tidy_pkgs <- c("datasets", "MASS", "modeldata")
 ?VGAM::backPain
 # ?VGAM::backPain2
 ?VGAM::budworm
+# ?VGAM::eyed # duplicative with {ordinalgmifs}
 ?VGAM::pneumo
 # ?VGAM::wine # taken from {ordinal}
 # unclear
@@ -80,4 +81,11 @@ ord_pkgs <- c(
 ?orf::odata
 
 # bound collection
-pkg_ord_data <- bind_rows(core_ord_data, vgam_ord_data, other_ord_data)
+semi_join(core_ord_data, tibble(name = c("housing", "hepatic_injury_qsar"))) |>
+  bind_rows(anti_join(
+    vgam_ord_data,
+    tibble(name = c("eyed", "wine", "car.all"))
+  )) |>
+  bind_rows(other_ord_data) |>
+  print() -> pkg_ord_data
+
