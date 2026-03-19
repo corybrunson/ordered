@@ -29,7 +29,7 @@ ordinalForest_wrapper <- function(x, y, ...) {
   # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "ordfor", .ns = "ordinalForest",
-    depvar = ".outcome", data = expr(x), ...
+    depvar = ".outcome", data = rlang::expr(x), ...
   )
   rlang::eval_tidy(cl)
 }

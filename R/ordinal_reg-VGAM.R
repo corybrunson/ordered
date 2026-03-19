@@ -69,7 +69,7 @@ VGAM_vglm_wrapper <- function(
   )
   cl <- rlang::call2(
     .fn = "vglm", .ns = "VGAM",
-    formula = expr(formula), data = expr(data),
+    formula = rlang::expr(formula), data = rlang::expr(data),
     family = family_call,
     ...
   )
@@ -102,7 +102,7 @@ VGAM_vgam_wrapper <- function(
   )
   cl <- rlang::call2(
     .fn = "vgam", .ns = "VGAM",
-    formula = expr(formula), data = expr(data),
+    formula = rlang::expr(formula), data = rlang::expr(data),
     family = family_call,
     ...
   )
