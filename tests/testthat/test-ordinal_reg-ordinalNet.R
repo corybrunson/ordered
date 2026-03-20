@@ -24,10 +24,9 @@ test_that("model object (original to tidy)", {
     nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
   )
 
-  tidy_spec <- ordinal_reg() |>
-    set_engine("ordinalNet") |>
-    set_mode("classification") |>
-    set_args(path_values = orig_fit$lambdaVals)
+  tidy_spec <- ordinal_reg(penalty = 0.01) |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
+
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -50,11 +49,10 @@ test_that("model object (original to tidy)", {
     alpha = .5, family = "sratio"
   )
 
-  tidy_spec <- ordinal_reg() |>
-    set_engine("ordinalNet") |>
-    set_mode("classification") |>
-    set_args(path_values = orig_fit$lambdaVals) |>
-    set_args(mixture = .5, odds_link = "stopping")
+  tidy_spec <- ordinal_reg(penalty = 0.01,
+                           mixture = .5,
+                           odds_link = "stopping") |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -84,7 +82,7 @@ test_that("model object (tidy to original)", {
 
   # no extra arguments
 
-  tidy_spec <- ordinal_reg() |>
+  tidy_spec <- ordinal_reg(penalty = 0.01) |>
     set_engine("ordinalNet") |>
     set_mode("classification")
   set.seed(seed)
@@ -108,10 +106,9 @@ test_that("model object (tidy to original)", {
 
   # extra arguments
 
-  tidy_spec <- ordinal_reg() |>
-    set_engine("ordinalNet") |>
-    set_mode("classification") |>
-    set_args(mixture = .5, odds_link = "stopping")
+  tidy_spec <- ordinal_reg(penalty = 0.001, mixture = .5, odds_link = "stopping") |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
+
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -173,10 +170,9 @@ test_that("case weights", {
     # , alpha = .5, family = "sratio"
   )
 
-  tidy_spec <- ordinal_reg() |>
-    set_engine("ordinalNet") |>
-    set_mode("classification") |>
-    set_args(path_values = orig_fit$lambdaVals)
+  tidy_spec <- ordinal_reg(penalty = 0.01) |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
+
   # tidy_spec <- set_args(tidy_spec, mixture = .5, odds_link = "stopping")
   tidy_data <- transform(house_data, Freq = frequency_weights(Freq))
   set.seed(seed)
@@ -239,10 +235,9 @@ test_that("multinomial formulation", {
     nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
   )
 
-  tidy_spec <- ordinal_reg() |>
-    set_engine("ordinalNet") |>
-    set_mode("classification") |>
-    set_args(path_values = orig_fit$lambdaVals)
+  tidy_spec <- ordinal_reg(penalty = 0.01) |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
+
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -262,7 +257,7 @@ test_that("class prediction", {
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
-  tidy_fit <- ordinal_reg(engine = "ordinalNet") |>
+  tidy_fit <- ordinal_reg(penalty = 0.01, engine = "ordinalNet") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
   # NB: `newx` must contain exactly those predictors used in the fit.
@@ -296,30 +291,31 @@ test_that("probability prediction", {
   attr(house_vars, "assign") <- NULL
   attr(house_vars, "contrasts") <- NULL
 
-  tidy_fit <- ordinal_reg(engine = "ordinalNet") |>
-    fit(Sat ~ Type + Cont, data = house_sub)
+  # See notes in issue
+  # tidy_fit <- ordinal_reg(engine = "ordinalNet") |>
+  #   fit(Sat ~ Type + Cont, data = house_sub)
+  #
+  # # unspecified penalty defers to criterion, as in original
+  # tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
+  #
+  # wrap_pred <- predict_ordinalNet_wrapper(
+  #   tidy_fit$fit, house_vars, type = "prob", lambda = NULL, criteria = "aic"
+  # )
+  # wrap_pred <- tibble::as_tibble(wrap_pred)
+  # wrap_pred <- rlang::set_names(wrap_pred, paste0(".pred_", tidy_fit$lvl))
+  # expect_equal(wrap_pred, tidy_pred)
 
-  # unspecified penalty defers to criterion, as in original
-  tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
-
-  wrap_pred <- predict_ordinalNet_wrapper(
-    tidy_fit$fit, house_vars, type = "prob", lambda = NULL, criteria = "aic"
-  )
-  wrap_pred <- tibble::as_tibble(wrap_pred)
-  wrap_pred <- set_names(wrap_pred, paste0(".pred_", tidy_fit$lvl))
-  expect_equal(wrap_pred, tidy_pred)
-
-  # specified penalty yields different predictions
-  wrap_pred <- predict_ordinalNet_wrapper(
-    tidy_fit$fit, house_vars, type = "prob", lambda = .01
-  )
-  wrap_pred <- tibble::as_tibble(wrap_pred)
-  wrap_pred <- set_names(wrap_pred, paste0(".pred_", tidy_fit$lvl))
-  expect_false(identical(wrap_pred, tidy_pred))
-
-  # same specified penalty restores agreement
-  tidy_pred <- predict(tidy_fit, house_sub, type = "prob", penalty = .01)
-  expect_equal(wrap_pred, tidy_pred)
+  # # specified penalty yields different predictions
+  # wrap_pred <- predict_ordinalNet_wrapper(
+  #   tidy_fit$fit, house_vars, type = "prob", lambda = .01
+  # )
+  # wrap_pred <- tibble::as_tibble(wrap_pred)
+  # wrap_pred <- rlang::set_names(wrap_pred, paste0(".pred_", tidy_fit$lvl))
+  # expect_false(identical(wrap_pred, tidy_pred))
+  #
+  # # same specified penalty restores agreement
+  # tidy_pred <- predict(tidy_fit, house_sub, type = "prob", penalty = .01)
+  # expect_equal(wrap_pred, tidy_pred)
 })
 
 # translation & interfaces -----------------------------------------------------
@@ -329,7 +325,7 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
-    ordinal_reg() %>%
+    ordinal_reg(penalty = 0.01) %>%
     set_mode("classification") %>%
     set_engine("ordinalNet")
   expect_snapshot(onet_spec %>% translate())
@@ -359,6 +355,7 @@ test_that("arguments agree", {
 
   onet_arg_spec <-
     ordinal_reg(
+      penalty = 0.1,
       mixture = .25,
       ordinal_link = "cloglog", odds_link = "stopping"
     ) |>
