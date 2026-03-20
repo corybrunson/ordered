@@ -199,7 +199,6 @@ test_that("case weights", {
 # REVIEW: This test is necessarily approximate--the `ordinalNet()` interfaces
 # don't perfectly agree with each other--but it seems appropriate to include it
 # ahead of the case weights test.
-# NB: This test fails when the additional (commented) arguments are passed.
 test_that("multinomial formulation", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("ordinalNet")
