@@ -5,8 +5,14 @@
 <url><loc>/LICENSE.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/VGAM_vglm_wrapper.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/ordered-package.html</loc></url>
-<url><loc>/reference/ordinal_forest_wrapper.html</loc></url>
+<url><loc>/reference/ordinalForest_parameters.html</loc></url>
+<url><loc>/reference/ordinalForest_wrapper.html</loc></url>
+<url><loc>/reference/ordinalNet_wrapper.html</loc></url>
+<url><loc>/reference/rpartScore_parameters.html</loc></url>
+<url><loc>/reference/rpartScore_wrapper.html</loc></url>
 </urlset>
 
