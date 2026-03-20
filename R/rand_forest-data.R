@@ -53,6 +53,62 @@ make_rand_forest_ordinalForest <- function() {
     has_submodel = FALSE
   )
 
+  # engine arguments:
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "naive",
+    original = "naive",
+    func = list(pkg = "ordered", fun = "naive_scores"),
+    has_submodel = FALSE
+  )
+
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "nsets",
+    original = "nsets",
+    func = list(pkg = "ordered", fun = "num_scores"),
+    has_submodel = FALSE
+  )
+
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "npermtrial",
+    original = "npermtrial",
+    func = list(pkg = "ordered", fun = "num_score_perms"),
+    has_submodel = FALSE
+  )
+
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "ntreeperdiv",
+    original = "ntreeperdiv",
+    func = list(pkg = "ordered", fun = "num_score_trees"),
+    has_submodel = FALSE
+  )
+
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "nbest",
+    original = "nbest",
+    func = list(pkg = "ordered", fun = "num_scores_best"),
+    has_submodel = FALSE
+  )
+
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ordinalForest",
+    parsnip = "perffunction",
+    original = "perffunction",
+    func = list(pkg = "ordered", fun = "ord_metric"),
+    has_submodel = FALSE
+  )
+
+  # Fit information
   parsnip::set_fit(
     model = "rand_forest",
     eng = "ordinalForest",

@@ -94,3 +94,51 @@
       Warning in `ordinalForest::ordfor()`:
       'min.node.size' must not be smaller than 10, if perffunction = 'probability'. -> 'min.node.size.' set to 10.
 
+# engine arguments are registered
+
+    Code
+      print(unlist(tmp))
+    Output
+                 pkg            fun       argument 
+           "ordered" "naive_scores"        "naive" 
+
+---
+
+    Code
+      print(unlist(tmp))
+    Output
+               pkg          fun     argument 
+         "ordered" "num_scores"      "nsets" 
+
+---
+
+    Code
+      print(unlist(tmp))
+    Output
+                    pkg               fun          argument 
+              "ordered" "num_score_perms"      "npermtrial" 
+
+---
+
+    Code
+      print(unlist(tmp))
+    Output
+                    pkg               fun          argument 
+              "ordered" "num_score_trees"     "ntreeperdiv" 
+
+---
+
+    Code
+      print(unlist(tmp))
+    Output
+                    pkg               fun          argument 
+              "ordered" "num_scores_best"           "nbest" 
+
+---
+
+    Code
+      print(unlist(tmp))
+    Output
+                 pkg            fun       argument 
+           "ordered"   "ord_metric" "perffunction" 
+
