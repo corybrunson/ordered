@@ -18,7 +18,8 @@ test_that("bad input", {
   # NB: Behavior is different from that of most models because no engines are
   # contained in {parsnip}; see 'R/aaa_models.R' in `parsnip`.
   expect_snapshot(
-    translate(ordinal_reg(mode = "classification") |> set_engine("wat?"))
+    translate(ordinal_reg(mode = "classification") |> set_engine("wat?")),
+    error = TRUE
   )
 })
 
