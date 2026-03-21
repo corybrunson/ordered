@@ -48,9 +48,9 @@ predict_ordinalNet_wrapper(
 
 \method{predict_raw}{`_ordinalNet`}(object, new_data, opts = list(), ...)
 
-predict_classprob._ordinalNet(object, new_data, ...)
+\method{predict_classprob}{`_ordinalNet`}(object, new_data, ...)
 
-predict_class._ordinalNet(object, new_data, ...)
+\method{predict_class}{`_ordinalNet`}(object, new_data, ...)
 }
 \arguments{
 \item{x}{The predictor data.}

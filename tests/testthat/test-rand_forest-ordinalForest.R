@@ -190,3 +190,18 @@ test_that("arguments agree", {
   expect_equal(orf_arg_fit$fit$forestfinal$mtry, 2)
   expect_equal(orf_arg_fit$fit$perffunction, "probability")
 })
+
+test_that("engine arguments are registered", {
+  prms <-
+    parsnip::rand_forest(engine = "ordinalForest", mode = "classification") |>
+    parsnip:::tunable.model_spec() |>
+    dplyr::filter(component_id == "engine")
+  expect_true(nrow(prms) == 6L)
+  for (i in 1:nrow(prms)) {
+    tmp <- prms$call_info[[i]]
+    tmp$argument <- prms$name[i]
+    expect_snapshot(print(unlist(tmp)))
+  }
+})
+
+
