@@ -101,8 +101,8 @@ ordinalNet_wrapper <- function(
   # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "ordinalNet", .ns = "ordinalNet",
-    x = expr(x), y = expr(y),
-    family = expr(family), link = expr(link),
+    x = rlang::expr(x), y = rlang::expr(y),
+    family = rlang::expr(family), link = rlang::expr(link),
     ...
   )
   rlang::eval_tidy(cl)
@@ -381,7 +381,7 @@ multi_predict_classprob_ordinal_net <- function(object, new_data, penalty) {
     ~ predict(object, new_data, type = "prob", penalty = .x) %>%
       tibble::as_tibble() %>%
       parsnip::add_rowindex() %>%
-      dplyr::mutate(penalty = .x) %>% relocate(penalty)
+      dplyr::mutate(penalty = .x) %>% dplyr::relocate(penalty)
   ) %>%
     tidyr::nest(.by = .row, .key = ".pred") %>%
     dplyr::select(-.row)
@@ -392,7 +392,7 @@ multi_predict_class_ordinal_net <- function(object, new_data, penalty) {
     penalty,
     ~ predict(object, new_data, type = "class", penalty = .x) %>%
       parsnip::add_rowindex() %>%
-      dplyr::mutate(penalty = .x) %>% relocate(penalty)
+      dplyr::mutate(penalty = .x) %>% dplyr::relocate(penalty)
   ) %>%
     tidyr::nest(.by = .row, .key = ".pred") %>%
     dplyr::select(-.row)
