@@ -74,7 +74,7 @@ check_spec_levels <- function (spec) {
   }
 }
 
-check_spec_pred_type <- function (object, type, call = caller_env()) {
+check_spec_pred_type <- function (object, type, call = rlang::caller_env()) {
   if (!spec_has_pred_type(object, type)) {
     possible_preds <- names(object$spec$method$pred)
     cli::cli_abort("No {.val {type}} prediction method available for this model.

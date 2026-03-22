@@ -28,7 +28,7 @@ rpartScore_wrapper <- function(formula, data, ...) {
   # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "rpartScore", .ns = "rpartScore",
-    formula = expr(formula), data = expr(data), ...
+    formula = rlang::expr(formula), data = rlang::expr(data), ...
   )
   rlang::eval_tidy(cl)
 }
