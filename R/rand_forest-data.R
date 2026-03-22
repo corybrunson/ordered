@@ -132,3 +132,5 @@ make_rand_forest_ordinalForest <- function() {
     )
   )
 }
+
+# nocov end
