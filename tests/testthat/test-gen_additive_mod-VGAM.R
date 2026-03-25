@@ -10,14 +10,14 @@ test_that("model object", {
   # no extra arguments
 
   set.seed(seed)
-  orig_fit <- VGAM::vglm(
+  orig_fit <- VGAM::vgam(
     Sat ~ Type + Infl + Cont,
     family = VGAM::cumulative(parallel = TRUE),
     data = house_sub
   )
 
-  tidy_spec <- ordinal_reg() |>
-    set_engine("vglm") |>
+  tidy_spec <- gen_additive_mod() |>
+    set_engine("vgam") |>
     set_mode("classification")
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -34,17 +34,17 @@ test_that("model object", {
   # extra arguments
 
   set.seed(seed)
-  orig_fit <- VGAM::vglm(
+  orig_fit <- VGAM::vgam(
     Sat ~ Type + Infl + Cont,
     # NB: Unused model parameters are ignored without comment.
     family = VGAM::cratio(link = "probitlink", parallel = TRUE),
     data = house_sub
   )
 
-  tidy_spec <- ordinal_reg() |>
-    set_engine("vglm") |>
+  tidy_spec <- gen_additive_mod() |>
+    set_engine("vgam") |>
     set_mode("classification") |>
-    set_args(ordinal_link = "probit", odds_link = "continuation_ratio")
+    set_args(link = "probit", family = "continuation_ratio")
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -73,15 +73,15 @@ test_that("case weights", {
   house_wts <- rpois(n = nrow(house_sub), 2) + 1L
 
   set.seed(seed)
-  orig_fit <- VGAM::vglm(
+  orig_fit <- VGAM::vgam(
     Sat ~ Type + Infl + Cont,
     family = VGAM::cumulative(parallel = TRUE),
     data = house_sub,
     weights = house_wts
   )
 
-  tidy_spec <- ordinal_reg() |>
-    set_engine("vglm") |>
+  tidy_spec <- gen_additive_mod() |>
+    set_engine("vgam") |>
     set_mode("classification")
   set.seed(seed)
   tidy_fit <- fit(
@@ -108,17 +108,12 @@ test_that("class prediction", {
   skip_if_not_installed("VGAM")
   house_sub <- get_house()$sub
 
-  tidy_fit <- ordinal_reg(engine = "vglm") |>
+  tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
   orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
-  # convert to probabilities
-  orig_pred <- plogis(orig_pred)
-  orig_pred <- cbind(
-    orig_pred[, 1],
-    orig_pred[, 2] - orig_pred[, 1],
-    1 - orig_pred[, 2]
-  )
+  expect_equal(colnames(orig_pred), tidy_fit$lvl)
+
   orig_pred <- apply(orig_pred, 1L, which.max)
   orig_pred <- ordered(tidy_fit$lvl[orig_pred], tidy_fit$lvl)
   orig_pred <- tibble::tibble(.pred_class = orig_pred)
@@ -135,19 +130,12 @@ test_that("probability prediction", {
   skip_if_not_installed("VGAM")
   house_sub <- get_house()$sub
 
-  tidy_fit <- ordinal_reg(engine = "vglm") |>
+  tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
   orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
-  # convert to probabilities
-  orig_pred <- plogis(orig_pred)
-  orig_pred <- cbind(
-    orig_pred[, 1],
-    orig_pred[, 2] - orig_pred[, 1],
-    1 - orig_pred[, 2]
-  )
-  colnames(orig_pred) <- paste0(".pred_", tidy_fit$lvl)
   orig_pred <- tibble::as_tibble(orig_pred)
+  names(orig_pred) <- paste0(".pred_", names(orig_pred))
 
   tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
 
@@ -161,9 +149,9 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
-    ordinal_reg() %>%
+    gen_additive_mod() %>%
     set_mode("classification") %>%
-    set_engine("vglm")
+    set_engine("vgam")
   expect_snapshot(onet_spec %>% translate())
 
   expect_no_error({
@@ -193,11 +181,10 @@ test_that("arguments agree", {
   skip_if_not_installed("QSARdata")
 
   onet_arg_spec <-
-    ordinal_reg(
-      ordinal_link = "cloglog", odds_link = "stopping"
-    ) |>
+    gen_additive_mod() |>
     set_mode("classification") %>%
-    set_engine("vglm")
+    set_engine("vgam") %>%
+    set_args(link = "cloglog", family = "stopping")
   expect_snapshot(onet_arg_spec %>% translate())
 
   expect_snapshot({
