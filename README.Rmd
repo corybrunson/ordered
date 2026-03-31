@@ -73,13 +73,14 @@ nope <- cli::symbol$cross
 get_from_env("models") |> 
   enframe(name = NULL, value = "model") |> 
   mutate(dependency = map(model, get_dependency)) |> 
-  unnest(dependency) |> unnest(pkg) |> 
+  unnest(dependency) |> 
+  unnest(pkg) |> 
   filter(pkg == "ordered") |> 
   mutate(info = map(model, \(.x) get_from_env(paste0(.x, "_predict")))) |> 
   nest(spec = c(model, engine, mode)) |> 
   transmute(info = map2(info, spec, inner_join, join_by(engine, mode))) |> 
   unnest(info) |> 
-  select(model, engine, mode, type) |> 
+  dplyr::select(model, engine, mode, type) |> 
   pivot_wider(
     names_from = type, values_from = mode,
     values_fill = nope, values_fn = function(x) yep
