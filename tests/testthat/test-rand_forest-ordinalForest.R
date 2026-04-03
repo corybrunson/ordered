@@ -105,7 +105,7 @@ test_that("class prediction", {
   orig_pred <- set_names(orig_pred, ".pred_class")
   tidy_pred <- predict(tidy_fit, house_sub, type = "class")
   # FIXME: Predicted classes do not agree.
-  # expect_equal(orig_pred, tidy_pred)
+  expect_equal(orig_pred, tidy_pred)
 
   expect_error(predict(tidy_fit, house_sub, type = "prob"), "perffunction")
 })
