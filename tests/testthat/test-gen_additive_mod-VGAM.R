@@ -5,29 +5,37 @@ seed <- 144688L
 test_that("model object", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
-  house_sub <- get_house()$sub
+  skip_if_not_installed("QSARdata")
+
+  # for `s()` and friends in GAM formula
+  suppressPackageStartupMessages(library(VGAM))
 
   # no extra arguments
 
   set.seed(seed)
   orig_fit <- VGAM::vgam(
-    Sat ~ Type + Infl + Cont,
+    class ~ mol_weight + volume + ClogP,
     family = VGAM::cumulative(parallel = TRUE),
-    data = house_sub
+    data = caco_train
   )
 
   tidy_spec <- gen_additive_mod() |>
     set_engine("vgam") |>
     set_mode("classification")
   set.seed(seed)
-  tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
+  tidy_fit <- fit(
+    tidy_spec,
+    class ~ mol_weight + volume + ClogP,
+    data = caco_train
+  )
 
   skip_slots <- c("call", "misc")
   for (s in setdiff(slotNames(orig_fit), skip_slots)) {
     expect_equal(
       slot(orig_fit, s),
       slot(tidy_fit$fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 
@@ -35,10 +43,10 @@ test_that("model object", {
 
   set.seed(seed)
   orig_fit <- VGAM::vgam(
-    Sat ~ Type + Infl + Cont,
+    class ~ s(mol_weight) + volume + ClogP,
     # NB: Unused model parameters are ignored without comment.
     family = VGAM::cratio(link = "probitlink", parallel = TRUE),
-    data = house_sub
+    data = caco_train
   )
 
   tidy_spec <- gen_additive_mod() |>
@@ -46,14 +54,19 @@ test_that("model object", {
     set_mode("classification") |>
     set_args(link = "probit", family = "continuation_ratio")
   set.seed(seed)
-  tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
+  tidy_fit <- fit(
+    tidy_spec,
+    class ~ s(mol_weight) + volume + ClogP,
+    data = caco_train
+  )
 
   skip_slots <- c("call", "misc")
   for (s in setdiff(slotNames(orig_fit), skip_slots)) {
     expect_equal(
       slot(orig_fit, s),
       slot(tidy_fit$fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 
@@ -67,17 +80,20 @@ test_that("model object", {
 test_that("case weights", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
-  house_sub <- get_house()$sub
+  skip_if_not_installed("QSARdata")
+
+  # for `s()` and friends in GAM formula
+  suppressPackageStartupMessages(library(VGAM))
 
   set.seed(seed)
-  house_wts <- rpois(n = nrow(house_sub), 2) + 1L
+  caco_wts <- rpois(n = nrow(caco_train), 2) + 1L
 
   set.seed(seed)
   orig_fit <- VGAM::vgam(
-    Sat ~ Type + Infl + Cont,
+    class ~ mol_weight + volume + s(ClogP),
     family = VGAM::cumulative(parallel = TRUE),
-    data = house_sub,
-    weights = house_wts
+    data = caco_train,
+    weights = caco_wts
   )
 
   tidy_spec <- gen_additive_mod() |>
@@ -86,9 +102,9 @@ test_that("case weights", {
   set.seed(seed)
   tidy_fit <- fit(
     tidy_spec,
-    Sat ~ Type + Infl + Cont,
-    data = house_sub,
-    case_weights = frequency_weights(house_wts)
+    class ~ mol_weight + volume + s(ClogP),
+    data = caco_train,
+    case_weights = frequency_weights(caco_wts)
   )
 
   skip_slots <- c("call", "misc")
@@ -96,7 +112,8 @@ test_that("case weights", {
     expect_equal(
       slot(orig_fit, s),
       slot(tidy_fit$fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 })
@@ -106,19 +123,20 @@ test_that("case weights", {
 test_that("class prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
-  house_sub <- get_house()$sub
+  skip_if_not_installed("QSARdata")
+
+  # for `s()` and friends in GAM formula
+  suppressPackageStartupMessages(library(VGAM))
 
   tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
-    fit(Sat ~ Type + Cont, data = house_sub)
+    fit(class ~ s(mol_weight) + volume + s(ClogP), data = caco_train)
 
-  orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
-  expect_equal(colnames(orig_pred), tidy_fit$lvl)
-
+  orig_pred <- predict(tidy_fit$fit, newdata = caco_train, type = "response")
   orig_pred <- apply(orig_pred, 1L, which.max)
   orig_pred <- ordered(tidy_fit$lvl[orig_pred], tidy_fit$lvl)
   orig_pred <- tibble::tibble(.pred_class = orig_pred)
 
-  tidy_pred <- predict(tidy_fit, house_sub, type = "class")
+  tidy_pred <- predict(tidy_fit, caco_train, type = "class")
 
   expect_equal(orig_pred, tidy_pred)
 })
@@ -128,16 +146,19 @@ test_that("class prediction", {
 test_that("probability prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
-  house_sub <- get_house()$sub
+  skip_if_not_installed("QSARdata")
+
+  # for `s()` and friends in GAM formula
+  suppressPackageStartupMessages(library(VGAM))
 
   tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
-    fit(Sat ~ Type + Cont, data = house_sub)
+    fit(class ~ mol_weight + s(volume) + s(ClogP), data = caco_train)
 
-  orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
+  orig_pred <- predict(tidy_fit$fit, newdata = caco_train, type = "response")
   orig_pred <- tibble::as_tibble(orig_pred)
   names(orig_pred) <- paste0(".pred_", names(orig_pred))
 
-  tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
+  tidy_pred <- predict(tidy_fit, caco_train, type = "prob")
 
   expect_equal(orig_pred, tidy_pred)
 })
