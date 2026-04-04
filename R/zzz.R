@@ -9,7 +9,8 @@
   make_ordinal_reg_polr()
   make_ordinal_reg_ordinalNet()
   make_ordinal_reg_vglm()
-  make_ordinal_reg_vgam()
+  # `gen_additive_mod`
+  make_gen_additive_mod_vgam()
   # `decision_tree`
   make_decision_tree_rpartScore()
   # `rand_forest`

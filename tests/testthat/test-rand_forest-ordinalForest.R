@@ -79,6 +79,7 @@ test_that("class prediction", {
   house_sub <- get_house()$sub
 
   # with class probabilities (default)
+  set.seed(seed)
   tidy_fit <- rand_forest(trees = 10) |>
     set_engine("ordinalForest") |>
     set_mode("classification") |>
@@ -92,20 +93,66 @@ test_that("class prediction", {
   tidy_pred <- predict(tidy_fit, house_sub, type = "class")
   expect_equal(orig_pred, tidy_pred)
 
-  # without class probabilities
+  # WARNING: Predictions using other `perffunction` values are stochastic.
+  # Seeds before `predict()` calls ensure that the predictions agree.
+  # Seeds before `fit()` calls are set to produce different predictions
+  # when those before `predict()` calls are not set.
+
+  # without class probabilities: 'equal'
+  set.seed(seed + 10L)
   tidy_fit <- rand_forest(trees = 10) |>
     set_engine("ordinalForest") |>
     set_mode("classification") |>
     set_args(nsets = 10, ntreeperdiv = 100, perffunction = "equal") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
+  set.seed(seed)
   orig_pred <- predict(tidy_fit$fit, newdata = house_sub)
   orig_pred <- ordered(orig_pred$ypred, levels(orig_pred$ypred))
   orig_pred <- tibble::as_tibble(orig_pred)
   orig_pred <- set_names(orig_pred, ".pred_class")
+  set.seed(seed)
   tidy_pred <- predict(tidy_fit, house_sub, type = "class")
-  # FIXME: Predicted classes do not agree.
-  # expect_equal(orig_pred, tidy_pred)
+  expect_equal(orig_pred, tidy_pred)
+
+  expect_error(predict(tidy_fit, house_sub, type = "prob"), "perffunction")
+
+  # without class probabilities: 'proportional'
+  set.seed(seed + 10L)
+  tidy_fit <- rand_forest(trees = 10) |>
+    set_engine("ordinalForest") |>
+    set_mode("classification") |>
+    set_args(nsets = 10, ntreeperdiv = 100, perffunction = "proportional") |>
+    fit(Sat ~ Type + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_pred <- predict(tidy_fit$fit, newdata = house_sub)
+  orig_pred <- ordered(orig_pred$ypred, levels(orig_pred$ypred))
+  orig_pred <- tibble::as_tibble(orig_pred)
+  orig_pred <- set_names(orig_pred, ".pred_class")
+  set.seed(seed)
+  tidy_pred <- predict(tidy_fit, house_sub, type = "class")
+  expect_equal(orig_pred, tidy_pred)
+
+  expect_error(predict(tidy_fit, house_sub, type = "prob"), "perffunction")
+
+  # without class probabilities: 'oneclass'
+  set.seed(seed)
+  tidy_fit <- rand_forest(trees = 10) |>
+    set_engine("ordinalForest") |>
+    set_mode("classification") |>
+    set_args(nsets = 10, ntreeperdiv = 100,
+             perffunction = "oneclass", classimp = "Medium") |>
+    fit(Sat ~ Type + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_pred <- predict(tidy_fit$fit, newdata = house_sub)
+  orig_pred <- ordered(orig_pred$ypred, levels(orig_pred$ypred))
+  orig_pred <- tibble::as_tibble(orig_pred)
+  orig_pred <- set_names(orig_pred, ".pred_class")
+  set.seed(seed)
+  tidy_pred <- predict(tidy_fit, house_sub, type = "class")
+  expect_equal(orig_pred, tidy_pred)
 
   expect_error(predict(tidy_fit, house_sub, type = "prob"), "perffunction")
 })

@@ -71,14 +71,14 @@ ordered provides new engines for several models, including all engines
 for `ordinal_reg()`, as summarized in the table. Currently only
 predictions of `type = "class"` and `type = "prob"` are supported.
 
-| model           | engine          | class | prob |
-|:----------------|:----------------|:------|:-----|
-| `decision_tree` | `rpartScore`    | ✔     | ✖    |
-| `ordinal_reg`   | `polr`          | ✔     | ✔    |
-| `ordinal_reg`   | `ordinalNet`    | ✔     | ✔    |
-| `ordinal_reg`   | `vglm`          | ✔     | ✔    |
-| `ordinal_reg`   | `vgam`          | ✔     | ✔    |
-| `rand_forest`   | `ordinalForest` | ✔     | ✔    |
+| model              | engine          | class | prob |
+|:-------------------|:----------------|:------|:-----|
+| `decision_tree`    | `rpartScore`    | ✔     | ✖    |
+| `gen_additive_mod` | `vgam`          | ✔     | ✔    |
+| `ordinal_reg`      | `polr`          | ✔     | ✔    |
+| `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    |
+| `ordinal_reg`      | `vglm`          | ✔     | ✔    |
+| `rand_forest`      | `ordinalForest` | ✔     | ✔    |
 
 ## Example
 
