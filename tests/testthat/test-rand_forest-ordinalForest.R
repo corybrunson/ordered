@@ -182,6 +182,7 @@ test_that("probability prediction", {
 
 test_that("interfaces agree", {
   skip_if_not_installed("ordinalForest")
+  skip_if_not_installed("boot")
   skip_if_not_installed("QSARdata")
 
   orf_spec <-
@@ -198,6 +199,7 @@ test_that("interfaces agree", {
   expect_snapshot(orf_f_fit)
 
   expect_no_error({
+    # NB: Different results using R 4.2.3 may be due to changes in the RNG.
     set.seed(13)
     orf_xy_fit <- fit_xy(orf_spec, x = caco_train[, -1], y = caco_train$class)
   })
@@ -211,6 +213,7 @@ test_that("interfaces agree", {
 
 test_that("arguments agree", {
   skip_if_not_installed("ordinalForest")
+  skip_if_not_installed("boot")
   skip_if_not_installed("QSARdata")
 
   orf_arg_spec <-
