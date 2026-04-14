@@ -75,39 +75,61 @@ to be numeric rather than ordered or factor; the wrapper edits the input
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">house_data</span> <span class="op">&lt;-</span></span></span>
 <span class="r-in"><span>  <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">)</span><span class="op">)</span>, <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">$</span><span class="va">Freq</span><span class="op">)</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="co"># subsample to reduce runtime</span></span></span>
+<span class="r-in"><span><span class="va">house_data</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">house_data</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">house_data</span><span class="op">)</span> <span class="op">/</span> <span class="fl">5</span><span class="op">)</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co"># fit wrapper</span></span></span>
 <span class="r-in"><span><span class="op">(</span> <span class="va">fit_orig</span> <span class="op">&lt;-</span> <span class="fu">rpartScore</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rpartScore/man/rpartScore.html" class="external-link">rpartScore</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  formula <span class="op">=</span> <span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>,</span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">house_data</span>, Sat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">Sat</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span> <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n= 1681 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> n= 336 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> node), split, n, deviance, yval</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       * denotes terminal node</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1) root 1681 1235 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2) Infl=Low,Medium 1286  927 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      4) Type=Tower,Atrium 491  344 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      5) Type=Apartment,Terrace 795  583 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       10) Infl=Low 392  258 1 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       11) Infl=Medium 403  289 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3) Infl=High 395  245 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1) root 336 257 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2) Infl=Low 124  97 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      4) Type=Tower,Terrace 55  45 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        8) Type=Terrace 24  14 1 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        9) Type=Tower 31  23 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      5) Type=Apartment,Atrium 69  52 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       10) Type=Apartment 54  36 1 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       11) Type=Atrium 15  10 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3) Infl=Medium,High 212 160 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      6) Cont=High 113  80 3  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       12) Type=Apartment,Atrium,Terrace 93  71 3  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         24) Type=Apartment,Terrace 74  56 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           48) Type=Apartment 52  37 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           49) Type=Terrace 22  15 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         25) Type=Atrium 19  11 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       13) Type=Tower 20   9 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      7) Cont=Low 99  73 2 *</span>
 <span class="r-in"><span><span class="op">(</span> <span class="va">fit_wrap</span> <span class="op">&lt;-</span> <span class="fu">rpartScore_wrapper</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  formula <span class="op">=</span> <span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>,</span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">house_data</span></span></span>
 <span class="r-in"><span><span class="op">)</span> <span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> n= 1681 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> n= 336 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> node), split, n, deviance, yval</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       * denotes terminal node</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1) root 1681 1235 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2) Infl=Low,Medium 1286  927 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      4) Type=Tower,Atrium 491  344 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      5) Type=Apartment,Terrace 795  583 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       10) Infl=Low 392  258 1 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       11) Infl=Medium 403  289 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3) Infl=High 395  245 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1) root 336 257 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2) Infl=Low 124  97 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      4) Type=Tower,Terrace 55  45 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        8) Type=Terrace 24  14 1 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        9) Type=Tower 31  23 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      5) Type=Apartment,Atrium 69  52 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       10) Type=Apartment 54  36 1 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       11) Type=Atrium 15  10 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3) Infl=Medium,High 212 160 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      6) Cont=High 113  80 3  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       12) Type=Apartment,Atrium,Terrace 93  71 3  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         24) Type=Apartment,Terrace 74  56 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           48) Type=Apartment 52  37 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           49) Type=Terrace 22  15 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         25) Type=Atrium 19  11 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       13) Type=Tower 20   9 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      7) Cont=Low 99  73 2 *</span>
 </code></pre></div>
     </div>
   </div>
