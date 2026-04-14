@@ -15,7 +15,7 @@
 
 ## Check results
 
-* This is a new release.
+* This is a new release so the NEWS is minimal.
 
 * The following words were flagged but are correctly spelled:
   Galimberti (19:8)
