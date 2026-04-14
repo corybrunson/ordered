@@ -11,7 +11,7 @@
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
 #' # subsample to reduce runtime
-#' house_data <- house_data[sample(nrow(house_data), nrow(house_data)/10), ]
+#' house_data <- house_data[sample(nrow(house_data), nrow(house_data) / 10), ]
 #' # fit wrapper
 #' ( fit_orig <- ordinalForest::ordfor(
 #'   depvar = "Sat",

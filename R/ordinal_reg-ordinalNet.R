@@ -29,9 +29,9 @@
 #'   lambdaVals = pen_vec
 #' ) )
 #' fit_tidy <-
-#'   ordinal_reg(ordinal_link = "logistic", odds_link = "stopping_ratio") |>
-#'   set_engine("ordinalNet") |>
-#'   set_args(path_values = pen_vec, penalty = 1) |>
+#'   ordinal_reg(ordinal_link = "logistic", odds_link = "stopping_ratio") %>%
+#'   set_engine("ordinalNet") %>%
+#'   set_args(path_values = pen_vec, penalty = 1) %>%
 #'   fit(formula = Sat ~ Type + Infl + Cont + 0, data = house_data)
 #' fit_tidy$fit
 #' # predict wrapper

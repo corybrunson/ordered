@@ -10,6 +10,8 @@
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("rpartScore")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+#' # subsample to reduce runtime
+#' house_data <- house_data[sample(nrow(house_data), nrow(house_data) / 5), ]
 #' # fit wrapper
 #' ( fit_orig <- rpartScore::rpartScore(
 #'   formula = Sat ~ Infl + Type + Cont,
