@@ -28,12 +28,12 @@ house_data <- house_data[sample(nrow(house_data), nrow(house_data) / 10), ]
 ( fit_orig <- ordinalForest::ordfor(
   depvar = "Sat",
   data = house_data,
-  nsets = 100, ntreefinal = 500
+  nsets = 50, ntreefinal = 200
 ) )
 ( fit_wrap <- ordinalForest_wrapper(
   x = subset(house_data, select = -Sat),
   y = house_data$Sat,
-  nsets = 100, ntreefinal = 500
+  nsets = 50, ntreefinal = 200
 ) )
 \dontshow{\}) # examplesIf}
 }

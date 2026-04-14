@@ -16,12 +16,12 @@
 #' ( fit_orig <- ordinalForest::ordfor(
 #'   depvar = "Sat",
 #'   data = house_data,
-#'   nsets = 100, ntreefinal = 500
+#'   nsets = 50, ntreefinal = 200
 #' ) )
 #' ( fit_wrap <- ordinalForest_wrapper(
 #'   x = subset(house_data, select = -Sat),
 #'   y = house_data$Sat,
-#'   nsets = 100, ntreefinal = 500
+#'   nsets = 50, ntreefinal = 200
 #' ) )
 #' @export
 ordinalForest_wrapper <- function(x, y, ...) {
