@@ -29,3 +29,12 @@
 * Occasionally my computers could not verify the current time.
 
 No ERRORs, WARNINGs, or other NOTEs obtained.
+
+## Context
+
+This package was developed in coordination with the following upgrades to other packages:
+* {parsnip} 1.5.0
+  * https://github.com/tidymodels/parsnip/issues/1298
+  * https://github.com/tidymodels/parsnip/pull/1346
+* {dials} 1.4.3
+  * https://github.com/tidymodels/dials/pull/435
