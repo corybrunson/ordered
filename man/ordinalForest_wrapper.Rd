@@ -25,15 +25,16 @@ house_data <-
 # subsample to reduce runtime
 house_data <- house_data[sample(nrow(house_data), nrow(house_data) / 10), ]
 # fit wrapper
+# (using inadvisedly few score sets and trees to reduce runtime)
 ( fit_orig <- ordinalForest::ordfor(
   depvar = "Sat",
   data = house_data,
-  nsets = 50, ntreefinal = 200
+  nsets = 25, ntreefinal = 100
 ) )
 ( fit_wrap <- ordinalForest_wrapper(
   x = subset(house_data, select = -Sat),
   y = house_data$Sat,
-  nsets = 50, ntreefinal = 200
+  nsets = 25, ntreefinal = 100
 ) )
 \dontshow{\}) # examplesIf}
 }
