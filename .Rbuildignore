@@ -1,10 +1,13 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.github$
+
 ^codecov\.yml$
 ^CODE_OF_CONDUCT\.md$
 ^LICENSE\.md$
 ^README\.Rmd$
-^cran-comments\.md$
 
 ^ignore$
+
+^cran-comments\.md$
+^CRAN-SUBMISSION$
