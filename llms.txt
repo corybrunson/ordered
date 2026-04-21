@@ -1,0 +1,195 @@
+# ordered
+
+`ordered` is a [parsnip](https://parsnip.tidymodels.org/) extension to
+enable additional classification models for ordinal outcomes (e.g.,
+“low”, “medium”, “high”). While there are several model/engine
+combinations in the parsnip package that can be used, this package adds:
+
+- cumulative link (cumulative logit) ordinal regression via
+  [`MASS::polr()`](https://rdrr.io/pkg/MASS/man/polr.html)
+- generalized linear and generalized additive ordinal regression models
+  of cumulative link, adjacent categories, continuation ratio, and
+  stopping ratio families via
+  [`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
+  [`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html) ([Yee,
+  2015](https://doi.org/10.18637/jss.v032.i10))
+- regularized elastic net ordinal regression models of cumulative link,
+  adjacent categories, continuation ratio, and stopping ratio families
+  via
+  [`ordinalNet::ordinalNet()`](https://rdrr.io/pkg/ordinalNet/man/ordinalNet.html)
+  ([Wurm, Hanlon, and Rathouz,
+  2021](https://doi.org/10.18637/jss.v099.i06))
+- ordinal classification trees via
+  [`rpartScore::rpartScore()`](https://rdrr.io/pkg/rpartScore/man/rpartScore.html)
+  ([Galimberti, Soffritti, and Di Maso,
+  2012](https://doi.org/10.18637/jss.v047.i10))
+- latent variable ordinal forests via
+  [`ordinalForest::ordfor()`](https://rdrr.io/pkg/ordinalForest/man/ordfor.html)
+  ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
+
+More will be added.
+
+There are some existing features in tidymodels packages that are useful
+for ordinal outcomes:
+
+- The [partykit](https://cran.r-project.org/package=partykit) engines
+  for
+  [`parsnip::decision_tree()`](https://parsnip.tidymodels.org/reference/decision_tree.html)
+  and
+  [`parsnip::rand_forest()`](https://parsnip.tidymodels.org/reference/rand_forest.html)
+  use the ordered nature of the factors to train the model.
+- The yardstick package has `yardstick::kap()` for weighted and
+  unweighted Kappa statistics (the former being of more interest). Also,
+  `yardstick::classification_cost()` can utilize more complex cost
+  structures and uses the class probabilities for estimation.
+
+## Installation
+
+You can install the development version of ordered like so:
+
+``` r
+# install.packages("pak")
+pak::pak("corybrunson/ordered", dependencies = FALSE)
+```
+
+Currently, ordered relies on engine registration in a parsnip fork and
+dial registration in the current development version:
+
+``` r
+pak::pak("corybrunson/parsnip@ordered", dependencies = FALSE)
+pak::pak("tidymodels/dials", dependencies = FALSE)
+```
+
+## Available models, engines, and prediction types
+
+ordered provides new engines for several models, including all engines
+for
+[`ordinal_reg()`](https://parsnip.tidymodels.org/reference/ordinal_reg.html),
+as summarized in the table. Currently only predictions of
+`type = "class"` and `type = "prob"` are supported.
+
+| model              | engine          | class | prob |
+|:-------------------|:----------------|:------|:-----|
+| `decision_tree`    | `rpartScore`    | ✔     | ✖    |
+| `gen_additive_mod` | `vgam`          | ✔     | ✔    |
+| `ordinal_reg`      | `polr`          | ✔     | ✔    |
+| `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    |
+| `ordinal_reg`      | `vglm`          | ✔     | ✔    |
+| `rand_forest`      | `ordinalForest` | ✔     | ✔    |
+
+## Example
+
+Here is a simple example using computational chemistry data to predict
+the permeability of a molecule:
+
+``` r
+library(dplyr)
+library(ordered)
+
+data(caco, package = "QSARdata")
+
+caco_dat <-
+  inner_join(caco_Outcome, caco_Dragon, by = "Molecule") %>%
+  as_tibble() %>%
+  select(
+    class = Class,
+    mol_weight = QikProp_mol_MW,
+    volume = QikProp_volume,
+    ClogP
+  )
+caco_train <- caco_dat[-(1:10), ]
+caco_test  <- caco_dat[ (1:10), ]
+
+ord_rf_spec <- 
+  # you should really use many more trees and score sets
+  rand_forest(mtry = 2, trees = 100) %>%
+  set_mode("classification") %>%
+  set_engine("ordinalForest", nsets = 100)
+
+set.seed(382)
+ord_rf_fit <- ord_rf_spec %>% fit(class ~ ., data = caco_train)
+augment(ord_rf_fit, new_data = caco_test)
+#> # A tibble: 10 × 8
+#>    .pred_class .pred_L .pred_M .pred_H class mol_weight volume  ClogP
+#>    <ord>         <dbl>   <dbl>   <dbl> <ord>      <dbl>  <dbl>  <dbl>
+#>  1 M            0.370    0.384  0.246  M           123.   445.  0.799
+#>  2 M            0.250    0.533  0.217  L           290.   856.  0.534
+#>  3 M            0.178    0.801  0.0212 M           519.  1576.  1.02 
+#>  4 M            0.221    0.736  0.0431 M           533.  1606.  1.58 
+#>  5 M            0.135    0.762  0.103  M           505.  1517.  1.71 
+#>  6 M            0.0698   0.913  0.0176 M           519.  1547.  2.27 
+#>  7 M            0.220    0.738  0.0417 M           517.  1600.  1.78 
+#>  8 M            0.109    0.868  0.0229 M           531.  1631.  2.34 
+#>  9 M            0.0307   0.952  0.0177 M           517.  1572.  2.81 
+#> 10 L            0.603    0.394  0.003  L           588.  1799. -1.85
+```
+
+## Code of Conduct
+
+Please note that the ordered project is released with a [Contributor
+Code of
+Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.
+
+To voice support for or volunteer to contribute additional engines,
+please comment on [this
+issue](https://github.com/corybrunson/ordered/issues/15).
+
+# Package index
+
+## ‘ordered’ package
+
+Tidymodels Engine Wrappers and Parameters for Ordinal Classification
+Models
+
+- [`ordered`](ordered-package.md)
+  [`ordered-package`](ordered-package.md) : ordered: parsnip Engines for
+  Ordinal Regression Models
+
+## Wrappers
+
+Wrappers for Ordinal Classification Engines
+
+- [`ordinalNet_wrapper()`](ordinalNet_wrapper.md)
+  [`predict_ordinalNet_wrapper()`](ordinalNet_wrapper.md)
+  [`predict(`*`<_ordinalNet>`*`)`](ordinalNet_wrapper.md)
+  [`multi_predict(`*`<_ordinalNet>`*`)`](ordinalNet_wrapper.md)
+  [`predict_raw(`*`<_ordinalNet>`*`)`](ordinalNet_wrapper.md)
+  [`predict_classprob(`*`<_ordinalNet>`*`)`](ordinalNet_wrapper.md)
+  [`predict_class(`*`<_ordinalNet>`*`)`](ordinalNet_wrapper.md) :
+
+  Wrappers for `ordinalNet`
+
+- [`VGAM_vglm_wrapper()`](VGAM_vglm_wrapper.md)
+  [`VGAM_vgam_wrapper()`](VGAM_vglm_wrapper.md)
+  [`values_ordinal_link_VGAM`](VGAM_vglm_wrapper.md) :
+
+  Wrappers for `VGAM`
+
+- [`rpartScore_wrapper()`](rpartScore_wrapper.md) :
+
+  A wrapper for `rpartScore`
+
+- [`ordinalForest_wrapper()`](ordinalForest_wrapper.md) :
+
+  A wrapper for `ordinalForest`
+
+## Parameters
+
+Tunable Engine Parameters
+
+- [`split_func()`](rpartScore_parameters.md)
+  [`prune_func()`](rpartScore_parameters.md) :
+
+  Dials for `rpartScore` engine parameters
+
+- [`naive_scores()`](ordinalForest_parameters.md)
+  [`num_scores()`](ordinalForest_parameters.md)
+  [`num_score_perms()`](ordinalForest_parameters.md)
+  [`num_score_trees()`](ordinalForest_parameters.md)
+  [`num_scores_best()`](ordinalForest_parameters.md)
+  [`ord_metric()`](ordinalForest_parameters.md)
+  [`values_ord_metric`](ordinalForest_parameters.md) :
+
+  Dials for `ordinalForest` engine parameters
+
