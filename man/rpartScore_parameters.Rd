@@ -14,7 +14,7 @@ prune_func(values = c("mr", "mc"))
 \item{values}{A character string of possible values.}
 }
 \value{
-Objects of S3 parent class \code{param} and primary class \code{qual_param};
+An object of S3 parent class \code{param} and primary class \code{qual_param};
 see \code{\link[dials:new-param]{dials::new_qual_param()}}.
 }
 \description{

@@ -42,8 +42,9 @@ provided, the default is used which matches the units used in \code{range}. If
 no transformation, \code{NULL}.}
 }
 \value{
-Objects of S3 parent class \code{param} and primary class \code{qual_param} or
-\code{quant_param}; see \code{\link[dials:new-param]{dials::new_qual_param()}} and [dials::new_quant_param().
+An object of S3 parent class \code{param} and primary class \code{qual_param}
+or \code{quant_param}; see \code{\link[dials:new-param]{dials::new_qual_param()}} and
+[dials::new_quant_param().
 }
 \description{
 These parameters are auxiliary to random forest models that use the

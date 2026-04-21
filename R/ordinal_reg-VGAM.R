@@ -15,7 +15,7 @@
 #'   single ordinal outcome column and therefore do not accept the convenient
 #'   `cbind(y1, y2, ...) ~ x1 + x2 + ...` encoding commonly used in `VGAM`.
 #' @keywords internal
-#' @returns Objects of S3 parent class `VGAM` and primary classes `vglm` and
+#' @returns An object of S3 parent class `VGAM` and primary classes `vglm` or
 #'   `vgam` as returned by [VGAM::vglm()] and [VGAM::vgam()].
 #' @examples
 #' values_ordinal_link_VGAM

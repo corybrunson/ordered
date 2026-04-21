@@ -38,7 +38,7 @@ values_ordinal_link_VGAM
 \item{...}{Additional arguments to pass.}
 }
 \value{
-Objects of S3 parent class \code{VGAM} and primary classes \code{vglm} and
+An object of S3 parent class \code{VGAM} and primary classes \code{vglm} or
 \code{vgam} as returned by \code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
 }
 \description{

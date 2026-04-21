@@ -9,7 +9,8 @@
 #' @param ... Additional arguments to pass.
 #' @keywords internal
 #' @returns An object of S3 class `ordinalNet` as returned by
-#'   [ordinalNet::ordinalNet()].
+#'   [ordinalNet::ordinalNet()], or a vector or matrix of predictions as
+#'   returned by [`ordinalNet::predict.ordinalNet`]`()`.
 
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("ordinalNet")
 #' house_data <-

@@ -63,7 +63,8 @@ predict_ordinalNet_wrapper(
 }
 \value{
 An object of S3 class \code{ordinalNet} as returned by
-\code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}}.
+\code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}}, or a vector or matrix of predictions as
+returned by \code{\link[ordinalNet:predict.ordinalNet]{ordinalNet::predict.ordinalNet}}\verb{()}.
 }
 \description{
 The fit wrapper converts the standardized \code{odds_link} options encoded in
