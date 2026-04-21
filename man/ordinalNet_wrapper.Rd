@@ -61,6 +61,10 @@ predict_ordinalNet_wrapper(
 
 \item{penalty}{A numeric vector of penalty values.}
 }
+\value{
+An object of S3 class \code{ordinalNet} as returned by
+\code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}}.
+}
 \description{
 The fit wrapper converts the standardized \code{odds_link} options encoded in
 \code{\link[dials:ordinal_link]{dials::values_odds_link}} to the \code{family} options of

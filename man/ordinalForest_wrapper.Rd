@@ -13,10 +13,13 @@ ordinalForest_wrapper(x, y, ...)
 
 \item{...}{Arguments to pass to the underlying model function.}
 }
+\value{
+An object of S3 class \code{ordfor} as returned by
+\code{\link[ordinalForest:ordfor]{ordinalForest::ordfor()}}.
+}
 \description{
 A wrapper is needed since they have a non-standard model interface that
-required the data set and the column name (character string) for the
-outcome.
+required the data set and the column name (character string) for the outcome.
 }
 \examples{
 \dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("ordinalForest")) withAutoprint(\{ # examplesIf}

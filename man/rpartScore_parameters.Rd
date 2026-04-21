@@ -13,6 +13,10 @@ prune_func(values = c("mr", "mc"))
 \arguments{
 \item{values}{A character string of possible values.}
 }
+\value{
+Objects of S3 parent class \code{param} and primary class \code{qual_param};
+see \code{\link[dials:new-param]{dials::new_qual_param()}}.
+}
 \description{
 These parameters are auxiliary to decision tree models that use the
 "rpartScore" engine. They correspond to tuning parameters that would be
@@ -27,4 +31,7 @@ decision tree models, so are provided here rather than in \code{dials}.
 \examples{
 split_func()
 prune_func()
+}
+\seealso{
+\code{\link[dials:trees]{dials::trees()}}
 }

@@ -8,6 +8,9 @@
 #' @param y The outcome vector.
 #' @param ... Additional arguments to pass.
 #' @keywords internal
+#' @returns An object of S3 class `ordinalNet` as returned by
+#'   [ordinalNet::ordinalNet()].
+
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("ordinalNet")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]

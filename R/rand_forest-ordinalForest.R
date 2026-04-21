@@ -1,12 +1,14 @@
 #' A wrapper for `ordinalForest`
 #'
 #' A wrapper is needed since they have a non-standard model interface that
-#' required the data set and the column name (character string) for the
-#' outcome.
+#' required the data set and the column name (character string) for the outcome.
 #' @param x The predictor data.
 #' @param y The outcome factor.
 #' @param ... Arguments to pass to the underlying model function.
 #' @keywords internal
+#' @returns An object of S3 class `ordfor` as returned by
+#'   [ordinalForest::ordfor()].
+
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("ordinalForest")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]

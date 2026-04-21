@@ -10,6 +10,9 @@
 #'   respectively. See `?rpartScore::rpartScore` for more details on the
 #'   original parameters. These parameters are engine-specific, not general to
 #'   decision tree models, so are provided here rather than in `dials`.
+#' @returns Objects of S3 parent class `param` and primary class `qual_param`;
+#'   see [dials::new_qual_param()].
+#' @seealso [dials::trees()]
 #' @examples
 #' split_func()
 #' prune_func()

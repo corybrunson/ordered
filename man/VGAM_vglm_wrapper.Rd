@@ -37,6 +37,10 @@ values_ordinal_link_VGAM
 
 \item{...}{Additional arguments to pass.}
 }
+\value{
+Objects of S3 parent class \code{VGAM} and primary classes \code{vglm} and
+\code{vgam} as returned by \code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
+}
 \description{
 These wrappers convert the standardized \code{odds_link} options encoded in
 \code{\link[dials:ordinal_link]{dials::values_odds_link}} to \code{\link[VGAM:vglmff-class]{VGAM::vglmff}} objects passed to the

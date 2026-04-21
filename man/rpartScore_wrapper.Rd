@@ -13,6 +13,10 @@ rpartScore_wrapper(formula, data, ...)
 
 \item{...}{Additional arguments to pass.}
 }
+\value{
+An object of S3 class \code{rpart} as returned by
+\code{\link[rpartScore:rpartScore]{rpartScore::rpartScore()}}.
+}
 \description{
 A wrapper is used because the model interface requires the response variable
 to be numeric rather than ordered or factor; the wrapper edits the input

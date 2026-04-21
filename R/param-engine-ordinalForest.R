@@ -39,6 +39,8 @@
 #'   set--specific forests; tunes `perffunction`. See also
 #'   `?ordinalForest::perff`.
 #'
+#' @returns Objects of S3 parent class `param` and primary class `qual_param` or
+#'   `quant_param`; see [dials::new_qual_param()] and [dials::new_quant_param().
 #' @seealso [dials::trees()]
 #' @examples
 #' naive_scores()
