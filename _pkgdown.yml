@@ -1,0 +1,25 @@
+template:
+  bootstrap: 5
+  math-rendering: mathjax
+
+reference:
+- title: "'ordered' package"
+  desc: >
+    Tidymodels Engine Wrappers and Parameters for Ordinal Classification Models
+  contents:
+  - '`ordered`'
+- title: "Wrappers"
+  desc: >
+    Wrappers for Ordinal Classification Engines
+  contents:
+  - '`ordinalNet_wrapper`'
+  - '`VGAM_vglm_wrapper`'
+  - '`VGAM_vgam_wrapper`'
+  - '`rpartScore_wrapper`'
+  - '`ordinalForest_wrapper`'
+- title: "Parameters"
+  desc: >
+    Tunable Engine Parameters
+  contents:
+  - '`rpartScore_parameters`'
+  - '`ordinalForest_parameters`'
