@@ -3,7 +3,6 @@ title: "Fitting and Predicting with ordered"
 vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteIndexEntry{Fitting and Predicting with ordered}
-  %\VignetteDepends{tidymodels}
 output:
   knitr:::html_vignette
 ---
