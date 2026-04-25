@@ -27,7 +27,7 @@ ordered_specs |>
 # values must be character-ized
 list(
   polr = list(ordinal_link = "\"probit\""),
-  ordinalNet = list(penalty = "NULL"),
+  ordinalNet = list(penalty = ".001", mixture = ".5"),
   vglm = list(),
   vgam = list(),
   rpartScore = list(),
@@ -71,7 +71,7 @@ oxford_c <- function(x) {
 
 vignette_rmd <- here::here("vignettes/articles/examples.Rmd")
 
-readLines("vignettes/template/template-examples-front.Rmd") |>
+readLines("vignettes/template/_template-examples-front.Rmd") |>
   write(file = vignette_rmd, append = FALSE)
 
 for (model_name in ordered_mods$model) {
@@ -109,7 +109,7 @@ for (model_name in ordered_mods$model) {
     )
     types_chunk <- str_c(type_lines, collapse = "\n")
 
-    readLines("vignettes/template/template-examples-engine.Rmd") |>
+    readLines("vignettes/template/_template-examples-engine.Rmd") |>
       gsub(pattern = "\\{model_name\\}", replacement = model_name) |>
       gsub(pattern = "\\{model_hyphen\\}", replacement = model_hyphen) |>
       gsub(pattern = "\\{model_abbr\\}", replacement = model_abbr) |>

@@ -3,11 +3,9 @@
 
 <summary>With the `"{engine_name}"` engine</summary>
 
-```{r}
-#| echo: false
-#' We'll model satisfaction of householders under varying conditions.
+We'll model satisfaction of householders under varying conditions.
 
-#+ results = "hide", messages = FALSE
+```{r}
 library(tidymodels)
 library(ordered)
 tidymodels_prefer()

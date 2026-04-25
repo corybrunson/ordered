@@ -35,11 +35,9 @@ The following examples use the same data set throughout.
 
 <summary>With the `"rpartScore"` engine</summary>
 
-```{r}
-#| echo: false
-#' We'll model satisfaction of householders under varying conditions.
+We'll model satisfaction of householders under varying conditions.
 
-#+ results = "hide", messages = FALSE
+```{r}
 library(tidymodels)
 library(ordered)
 tidymodels_prefer()
@@ -83,11 +81,9 @@ predict(dt_fit, house_test, type = "class")
 
 <summary>With the `"vgam"` engine</summary>
 
-```{r}
-#| echo: false
-#' We'll model satisfaction of householders under varying conditions.
+We'll model satisfaction of householders under varying conditions.
 
-#+ results = "hide", messages = FALSE
+```{r}
 library(tidymodels)
 library(ordered)
 tidymodels_prefer()
@@ -132,11 +128,9 @@ predict(gam_fit, house_test, type = "prob")
 
 <summary>With the `"polr"` engine</summary>
 
-```{r}
-#| echo: false
-#' We'll model satisfaction of householders under varying conditions.
+We'll model satisfaction of householders under varying conditions.
 
-#+ results = "hide", messages = FALSE
+```{r}
 library(tidymodels)
 library(ordered)
 tidymodels_prefer()
@@ -179,11 +173,9 @@ predict(or_fit, house_test, type = "prob")
 
 <summary>With the `"ordinalNet"` engine</summary>
 
-```{r}
-#| echo: false
-#' We'll model satisfaction of householders under varying conditions.
+We'll model satisfaction of householders under varying conditions.
 
-#+ results = "hide", messages = FALSE
+```{r}
 library(tidymodels)
 library(ordered)
 tidymodels_prefer()
@@ -199,7 +191,7 @@ We can define the model with specific parameters:
 
 ```{r}
 or_spec <-
-  ordinal_reg(penalty = NULL) |>
+  ordinal_reg(penalty = .001, mixture = .5) |>
   set_engine("ordinalNet") |>
   set_mode("classification")
 or_spec
@@ -226,11 +218,9 @@ predict(or_fit, house_test, type = "prob")
 
 <summary>With the `"vglm"` engine</summary>
 
-```{r}
-#| echo: false
-#' We'll model satisfaction of householders under varying conditions.
+We'll model satisfaction of householders under varying conditions.
 
-#+ results = "hide", messages = FALSE
+```{r}
 library(tidymodels)
 library(ordered)
 tidymodels_prefer()
@@ -275,11 +265,9 @@ predict(or_fit, house_test, type = "prob")
 
 <summary>With the `"ordinalForest"` engine</summary>
 
-```{r}
-#| echo: false
-#' We'll model satisfaction of householders under varying conditions.
+We'll model satisfaction of householders under varying conditions.
 
-#+ results = "hide", messages = FALSE
+```{r}
 library(tidymodels)
 library(ordered)
 tidymodels_prefer()
