@@ -7,6 +7,14 @@ into separate model types. A vignette will provide thorough
 illustrations of ordered functionality. See below for examples of
 fitting ordinal regression models with ordered.
 
+## See also
+
+Useful links:
+
+- <https://corybrunson.github.io/ordered/>
+
+- Report bugs at <https://github.com/corybrunson/ordered/issues>
+
 ## Author
 
 **Maintainer**: Jason Cory Brunson <cornelioid@gmail.com>
