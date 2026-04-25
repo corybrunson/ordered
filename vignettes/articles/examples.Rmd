@@ -1,0 +1,319 @@
+---
+title: "Fitting and Predicting with ordered"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Fitting and Predicting with ordered}
+output:
+  knitr:::html_vignette
+---
+
+```{r}
+#| label: startup
+#| include: false
+library(utils)
+```
+
+These examples illustrate which models, engines, and prediction types
+are available in ordered.
+As a reminder, in parsnip,
+
+- the **model type** differentiates basic modeling approaches,
+  such as random forests and ordinal regression;
+
+- the **mode** denotes in what kind of modeling context it will be used
+  (here, classification); and
+
+- the computational **engine** indicates how the model is fit,
+  such as with a specific R package implementation
+  or even methods outside of R like Keras or Stan.
+
+The following examples use the same data set throughout.
+
+## `decision_tree()` models
+
+<details id="decision-tree-rpartScore">
+
+<summary>With the `"rpartScore"` engine</summary>
+
+```{r}
+#| echo: false
+#' We'll model satisfaction of householders under varying conditions.
+
+#+ results = "hide", messages = FALSE
+library(tidymodels)
+library(ordered)
+tidymodels_prefer()
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+dt_spec <-
+  decision_tree() |>
+  set_engine("rpartScore") |>
+  set_mode("classification")
+dt_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+dt_fit <- dt_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+dt_fit
+```
+
+The holdout data can be predicted for the most likely class:
+
+```{r}
+predict(dt_fit, house_test, type = "class")
+```
+
+</details>
+
+## `gen_additive_mod()` models
+
+<details id="gen-additive-mod-vgam">
+
+<summary>With the `"vgam"` engine</summary>
+
+```{r}
+#| echo: false
+#' We'll model satisfaction of householders under varying conditions.
+
+#+ results = "hide", messages = FALSE
+library(tidymodels)
+library(ordered)
+tidymodels_prefer()
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+gam_spec <-
+  gen_additive_mod() |>
+  set_engine("vgam") |>
+  set_mode("classification")
+gam_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+gam_fit <- gam_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+gam_fit
+```
+
+The holdout data can be predicted for the most likely class or all class probabilities:
+
+```{r}
+predict(gam_fit, house_test, type = "class")
+predict(gam_fit, house_test, type = "prob")
+```
+
+</details>
+
+## `ordinal_reg()` models
+
+<details id="ordinal-reg-polr">
+
+<summary>With the `"polr"` engine</summary>
+
+```{r}
+#| echo: false
+#' We'll model satisfaction of householders under varying conditions.
+
+#+ results = "hide", messages = FALSE
+library(tidymodels)
+library(ordered)
+tidymodels_prefer()
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+or_spec <-
+  ordinal_reg(ordinal_link = "probit") |>
+  set_engine("polr") |>
+  set_mode("classification")
+or_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+or_fit
+```
+
+The holdout data can be predicted for the most likely class or all class probabilities:
+
+```{r}
+predict(or_fit, house_test, type = "class")
+predict(or_fit, house_test, type = "prob")
+```
+
+</details>
+
+<details id="ordinal-reg-ordinalNet">
+
+<summary>With the `"ordinalNet"` engine</summary>
+
+```{r}
+#| echo: false
+#' We'll model satisfaction of householders under varying conditions.
+
+#+ results = "hide", messages = FALSE
+library(tidymodels)
+library(ordered)
+tidymodels_prefer()
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+or_spec <-
+  ordinal_reg(penalty = NULL) |>
+  set_engine("ordinalNet") |>
+  set_mode("classification")
+or_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+or_fit
+```
+
+The holdout data can be predicted for the most likely class or all class probabilities:
+
+```{r}
+predict(or_fit, house_test, type = "class")
+predict(or_fit, house_test, type = "prob")
+```
+
+</details>
+
+<details id="ordinal-reg-vglm">
+
+<summary>With the `"vglm"` engine</summary>
+
+```{r}
+#| echo: false
+#' We'll model satisfaction of householders under varying conditions.
+
+#+ results = "hide", messages = FALSE
+library(tidymodels)
+library(ordered)
+tidymodels_prefer()
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+or_spec <-
+  ordinal_reg() |>
+  set_engine("vglm") |>
+  set_mode("classification")
+or_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+or_fit
+```
+
+The holdout data can be predicted for the most likely class or all class probabilities:
+
+```{r}
+predict(or_fit, house_test, type = "class")
+predict(or_fit, house_test, type = "prob")
+```
+
+</details>
+
+## `rand_forest()` models
+
+<details id="rand-forest-ordinalForest">
+
+<summary>With the `"ordinalForest"` engine</summary>
+
+```{r}
+#| echo: false
+#' We'll model satisfaction of householders under varying conditions.
+
+#+ results = "hide", messages = FALSE
+library(tidymodels)
+library(ordered)
+tidymodels_prefer()
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+rf_spec <-
+  rand_forest(trees = 1000) |>
+  set_engine("ordinalForest") |>
+  set_mode("classification")
+rf_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+rf_fit <- rf_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+rf_fit
+```
+
+The holdout data can be predicted for the most likely class or all class probabilities:
+
+```{r}
+predict(rf_fit, house_test, type = "class")
+predict(rf_fit, house_test, type = "prob")
+```
+
+</details>

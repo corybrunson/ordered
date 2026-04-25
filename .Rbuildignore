@@ -7,7 +7,13 @@
 ^LICENSE\.md$
 ^README\.Rmd$
 
-^ignore$
+^vignettes/articles$
+^vignettes/template$
+
+^_pkgdown.yml$
+^docs$
 
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
+
+^ignore$

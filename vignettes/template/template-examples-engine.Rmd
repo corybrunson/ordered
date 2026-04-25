@@ -1,0 +1,46 @@
+
+<details id="{model_hyphen}-{engine_hyphen}">
+
+<summary>With the `"{engine_name}"` engine</summary>
+
+```{r}
+#| echo: false
+#' We'll model satisfaction of householders under varying conditions.
+
+#+ results = "hide", messages = FALSE
+library(tidymodels)
+library(ordered)
+tidymodels_prefer()
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+{model_abbr}_spec <-
+  {model_name}({engine_args}) |>
+  set_engine("{engine_name}") |>
+  set_mode("classification")
+{model_abbr}_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+{model_abbr}_fit <- {model_abbr}_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+{model_abbr}_fit
+```
+
+The holdout data can be predicted for {types_clause}:
+
+```{r}
+{types_chunk}
+```
+
+</details>
