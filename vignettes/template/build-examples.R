@@ -28,7 +28,7 @@ ordered_specs |>
 list(
   polr = list(ordinal_link = "\"probit\""),
   ordinalNet = list(penalty = ".001", mixture = ".5"),
-  vglm = list(),
+  vglm = list(odds_link = "\"continuation_ratio\""),
   vgam = list(),
   rpartScore = list(),
   ordinalForest = list(trees = "1000")
@@ -36,13 +36,12 @@ list(
   enframe(name = "engine", value = "args") |>
   print() -> spec_args
 
-# TODO: Put these in a `set_args()` call.
 # values must be character-ized
 list(
   polr = list(),
   ordinalNet = list(),
   vglm = list(),
-  vgam = list(),
+  vgam = list(family = "\"stopping_ratio\""),
   rpartScore = list(split = "\"quad\""),
   ordinalForest = list(nsets = "100")
 ) |>
@@ -88,12 +87,21 @@ for (model_name in ordered_mods$model) {
 
     engine_hyphen <- str_replace_all(engine_name, "(\\_|\\.)", "-")
 
-    engine_args <- spec_args |>
+    model_args <- spec_args |>
       filter(engine == engine_name) |>
       pull(args) |> unlist() |>
       enframe(name = "arg", value = "value") |>
       unite(pass, arg, value, sep = " = ") |>
       pull(pass) |> str_c(collapse = ", ")
+
+    engine_args <- eng_args |>
+      filter(engine == engine_name) |>
+      pull(args) |> unlist() |>
+      enframe(name = "arg", value = "value") |>
+      unite(pass, arg, value, sep = " = ") |>
+      pull(pass)
+    engine_pass <-
+      str_c(c(str_c("\"", engine_name, "\""), engine_args), collapse = ", ")
 
     engine_types <-
       ordered_preds |>
@@ -115,7 +123,8 @@ for (model_name in ordered_mods$model) {
       gsub(pattern = "\\{model_abbr\\}", replacement = model_abbr) |>
       gsub(pattern = "\\{engine_name\\}", replacement = engine_name) |>
       gsub(pattern = "\\{engine_hyphen\\}", replacement = engine_hyphen) |>
-      gsub(pattern = "\\{engine_args\\}", replacement = engine_args) |>
+      gsub(pattern = "\\{engine_pass\\}", replacement = engine_pass) |>
+      gsub(pattern = "\\{model_args\\}", replacement = model_args) |>
       gsub(pattern = "\\{types_clause\\}", replacement = types_clause) |>
       gsub(pattern = "\\{types_chunk\\}", replacement = types_chunk) |>
       write(file = vignette_rmd, append = TRUE)

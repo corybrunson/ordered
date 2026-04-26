@@ -53,7 +53,7 @@ We can define the model with specific parameters:
 ```{r}
 dt_spec <-
   decision_tree() |>
-  set_engine("rpartScore") |>
+  set_engine("rpartScore", split = "quad") |>
   set_mode("classification")
 dt_spec
 ```
@@ -98,7 +98,7 @@ We can define the model with specific parameters:
 ```{r}
 gam_spec <-
   gen_additive_mod() |>
-  set_engine("vgam") |>
+  set_engine("vgam", family = "stopping_ratio") |>
   set_mode("classification")
 gam_spec
 ```
@@ -231,7 +231,7 @@ We can define the model with specific parameters:
 
 ```{r}
 or_spec <-
-  ordinal_reg() |>
+  ordinal_reg(odds_link = "continuation_ratio") |>
   set_engine("vglm") |>
   set_mode("classification")
 or_spec
@@ -278,7 +278,7 @@ We can define the model with specific parameters:
 ```{r}
 rf_spec <-
   rand_forest(trees = 1000) |>
-  set_engine("ordinalForest") |>
+  set_engine("ordinalForest", nsets = 100) |>
   set_mode("classification")
 rf_spec
 ```

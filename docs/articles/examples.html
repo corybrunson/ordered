@@ -104,10 +104,13 @@ conditions.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dt_spec</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/decision_tree.html" class="external-link">decision_tree</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"rpartScore"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"rpartScore"</span>, split <span class="op">=</span> <span class="st">"quad"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
 <span><span class="va">dt_spec</span></span></code></pre></div>
 <pre><code><span><span class="co">## Decision Tree Model Specification (classification)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Engine-Specific Arguments:</span></span>
+<span><span class="co">##   split = quad</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Computational engine: rpartScore</span></span></code></pre>
 <p>Now we create the model fit object:</p>
@@ -122,13 +125,13 @@ conditions.</p>
 <span><span class="co">## node), split, n, deviance, yval</span></span>
 <span><span class="co">##       * denotes terminal node</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">##  1) root 1669 1225 2  </span></span>
-<span><span class="co">##    2) Infl=Low,Medium 1280  922 2  </span></span>
-<span><span class="co">##      4) Type=Tower,Atrium 488  342 2 *</span></span>
-<span><span class="co">##      5) Type=Apartment,Terrace 792  580 2  </span></span>
-<span><span class="co">##       10) Infl=Low 391  258 1 *</span></span>
-<span><span class="co">##       11) Infl=Medium 401  287 2 *</span></span>
-<span><span class="co">##    3) Infl=High 389  242 3 *</span></span></code></pre>
+<span><span class="co">## 1) root 1669 1225 2  </span></span>
+<span><span class="co">##   2) Infl=Low 624  454 2  </span></span>
+<span><span class="co">##     4) Type=Apartment,Terrace 391  258 1 *</span></span>
+<span><span class="co">##     5) Type=Tower,Atrium 233  161 2 *</span></span>
+<span><span class="co">##   3) Infl=Medium,High 1045  771 2  </span></span>
+<span><span class="co">##     6) Infl=Medium 656  468 2 *</span></span>
+<span><span class="co">##     7) Infl=High 389  242 3 *</span></span></code></pre>
 <p>The holdout data can be predicted for the most likely class:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">dt_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
@@ -170,10 +173,13 @@ conditions.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gam_spec</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/gen_additive_mod.html" class="external-link">gen_additive_mod</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"vgam"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"vgam"</span>, family <span class="op">=</span> <span class="st">"stopping_ratio"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
 <span><span class="va">gam_spec</span></span></code></pre></div>
 <pre><code><span><span class="co">## GAM Model Specification (classification)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Engine-Specific Arguments:</span></span>
+<span><span class="co">##   family = stopping_ratio</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Computational engine: vgam</span></span></code></pre>
 <p>Now we create the model fit object:</p>
@@ -185,13 +191,13 @@ conditions.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
-<span><span class="co">## VGAM::vgam(formula = formula, family = VGAM::cumulative(link = "logitlink", </span></span>
+<span><span class="co">## VGAM::vgam(formula = formula, family = VGAM::sratio(link = "logitlink", </span></span>
 <span><span class="co">##     parallel = TRUE), data = data)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Degrees of Freedom: 3338 Total; 3330 Residual</span></span>
-<span><span class="co">## Residual deviance: 3457.93 </span></span>
-<span><span class="co">## Log-likelihood: -1728.965</span></span></code></pre>
+<span><span class="co">## Residual deviance: 3460.191 </span></span>
+<span><span class="co">## Log-likelihood: -1730.096</span></span></code></pre>
 <p>The holdout data can be predicted for the most likely class or all
 class probabilities:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
@@ -199,35 +205,35 @@ class probabilities:</p>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
 <span><span class="co">##    .pred_class</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 2</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Low        </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Low        </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 5</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 6</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Low        </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 8</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 9</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span> High</span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">gam_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
 <span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
 <span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.377        0.287      0.336</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.145        0.212      0.643</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.518        0.260      0.221</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.232        0.265      0.504</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.334        0.287      0.378</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.298        0.283      0.419</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.298        0.283      0.419</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.302        0.284      0.414</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.302        0.284      0.414</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.174        0.234      0.591</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.174        0.234      0.591</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.174        0.234      0.591</span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.262        0.256      0.481</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.262        0.256      0.481</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.158        0.185      0.657</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.490        0.301      0.209</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.212        0.226      0.562</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.211        0.226      0.563</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.420        0.302      0.278</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.306        0.276      0.418</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.277        0.264      0.459</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.168        0.193      0.638</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.532        0.295      0.173</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.409        0.301      0.290</span></span></code></pre>
 </details>
 </div>
 <div class="section level2">
@@ -529,11 +535,14 @@ conditions.</p>
 <p>We can define the model with specific parameters:</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">or_spec</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span>odds_link <span class="op">=</span> <span class="st">"continuation_ratio"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"vglm"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
 <span><span class="va">or_spec</span></span></code></pre></div>
 <pre><code><span><span class="co">## Ordinal Regression Model Specification (classification)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Main Arguments:</span></span>
+<span><span class="co">##   odds_link = continuation_ratio</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Computational engine: vglm</span></span></code></pre>
 <p>Now we create the model fit object:</p>
@@ -545,19 +554,19 @@ conditions.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
-<span><span class="co">## VGAM::vglm(formula = formula, family = VGAM::cumulative(link = "logitlink", </span></span>
+<span><span class="co">## VGAM::vglm(formula = formula, family = VGAM::cratio(link = "logitlink", </span></span>
 <span><span class="co">##     parallel = TRUE), data = data)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">## (Intercept):1 (Intercept):2    InflMedium      InflHigh TypeApartment </span></span>
-<span><span class="co">##    -0.4999637     0.6867241    -0.5506876    -1.2850886     0.5695908 </span></span>
+<span><span class="co">##     0.5357923     0.1421721     0.4738798     1.1288464    -0.4913145 </span></span>
 <span><span class="co">##    TypeAtrium   TypeTerrace      ContHigh </span></span>
-<span><span class="co">##     0.3499041     1.0901346    -0.3572682 </span></span>
+<span><span class="co">##    -0.3361781    -0.9588670     0.2834405 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Degrees of Freedom: 3338 Total; 3330 Residual</span></span>
-<span><span class="co">## Residual deviance: 3455.499 </span></span>
-<span><span class="co">## Log-likelihood: -1727.749</span></span></code></pre>
+<span><span class="co">## Residual deviance: 3459.711 </span></span>
+<span><span class="co">## Log-likelihood: -1729.856</span></span></code></pre>
 <p>The holdout data can be predicted for the most likely class or all
 class probabilities:</p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
@@ -582,18 +591,18 @@ class probabilities:</p>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
 <span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
 <span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.259        0.275      0.466</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.517        0.261      0.222</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.517        0.261      0.222</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.229        0.264      0.507</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.192        0.246      0.562</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.510        0.263      0.227</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.429        0.282      0.289</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.429        0.282      0.289</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.302        0.284      0.414</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.172        0.233      0.595</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.172        0.233      0.595</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.558        0.247      0.195</span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.267        0.257      0.476</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.489        0.300      0.211</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.489        0.300      0.211</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.236        0.240      0.524</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.209        0.223      0.568</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.487        0.300      0.213</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.419        0.300      0.281</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.419        0.300      0.281</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.310        0.276      0.415</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.189        0.208      0.603</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.189        0.208      0.603</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.535        0.293      0.172</span></span></code></pre>
 </details>
 </div>
 <div class="section level2">
@@ -617,13 +626,16 @@ conditions.</p>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rf_spec</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>trees <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ordinalForest"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ordinalForest"</span>, nsets <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
 <span><span class="va">rf_spec</span></span></code></pre></div>
 <pre><code><span><span class="co">## Random Forest Model Specification (classification)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Main Arguments:</span></span>
 <span><span class="co">##   trees = 1000</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Engine-Specific Arguments:</span></span>
+<span><span class="co">##   nsets = 100</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Computational engine: ordinalForest</span></span></code></pre>
 <p>Now we create the model fit object:</p>
@@ -643,7 +655,7 @@ conditions.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Forest setup: </span></span>
 <span><span class="co">## Number of trees in ordinal forest: 1000 </span></span>
-<span><span class="co">## Number of considered score sets in total: 1000 </span></span>
+<span><span class="co">## Number of considered score sets in total: 100 </span></span>
 <span><span class="co">## Number of best score sets used for approximating the optimal score set: 10 </span></span>
 <span><span class="co">## Number of trees per regression forests constructed in the optimization: 100 </span></span>
 <span><span class="co">## Performance function: "probability"</span></span></code></pre>
@@ -671,18 +683,18 @@ class probabilities:</p>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
 <span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
 <span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.336        0.261      0.404</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.471        0.249      0.280</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.471        0.249      0.280</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.284        0.218      0.498</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.278        0.245      0.477</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.400        0.280      0.320</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.396        0.280      0.324</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.396        0.280      0.324</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.280        0.277      0.443</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.213        0.253      0.534</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.213        0.253      0.534</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.490        0.271      0.239</span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.334        0.259      0.408</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.474        0.249      0.277</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.474        0.249      0.277</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.284        0.219      0.497</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.274        0.250      0.476</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.402        0.278      0.320</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.396        0.278      0.326</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.396        0.278      0.326</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.279        0.277      0.444</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.214        0.251      0.535</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.214        0.251      0.535</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.486        0.272      0.241</span></span></code></pre>
 </details>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

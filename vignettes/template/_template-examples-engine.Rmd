@@ -20,8 +20,8 @@ We can define the model with specific parameters:
 
 ```{r}
 {model_abbr}_spec <-
-  {model_name}({engine_args}) |>
-  set_engine("{engine_name}") |>
+  {model_name}({model_args}) |>
+  set_engine({engine_pass}) |>
   set_mode("classification")
 {model_abbr}_spec
 ```
