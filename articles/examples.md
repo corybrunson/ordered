@@ -37,12 +37,15 @@ We can define the model with specific parameters:
 ``` r
 dt_spec <-
   decision_tree() |>
-  set_engine("rpartScore") |>
+  set_engine("rpartScore", split = "quad") |>
   set_mode("classification")
 dt_spec
 ```
 
     ## Decision Tree Model Specification (classification)
+    ## 
+    ## Engine-Specific Arguments:
+    ##   split = quad
     ## 
     ## Computational engine: rpartScore
 
@@ -61,13 +64,13 @@ dt_fit
     ## node), split, n, deviance, yval
     ##       * denotes terminal node
     ## 
-    ##  1) root 1669 1225 2  
-    ##    2) Infl=Low,Medium 1280  922 2  
-    ##      4) Type=Tower,Atrium 488  342 2 *
-    ##      5) Type=Apartment,Terrace 792  580 2  
-    ##       10) Infl=Low 391  258 1 *
-    ##       11) Infl=Medium 401  287 2 *
-    ##    3) Infl=High 389  242 3 *
+    ## 1) root 1669 1225 2  
+    ##   2) Infl=Low 624  454 2  
+    ##     4) Type=Apartment,Terrace 391  258 1 *
+    ##     5) Type=Tower,Atrium 233  161 2 *
+    ##   3) Infl=Medium,High 1045  771 2  
+    ##     6) Infl=Medium 656  468 2 *
+    ##     7) Infl=High 389  242 3 *
 
 The holdout data can be predicted for the most likely class:
 
@@ -113,12 +116,15 @@ We can define the model with specific parameters:
 ``` r
 gam_spec <-
   gen_additive_mod() |>
-  set_engine("vgam") |>
+  set_engine("vgam", family = "stopping_ratio") |>
   set_mode("classification")
 gam_spec
 ```
 
     ## GAM Model Specification (classification)
+    ## 
+    ## Engine-Specific Arguments:
+    ##   family = stopping_ratio
     ## 
     ## Computational engine: vgam
 
@@ -134,13 +140,13 @@ gam_fit
     ## 
     ## 
     ## Call:
-    ## VGAM::vgam(formula = formula, family = VGAM::cumulative(link = "logitlink", 
+    ## VGAM::vgam(formula = formula, family = VGAM::sratio(link = "logitlink", 
     ##     parallel = TRUE), data = data)
     ## 
     ## 
     ## Degrees of Freedom: 3338 Total; 3330 Residual
-    ## Residual deviance: 3457.93 
-    ## Log-likelihood: -1728.965
+    ## Residual deviance: 3460.191 
+    ## Log-likelihood: -1730.096
 
 The holdout data can be predicted for the most likely class or all class
 probabilities:
@@ -152,18 +158,18 @@ predict(gam_fit, house_test, type = "class")
     ## # A tibble: 12 × 1
     ##    .pred_class
     ##    <ord>      
-    ##  1 Low        
+    ##  1 High       
     ##  2 High       
-    ##  3 Low        
-    ##  4 High       
+    ##  3 High       
+    ##  4 Low        
     ##  5 High       
     ##  6 High       
-    ##  7 High       
+    ##  7 Low        
     ##  8 High       
     ##  9 High       
     ## 10 High       
-    ## 11 High       
-    ## 12 High
+    ## 11 Low        
+    ## 12 Low
 
 ``` r
 predict(gam_fit, house_test, type = "prob")
@@ -172,18 +178,18 @@ predict(gam_fit, house_test, type = "prob")
     ## # A tibble: 12 × 3
     ##    .pred_Low .pred_Medium .pred_High
     ##        <dbl>        <dbl>      <dbl>
-    ##  1     0.377        0.287      0.336
-    ##  2     0.145        0.212      0.643
-    ##  3     0.518        0.260      0.221
-    ##  4     0.232        0.265      0.504
-    ##  5     0.334        0.287      0.378
-    ##  6     0.298        0.283      0.419
-    ##  7     0.298        0.283      0.419
-    ##  8     0.302        0.284      0.414
-    ##  9     0.302        0.284      0.414
-    ## 10     0.174        0.234      0.591
-    ## 11     0.174        0.234      0.591
-    ## 12     0.174        0.234      0.591
+    ##  1     0.262        0.256      0.481
+    ##  2     0.262        0.256      0.481
+    ##  3     0.158        0.185      0.657
+    ##  4     0.490        0.301      0.209
+    ##  5     0.212        0.226      0.562
+    ##  6     0.211        0.226      0.563
+    ##  7     0.420        0.302      0.278
+    ##  8     0.306        0.276      0.418
+    ##  9     0.277        0.264      0.459
+    ## 10     0.168        0.193      0.638
+    ## 11     0.532        0.295      0.173
+    ## 12     0.409        0.301      0.290
 
 ## `ordinal_reg()` models
 
@@ -519,13 +525,16 @@ We can define the model with specific parameters:
 
 ``` r
 or_spec <-
-  ordinal_reg() |>
+  ordinal_reg(odds_link = "continuation_ratio") |>
   set_engine("vglm") |>
   set_mode("classification")
 or_spec
 ```
 
     ## Ordinal Regression Model Specification (classification)
+    ## 
+    ## Main Arguments:
+    ##   odds_link = continuation_ratio
     ## 
     ## Computational engine: vglm
 
@@ -541,19 +550,19 @@ or_fit
     ## 
     ## 
     ## Call:
-    ## VGAM::vglm(formula = formula, family = VGAM::cumulative(link = "logitlink", 
+    ## VGAM::vglm(formula = formula, family = VGAM::cratio(link = "logitlink", 
     ##     parallel = TRUE), data = data)
     ## 
     ## 
     ## Coefficients:
     ## (Intercept):1 (Intercept):2    InflMedium      InflHigh TypeApartment 
-    ##    -0.4999637     0.6867241    -0.5506876    -1.2850886     0.5695908 
+    ##     0.5357923     0.1421721     0.4738798     1.1288464    -0.4913145 
     ##    TypeAtrium   TypeTerrace      ContHigh 
-    ##     0.3499041     1.0901346    -0.3572682 
+    ##    -0.3361781    -0.9588670     0.2834405 
     ## 
     ## Degrees of Freedom: 3338 Total; 3330 Residual
-    ## Residual deviance: 3455.499 
-    ## Log-likelihood: -1727.749
+    ## Residual deviance: 3459.711 
+    ## Log-likelihood: -1729.856
 
 The holdout data can be predicted for the most likely class or all class
 probabilities:
@@ -585,18 +594,18 @@ predict(or_fit, house_test, type = "prob")
     ## # A tibble: 12 × 3
     ##    .pred_Low .pred_Medium .pred_High
     ##        <dbl>        <dbl>      <dbl>
-    ##  1     0.259        0.275      0.466
-    ##  2     0.517        0.261      0.222
-    ##  3     0.517        0.261      0.222
-    ##  4     0.229        0.264      0.507
-    ##  5     0.192        0.246      0.562
-    ##  6     0.510        0.263      0.227
-    ##  7     0.429        0.282      0.289
-    ##  8     0.429        0.282      0.289
-    ##  9     0.302        0.284      0.414
-    ## 10     0.172        0.233      0.595
-    ## 11     0.172        0.233      0.595
-    ## 12     0.558        0.247      0.195
+    ##  1     0.267        0.257      0.476
+    ##  2     0.489        0.300      0.211
+    ##  3     0.489        0.300      0.211
+    ##  4     0.236        0.240      0.524
+    ##  5     0.209        0.223      0.568
+    ##  6     0.487        0.300      0.213
+    ##  7     0.419        0.300      0.281
+    ##  8     0.419        0.300      0.281
+    ##  9     0.310        0.276      0.415
+    ## 10     0.189        0.208      0.603
+    ## 11     0.189        0.208      0.603
+    ## 12     0.535        0.293      0.172
 
 ## `rand_forest()` models
 
@@ -620,7 +629,7 @@ We can define the model with specific parameters:
 ``` r
 rf_spec <-
   rand_forest(trees = 1000) |>
-  set_engine("ordinalForest") |>
+  set_engine("ordinalForest", nsets = 100) |>
   set_mode("classification")
 rf_spec
 ```
@@ -629,6 +638,9 @@ rf_spec
     ## 
     ## Main Arguments:
     ##   trees = 1000
+    ## 
+    ## Engine-Specific Arguments:
+    ##   nsets = 100
     ## 
     ## Computational engine: ordinalForest
 
@@ -652,7 +664,7 @@ rf_fit
     ## 
     ## Forest setup: 
     ## Number of trees in ordinal forest: 1000 
-    ## Number of considered score sets in total: 1000 
+    ## Number of considered score sets in total: 100 
     ## Number of best score sets used for approximating the optimal score set: 10 
     ## Number of trees per regression forests constructed in the optimization: 100 
     ## Performance function: "probability"
@@ -687,15 +699,15 @@ predict(rf_fit, house_test, type = "prob")
     ## # A tibble: 12 × 3
     ##    .pred_Low .pred_Medium .pred_High
     ##        <dbl>        <dbl>      <dbl>
-    ##  1     0.337        0.259      0.405
-    ##  2     0.472        0.250      0.278
-    ##  3     0.472        0.250      0.278
-    ##  4     0.282        0.219      0.498
-    ##  5     0.277        0.247      0.476
-    ##  6     0.399        0.283      0.318
-    ##  7     0.395        0.281      0.324
-    ##  8     0.395        0.281      0.324
-    ##  9     0.281        0.277      0.442
-    ## 10     0.218        0.252      0.530
-    ## 11     0.218        0.252      0.530
-    ## 12     0.480        0.273      0.247
+    ##  1     0.335        0.259      0.407
+    ##  2     0.471        0.249      0.279
+    ##  3     0.471        0.249      0.279
+    ##  4     0.285        0.220      0.496
+    ##  5     0.276        0.247      0.477
+    ##  6     0.399        0.278      0.323
+    ##  7     0.399        0.280      0.321
+    ##  8     0.399        0.280      0.321
+    ##  9     0.279        0.276      0.444
+    ## 10     0.214        0.250      0.536
+    ## 11     0.214        0.250      0.536
+    ## 12     0.489        0.270      0.241
