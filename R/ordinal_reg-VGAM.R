@@ -15,9 +15,12 @@
 #'   single ordinal outcome column and therefore do not accept the convenient
 #'   `cbind(y1, y2, ...) ~ x1 + x2 + ...` encoding commonly used in `VGAM`.
 #' @keywords internal
+#' @returns An object of S3 parent class `VGAM` and primary classes `vglm` or
+#'   `vgam` as returned by [VGAM::vglm()] and [VGAM::vgam()].
 #' @examples
 #' values_ordinal_link_VGAM
 #' dials::ordinal_link(values = values_ordinal_link_VGAM)
+
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
@@ -69,7 +72,7 @@ VGAM_vglm_wrapper <- function(
   )
   cl <- rlang::call2(
     .fn = "vglm", .ns = "VGAM",
-    formula = expr(formula), data = expr(data),
+    formula = rlang::expr(formula), data = rlang::expr(data),
     family = family_call,
     ...
   )
@@ -102,7 +105,7 @@ VGAM_vgam_wrapper <- function(
   )
   cl <- rlang::call2(
     .fn = "vgam", .ns = "VGAM",
-    formula = expr(formula), data = expr(data),
+    formula = rlang::expr(formula), data = rlang::expr(data),
     family = family_call,
     ...
   )

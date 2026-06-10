@@ -13,25 +13,31 @@ ordinalForest_wrapper(x, y, ...)
 
 \item{...}{Arguments to pass to the underlying model function.}
 }
+\value{
+An object of S3 class \code{ordfor} as returned by
+\code{\link[ordinalForest:ordfor]{ordinalForest::ordfor()}}.
+}
 \description{
 A wrapper is needed since they have a non-standard model interface that
-required the data set and the column name (character string) for the
-outcome.
+required the data set and the column name (character string) for the outcome.
 }
 \examples{
 \dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("ordinalForest")) withAutoprint(\{ # examplesIf}
 house_data <-
   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
 # subsample to reduce runtime
-house_data <- house_data[sample(nrow(house_data), nrow(house_data)/10), ]
+house_data <- house_data[sample(nrow(house_data), nrow(house_data) / 10), ]
 # fit wrapper
+# (using inadvisedly few score sets and trees to reduce runtime)
 ( fit_orig <- ordinalForest::ordfor(
   depvar = "Sat",
-  data = house_data
+  data = house_data,
+  nsets = 25, ntreefinal = 100
 ) )
 ( fit_wrap <- ordinalForest_wrapper(
   x = subset(house_data, select = -Sat),
-  y = house_data$Sat
+  y = house_data$Sat,
+  nsets = 25, ntreefinal = 100
 ) )
 \dontshow{\}) # examplesIf}
 }

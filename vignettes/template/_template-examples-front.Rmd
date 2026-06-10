@@ -1,0 +1,30 @@
+---
+title: "Fitting and Predicting with ordered"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Fitting and Predicting with ordered}
+output:
+  knitr:::html_vignette
+---
+
+```{r}
+#| label: startup
+#| include: false
+library(utils)
+```
+
+These examples illustrate which models, engines, and prediction types
+are available in ordered.
+As a reminder, in parsnip,
+
+- the **model type** differentiates basic modeling approaches,
+  such as random forests and ordinal regression;
+
+- the **mode** denotes in what kind of modeling context it will be used
+  (here, classification); and
+
+- the computational **engine** indicates how the model is fit,
+  such as with a specific R package implementation
+  or even methods outside of R like Keras or Stan.
+
+The following examples use the same data set throughout.

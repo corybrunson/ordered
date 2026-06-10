@@ -8,6 +8,10 @@
 #' @param y The outcome vector.
 #' @param ... Additional arguments to pass.
 #' @keywords internal
+#' @returns An object of S3 class `ordinalNet` as returned by
+#'   [ordinalNet::ordinalNet()], or a vector or matrix of predictions as
+#'   returned by [`ordinalNet::predict.ordinalNet`]`()`.
+
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("ordinalNet")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
@@ -29,9 +33,9 @@
 #'   lambdaVals = pen_vec
 #' ) )
 #' fit_tidy <-
-#'   ordinal_reg(ordinal_link = "logistic", odds_link = "stopping_ratio") |>
-#'   set_engine("ordinalNet") |>
-#'   set_args(path_values = pen_vec, penalty = 1) |>
+#'   ordinal_reg(ordinal_link = "logistic", odds_link = "stopping_ratio") %>%
+#'   set_engine("ordinalNet") %>%
+#'   set_args(path_values = pen_vec, penalty = 1) %>%
 #'   fit(formula = Sat ~ Type + Infl + Cont + 0, data = house_data)
 #' fit_tidy$fit
 #' # predict wrapper
@@ -101,8 +105,8 @@ ordinalNet_wrapper <- function(
   # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "ordinalNet", .ns = "ordinalNet",
-    x = expr(x), y = expr(y),
-    family = expr(family), link = expr(link),
+    x = rlang::expr(x), y = rlang::expr(y),
+    family = rlang::expr(family), link = rlang::expr(link),
     ...
   )
   rlang::eval_tidy(cl)
@@ -381,7 +385,7 @@ multi_predict_classprob_ordinal_net <- function(object, new_data, penalty) {
     ~ predict(object, new_data, type = "prob", penalty = .x) %>%
       tibble::as_tibble() %>%
       parsnip::add_rowindex() %>%
-      dplyr::mutate(penalty = .x) %>% relocate(penalty)
+      dplyr::mutate(penalty = .x) %>% dplyr::relocate(penalty)
   ) %>%
     tidyr::nest(.by = .row, .key = ".pred") %>%
     dplyr::select(-.row)
@@ -392,7 +396,7 @@ multi_predict_class_ordinal_net <- function(object, new_data, penalty) {
     penalty,
     ~ predict(object, new_data, type = "class", penalty = .x) %>%
       parsnip::add_rowindex() %>%
-      dplyr::mutate(penalty = .x) %>% relocate(penalty)
+      dplyr::mutate(penalty = .x) %>% dplyr::relocate(penalty)
   ) %>%
     tidyr::nest(.by = .row, .key = ".pred") %>%
     dplyr::select(-.row)

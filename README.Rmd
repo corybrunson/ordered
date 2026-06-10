@@ -46,11 +46,11 @@ You can install the development version of ordered like so:
 pak::pak("corybrunson/ordered", dependencies = FALSE)
 ```
 
-Currently, ordered relies on engine and dial registration in the following forks:
+Currently, ordered relies on engine registration in a parsnip fork and dial registration in the current development version:
 
 ``` r
 pak::pak("corybrunson/parsnip@ordered", dependencies = FALSE)
-pak::pak("corybrunson/dials@ordered", dependencies = FALSE)
+pak::pak("tidymodels/dials", dependencies = FALSE)
 ```
 
 ## Available models, engines, and prediction types
@@ -73,7 +73,8 @@ nope <- cli::symbol$cross
 get_from_env("models") |> 
   enframe(name = NULL, value = "model") |> 
   mutate(dependency = map(model, get_dependency)) |> 
-  unnest(dependency) |> unnest(pkg) |> 
+  unnest(dependency) |> 
+  unnest(pkg) |> 
   filter(pkg == "ordered") |> 
   mutate(info = map(model, \(.x) get_from_env(paste0(.x, "_predict")))) |> 
   nest(spec = c(model, engine, mode)) |> 

@@ -7,9 +7,14 @@
 #' @param data The data frame to pass.
 #' @param ... Additional arguments to pass.
 #' @keywords internal
+#' @returns An object of S3 class `rpart` as returned by
+#'   [rpartScore::rpartScore()].
+
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("rpartScore")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+#' # subsample to reduce runtime
+#' house_data <- house_data[sample(nrow(house_data), nrow(house_data) / 5), ]
 #' # fit wrapper
 #' ( fit_orig <- rpartScore::rpartScore(
 #'   formula = Sat ~ Infl + Type + Cont,
@@ -28,7 +33,7 @@ rpartScore_wrapper <- function(formula, data, ...) {
   # execute call on modified inputs
   cl <- rlang::call2(
     .fn = "rpartScore", .ns = "rpartScore",
-    formula = expr(formula), data = expr(data), ...
+    formula = rlang::expr(formula), data = rlang::expr(data), ...
   )
   rlang::eval_tidy(cl)
 }

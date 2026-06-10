@@ -21,7 +21,7 @@
       res <- translate(set_engine(ordinal_reg(mode = "classification"), NULL))
     Condition
       Error in `set_engine()`:
-      ! Missing engine. Possible mode/engine combinations are: classification {polr, ordinalNet, vglm, vgam}.
+      ! Missing engine. Possible mode/engine combinations are: classification {polr, ordinalNet, vglm}.
 
 ---
 
@@ -35,11 +35,8 @@
 
     Code
       translate(set_engine(ordinal_reg(mode = "classification"), "wat?"))
-    Message
-      ! parsnip could not locate an implementation for `ordinal_reg` classification model specifications using the `wat?` engine.
-    Output
-      Ordinal Regression Model Specification (classification)
-      
-      Computational engine: wat? 
-      
+    Condition
+      Error in `set_engine()`:
+      x Engine "wat?" is not supported for `ordinal_reg()`.
+      i See `show_engines("ordinal_reg")`.
 

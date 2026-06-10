@@ -79,6 +79,7 @@ test_that("class prediction", {
   house_sub <- get_house()$sub
 
   # with class probabilities (default)
+  set.seed(seed)
   tidy_fit <- rand_forest(trees = 10) |>
     set_engine("ordinalForest") |>
     set_mode("classification") |>
@@ -92,20 +93,66 @@ test_that("class prediction", {
   tidy_pred <- predict(tidy_fit, house_sub, type = "class")
   expect_equal(orig_pred, tidy_pred)
 
-  # without class probabilities
+  # WARNING: Predictions using other `perffunction` values are stochastic.
+  # Seeds before `predict()` calls ensure that the predictions agree.
+  # Seeds before `fit()` calls are set to produce different predictions
+  # when those before `predict()` calls are not set.
+
+  # without class probabilities: 'equal'
+  set.seed(seed + 10L)
   tidy_fit <- rand_forest(trees = 10) |>
     set_engine("ordinalForest") |>
     set_mode("classification") |>
     set_args(nsets = 10, ntreeperdiv = 100, perffunction = "equal") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
+  set.seed(seed)
   orig_pred <- predict(tidy_fit$fit, newdata = house_sub)
   orig_pred <- ordered(orig_pred$ypred, levels(orig_pred$ypred))
   orig_pred <- tibble::as_tibble(orig_pred)
   orig_pred <- set_names(orig_pred, ".pred_class")
+  set.seed(seed)
   tidy_pred <- predict(tidy_fit, house_sub, type = "class")
-  # FIXME: Predicted classes do not agree.
-  # expect_equal(orig_pred, tidy_pred)
+  expect_equal(orig_pred, tidy_pred)
+
+  expect_error(predict(tidy_fit, house_sub, type = "prob"), "perffunction")
+
+  # without class probabilities: 'proportional'
+  set.seed(seed + 10L)
+  tidy_fit <- rand_forest(trees = 10) |>
+    set_engine("ordinalForest") |>
+    set_mode("classification") |>
+    set_args(nsets = 10, ntreeperdiv = 100, perffunction = "proportional") |>
+    fit(Sat ~ Type + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_pred <- predict(tidy_fit$fit, newdata = house_sub)
+  orig_pred <- ordered(orig_pred$ypred, levels(orig_pred$ypred))
+  orig_pred <- tibble::as_tibble(orig_pred)
+  orig_pred <- set_names(orig_pred, ".pred_class")
+  set.seed(seed)
+  tidy_pred <- predict(tidy_fit, house_sub, type = "class")
+  expect_equal(orig_pred, tidy_pred)
+
+  expect_error(predict(tidy_fit, house_sub, type = "prob"), "perffunction")
+
+  # without class probabilities: 'oneclass'
+  set.seed(seed)
+  tidy_fit <- rand_forest(trees = 10) |>
+    set_engine("ordinalForest") |>
+    set_mode("classification") |>
+    set_args(nsets = 10, ntreeperdiv = 100,
+             perffunction = "oneclass", classimp = "Medium") |>
+    fit(Sat ~ Type + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_pred <- predict(tidy_fit$fit, newdata = house_sub)
+  orig_pred <- ordered(orig_pred$ypred, levels(orig_pred$ypred))
+  orig_pred <- tibble::as_tibble(orig_pred)
+  orig_pred <- set_names(orig_pred, ".pred_class")
+  set.seed(seed)
+  tidy_pred <- predict(tidy_fit, house_sub, type = "class")
+  expect_equal(orig_pred, tidy_pred)
 
   expect_error(predict(tidy_fit, house_sub, type = "prob"), "perffunction")
 })
@@ -135,6 +182,7 @@ test_that("probability prediction", {
 
 test_that("interfaces agree", {
   skip_if_not_installed("ordinalForest")
+  skip_if_not_installed("boot")
   skip_if_not_installed("QSARdata")
 
   orf_spec <-
@@ -151,6 +199,7 @@ test_that("interfaces agree", {
   expect_snapshot(orf_f_fit)
 
   expect_no_error({
+    # NB: Different results using R 4.2.3 may be due to changes in the RNG.
     set.seed(13)
     orf_xy_fit <- fit_xy(orf_spec, x = caco_train[, -1], y = caco_train$class)
   })
@@ -164,6 +213,7 @@ test_that("interfaces agree", {
 
 test_that("arguments agree", {
   skip_if_not_installed("ordinalForest")
+  skip_if_not_installed("boot")
   skip_if_not_installed("QSARdata")
 
   orf_arg_spec <-
@@ -190,3 +240,18 @@ test_that("arguments agree", {
   expect_equal(orf_arg_fit$fit$forestfinal$mtry, 2)
   expect_equal(orf_arg_fit$fit$perffunction, "probability")
 })
+
+test_that("engine arguments are registered", {
+  prms <-
+    parsnip::rand_forest(engine = "ordinalForest", mode = "classification") |>
+    parsnip:::tunable.model_spec() |>
+    dplyr::filter(component_id == "engine")
+  expect_true(nrow(prms) == 6L)
+  for (i in 1:nrow(prms)) {
+    tmp <- prms$call_info[[i]]
+    tmp$argument <- prms$name[i]
+    expect_snapshot(print(unlist(tmp)))
+  }
+})
+
+

@@ -27,6 +27,7 @@ make_decision_tree_rpartScore <- function() {
     mode = "classification"
   )
 
+  # dials provided in {dials}
   parsnip::set_model_arg(
     model = "decision_tree",
     eng = "rpartScore",
@@ -49,6 +50,24 @@ make_decision_tree_rpartScore <- function() {
     parsnip = "cost_complexity",
     original = "cp",
     func = list(pkg = "dials", fun = "cost_complexity"),
+    has_submodel = FALSE
+  )
+
+  # engine-specific arguments
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "split",
+    original = "split",
+    func = list(pkg = "ordered", fun = "split_func"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "decision_tree",
+    eng = "rpartScore",
+    parsnip = "prune",
+    original = "prune",
+    func = list(pkg = "ordered", fun = "prune_func"),
     has_submodel = FALSE
   )
 

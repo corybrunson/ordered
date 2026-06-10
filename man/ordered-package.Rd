@@ -19,8 +19,8 @@ if (rlang::is_installed("MASS")) {
 # Weighted sample
 
 set.seed(561246)
-house_sub <- MASS::housing |>
-  dplyr::sample_n(size = 120, replace = TRUE, weight = Freq) |>
+house_sub <- MASS::housing \%>\%
+  dplyr::sample_n(size = 120, replace = TRUE, weight = Freq) \%>\%
   subset(select = -Freq)
 train_inds <- sample(120, 80)
 house_train <- house_sub[train_inds, ]
@@ -28,9 +28,9 @@ house_test <- house_sub[-train_inds, ]
 
 # Cumulative-link proportional-odds probit regression model
 
-fit_cpop <- ordinal_reg() |>
-  set_engine("polr") |>
-  set_args(ordinal_link = "probit") |>
+fit_cpop <- ordinal_reg() \%>\%
+  set_engine("polr") \%>\%
+  set_args(ordinal_link = "probit") \%>\%
   fit(Sat ~ Infl + Type + Cont, data = house_train)
 predict(fit_cpop, house_test, type = "prob")
 
@@ -38,13 +38,21 @@ if (rlang::is_installed("ordinalForest")) {
 
 # Ordinal forest
 
-fit_orf <- rand_forest(mode = "classification") |>
-  set_engine("ordinalForest") |>
-  set_args(perffunction = "probability") |>
+fit_orf <- rand_forest(mode = "classification") \%>\%
+  set_engine("ordinalForest") \%>\%
+  set_args(nsets = 50, ntreefinal = 100, perffunction = "probability") \%>\%
   fit(Sat ~ Infl + Type + Cont, data = house_train)
 predict(fit_orf, house_test, type = "prob")
 
 }
+}
+
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://corybrunson.github.io/ordered/}
+  \item Report bugs at \url{https://github.com/corybrunson/ordered/issues}
 }
 
 }

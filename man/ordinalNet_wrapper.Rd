@@ -48,9 +48,9 @@ predict_ordinalNet_wrapper(
 
 \method{predict_raw}{`_ordinalNet`}(object, new_data, opts = list(), ...)
 
-predict_classprob._ordinalNet(object, new_data, ...)
+\method{predict_classprob}{`_ordinalNet`}(object, new_data, ...)
 
-predict_class._ordinalNet(object, new_data, ...)
+\method{predict_class}{`_ordinalNet`}(object, new_data, ...)
 }
 \arguments{
 \item{x}{The predictor data.}
@@ -60,6 +60,11 @@ predict_class._ordinalNet(object, new_data, ...)
 \item{...}{Additional arguments to pass.}
 
 \item{penalty}{A numeric vector of penalty values.}
+}
+\value{
+An object of S3 class \code{ordinalNet} as returned by
+\code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}}, or a vector or matrix of predictions as
+returned by \code{\link[ordinalNet:predict.ordinalNet]{ordinalNet::predict.ordinalNet}}\verb{()}.
 }
 \description{
 The fit wrapper converts the standardized \code{odds_link} options encoded in
@@ -89,9 +94,9 @@ pen_vec <- 10 ^ seq(-2.5, -.5, 1)
   lambdaVals = pen_vec
 ) )
 fit_tidy <-
-  ordinal_reg(ordinal_link = "logistic", odds_link = "stopping_ratio") |>
-  set_engine("ordinalNet") |>
-  set_args(path_values = pen_vec, penalty = 1) |>
+  ordinal_reg(ordinal_link = "logistic", odds_link = "stopping_ratio") \%>\%
+  set_engine("ordinalNet") \%>\%
+  set_args(path_values = pen_vec, penalty = 1) \%>\%
   fit(formula = Sat ~ Type + Infl + Cont + 0, data = house_data)
 fit_tidy$fit
 # predict wrapper

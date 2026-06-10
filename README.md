@@ -57,12 +57,12 @@ You can install the development version of ordered like so:
 pak::pak("corybrunson/ordered", dependencies = FALSE)
 ```
 
-Currently, ordered relies on engine and dial registration in the
-following forks:
+Currently, ordered relies on engine registration in a parsnip fork and
+dial registration in the current development version:
 
 ``` r
 pak::pak("corybrunson/parsnip@ordered", dependencies = FALSE)
-pak::pak("corybrunson/dials@ordered", dependencies = FALSE)
+pak::pak("tidymodels/dials", dependencies = FALSE)
 ```
 
 ## Available models, engines, and prediction types
@@ -71,14 +71,14 @@ ordered provides new engines for several models, including all engines
 for `ordinal_reg()`, as summarized in the table. Currently only
 predictions of `type = "class"` and `type = "prob"` are supported.
 
-| model           | engine          | class | prob |
-|:----------------|:----------------|:------|:-----|
-| `decision_tree` | `rpartScore`    | ✔     | ✖    |
-| `ordinal_reg`   | `polr`          | ✔     | ✔    |
-| `ordinal_reg`   | `ordinalNet`    | ✔     | ✔    |
-| `ordinal_reg`   | `vglm`          | ✔     | ✔    |
-| `ordinal_reg`   | `vgam`          | ✔     | ✔    |
-| `rand_forest`   | `ordinalForest` | ✔     | ✔    |
+| model              | engine          | class | prob |
+|:-------------------|:----------------|:------|:-----|
+| `decision_tree`    | `rpartScore`    | ✔     | ✖    |
+| `gen_additive_mod` | `vgam`          | ✔     | ✔    |
+| `ordinal_reg`      | `polr`          | ✔     | ✔    |
+| `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    |
+| `ordinal_reg`      | `vglm`          | ✔     | ✔    |
+| `rand_forest`      | `ordinalForest` | ✔     | ✔    |
 
 ## Example
 
