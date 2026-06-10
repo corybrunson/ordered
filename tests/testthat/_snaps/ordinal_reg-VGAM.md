@@ -1,7 +1,7 @@
 # interfaces agree
 
     Code
-      onet_spec %>% translate()
+      translate(onet_spec)
     Output
       Ordinal Regression Model Specification (classification)
       
@@ -56,7 +56,7 @@
 # arguments agree
 
     Code
-      onet_arg_spec %>% translate()
+      translate(onet_arg_spec)
     Output
       Ordinal Regression Model Specification (classification)
       

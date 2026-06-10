@@ -111,13 +111,8 @@ test_that("class prediction", {
   tidy_fit <- ordinal_reg(engine = "vglm") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
-  orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
-  # convert to probabilities
-  orig_pred <- plogis(orig_pred)
-  orig_pred <- cbind(
-    orig_pred[, 1],
-    orig_pred[, 2] - orig_pred[, 1],
-    1 - orig_pred[, 2]
+  orig_pred <- VGAM::predict(
+    tidy_fit$fit, newdata = house_sub, type = "response"
   )
   orig_pred <- apply(orig_pred, 1L, which.max)
   orig_pred <- ordered(tidy_fit$lvl[orig_pred], tidy_fit$lvl)
@@ -138,13 +133,8 @@ test_that("probability prediction", {
   tidy_fit <- ordinal_reg(engine = "vglm") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
-  orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
-  # convert to probabilities
-  orig_pred <- plogis(orig_pred)
-  orig_pred <- cbind(
-    orig_pred[, 1],
-    orig_pred[, 2] - orig_pred[, 1],
-    1 - orig_pred[, 2]
+  orig_pred <- VGAM::predict(
+    tidy_fit$fit, newdata = house_sub, type = "response"
   )
   colnames(orig_pred) <- paste0(".pred_", tidy_fit$lvl)
   orig_pred <- tibble::as_tibble(orig_pred)
@@ -161,10 +151,10 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
-    ordinal_reg() %>%
-    set_mode("classification") %>%
+    ordinal_reg() |>
+    set_mode("classification") |>
     set_engine("vglm")
-  expect_snapshot(onet_spec %>% translate())
+  expect_snapshot(onet_spec |> translate())
 
   expect_no_error({
     set.seed(13)
@@ -196,9 +186,9 @@ test_that("arguments agree", {
     ordinal_reg(
       ordinal_link = "cloglog", odds_link = "stopping"
     ) |>
-    set_mode("classification") %>%
+    set_mode("classification") |>
     set_engine("vglm")
-  expect_snapshot(onet_arg_spec %>% translate())
+  expect_snapshot(onet_arg_spec |> translate())
 
   expect_snapshot({
     set.seed(13)

@@ -283,10 +283,10 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
-    ordinal_reg(penalty = 0.01) %>%
-    set_mode("classification") %>%
+    ordinal_reg(penalty = 0.01) |>
+    set_mode("classification") |>
     set_engine("ordinalNet")
-  expect_snapshot(onet_spec %>% translate())
+  expect_snapshot(onet_spec |> translate())
 
   expect_no_error({
     set.seed(13)
@@ -316,9 +316,9 @@ test_that("arguments agree", {
       mixture = .25,
       ordinal_link = "cloglog", odds_link = "stopping"
     ) |>
-    set_mode("classification") %>%
+    set_mode("classification") |>
     set_engine("ordinalNet", path_values = 10 ^ seq(-6, -1))
-  expect_snapshot(onet_arg_spec %>% translate())
+  expect_snapshot(onet_arg_spec |> translate())
 
   expect_snapshot({
     set.seed(13)

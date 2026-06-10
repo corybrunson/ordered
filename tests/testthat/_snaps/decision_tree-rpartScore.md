@@ -1,7 +1,7 @@
 # interfaces agree
 
     Code
-      odt_spec %>% translate()
+      translate(odt_spec)
     Output
       Decision Tree Model Specification (classification)
       
@@ -58,7 +58,7 @@
 # arguments agree
 
     Code
-      odt_def_spec %>% translate()
+      translate(odt_def_spec)
     Output
       Decision Tree Model Specification (classification)
       
@@ -71,7 +71,7 @@
 ---
 
     Code
-      odt_arg_spec %>% translate()
+      translate(odt_arg_spec)
     Output
       Decision Tree Model Specification (classification)
       

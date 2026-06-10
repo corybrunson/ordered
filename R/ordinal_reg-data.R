@@ -375,6 +375,9 @@ make_ordinal_reg_ordinalNet <- function() {
 
 make_ordinal_reg_lrm <- function() {
 
+  # ----------------------------------------------------------------------------
+  # `rms::lrm` components
+
   parsnip::set_model_engine("ordinal_reg", "classification", "lrm")
   parsnip::set_dependency(
     "ordinal_reg",
@@ -426,6 +429,27 @@ make_ordinal_reg_lrm <- function() {
     model = "ordinal_reg",
     eng = "lrm",
     mode = "classification",
+    type = "class",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        x <- apply(x, 1L, which.max)
+        ordered(object$lvl[x], object$lvl)
+      },
+      func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "fitted.ind"
+        )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "lrm",
+    mode = "classification",
     type = "prob",
     value = list(
       pre = NULL,
@@ -434,7 +458,7 @@ make_ordinal_reg_lrm <- function() {
         x <- set_names(x, paste0(".pred_", object$lvl))
         x
       },
-      func = c(fun = "predict"),
+      func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
       args =
         list(
           object = quote(object$fit),
@@ -463,6 +487,107 @@ make_ordinal_reg_lrm <- function() {
   #       )
   #   )
   # )
+
+  # ----------------------------------------------------------------------------
+  # `rms::orm` components
+
+  parsnip::set_model_engine("ordinal_reg", "classification", "orm")
+  parsnip::set_dependency(
+    "ordinal_reg",
+    eng = "orm",
+    pkg = "ordered",
+    mode = "classification"
+  )
+  parsnip::set_dependency(
+    "ordinal_reg",
+    eng = "orm",
+    pkg = "rms",
+    mode = "classification"
+  )
+
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "orm",
+    parsnip = "ordinal_link",
+    original = "family",
+    func = list(pkg = "dials", fun = "ordinal_link"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "orm",
+    parsnip = "penalty",
+    original = "penalty",
+    func = list(pkg = "dials", fun = "penalty"),
+    has_submodel = FALSE
+  )
+
+  parsnip::set_fit(
+    model = "ordinal_reg",
+    eng = "orm",
+    mode = "classification",
+    value = list(
+      interface = "formula",
+      protect = c("formula", "data", "weights"),
+      func = c(pkg = "rms", fun = "orm"),
+      defaults = list()
+    )
+  )
+
+  parsnip::set_encoding(
+    model = "ordinal_reg",
+    eng = "orm",
+    mode = "classification",
+    options = list(
+      predictor_indicators = "traditional",
+      compute_intercept = TRUE,
+      remove_intercept = TRUE,
+      allow_sparse_x = FALSE
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "orm",
+    mode = "classification",
+    type = "class",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        x <- apply(x, 1L, which.max)
+        ordered(object$lvl[x], object$lvl)
+      },
+      func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "fitted.ind"
+        )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "orm",
+    mode = "classification",
+    type = "prob",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        x <- tibble::as_tibble(x)
+        x <- set_names(x, paste0(".pred_", object$lvl))
+        x
+      },
+      func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "fitted.ind"
+        )
+    )
+  )
 
 }
 

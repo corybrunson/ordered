@@ -114,10 +114,10 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   olpr_spec <-
-    ordinal_reg() %>%
-    set_mode("classification") %>%
+    ordinal_reg() |>
+    set_mode("classification") |>
     set_engine("polr")
-  expect_snapshot(olpr_spec %>% translate())
+  expect_snapshot(olpr_spec |> translate())
 
   expect_no_error({
     set.seed(13)
@@ -149,9 +149,9 @@ test_that("arguments agree", {
 
   olpr_arg_spec <-
     ordinal_reg(ordinal_link = "cloglog") |>
-    set_mode("classification") %>%
+    set_mode("classification") |>
     set_engine("polr")
-  expect_snapshot(olpr_arg_spec %>% translate())
+  expect_snapshot(olpr_arg_spec |> translate())
 
   expect_snapshot({
     set.seed(13)

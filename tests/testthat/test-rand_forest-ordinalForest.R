@@ -186,11 +186,11 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   orf_spec <-
-    rand_forest() %>%
-    set_mode("classification") %>%
-    set_engine("ordinalForest") %>%
+    rand_forest() |>
+    set_mode("classification") |>
+    set_engine("ordinalForest") |>
     set_args(perffunction = "probability")
-  expect_snapshot(orf_spec %>% translate())
+  expect_snapshot(orf_spec |> translate())
 
   expect_no_error({
     set.seed(13)
@@ -217,14 +217,14 @@ test_that("arguments agree", {
   skip_if_not_installed("QSARdata")
 
   orf_arg_spec <-
-    rand_forest(mtry = 2, min_n = 11, trees = 100) %>%
-    set_mode("classification") %>%
+    rand_forest(mtry = 2, min_n = 11, trees = 100) |>
+    set_mode("classification") |>
     set_engine(
       "ordinalForest",
       nsets = 50, ntreeperdiv = 80, npermtrial = 70, nbest = 10
-    ) %>%
+    ) |>
     set_args(perffunction = "probability")
-  expect_snapshot(orf_arg_spec %>% translate())
+  expect_snapshot(orf_arg_spec |> translate())
 
   # This warning is a bug that I'll report
   expect_snapshot({
@@ -253,5 +253,3 @@ test_that("engine arguments are registered", {
     expect_snapshot(print(unlist(tmp)))
   }
 })
-
-
