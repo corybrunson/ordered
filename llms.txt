@@ -48,6 +48,7 @@ for ordinal outcomes:
 You can install the development version of ordered like so:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("corybrunson/ordered", dependencies = FALSE)
 ```
@@ -56,6 +57,7 @@ Currently, ordered relies on engine registration in a parsnip fork and
 dial registration in the current development version:
 
 ``` r
+
 pak::pak("corybrunson/parsnip@ordered", dependencies = FALSE)
 pak::pak("tidymodels/dials", dependencies = FALSE)
 ```
@@ -83,6 +85,7 @@ Here is a simple example using computational chemistry data to predict
 the permeability of a molecule:
 
 ``` r
+
 library(dplyr)
 library(ordered)
 

@@ -13,8 +13,8 @@
     }
   };
 </script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="parsnip Engines and Wrappers for Ordinal Classification Models">
 <meta name="description" content="Bindings, methods, and tuners for using ordinal classification models with the parsnip and dials packages. These include the regularized elastic net ordinal regression of Wurm, Hanlon, and Rathouz (2021) &lt;doi:10.18637/jss.v099.i06&gt; in ordinalNet, the ordinal classification trees of Galimberti, Soffritti, and Di Maso (2012) &lt;doi:10.18637/jss.v047.i10&gt; in rpartScore, and the latent variable ordinal forests of Hornung (2020) &lt;doi:10.1007/s00357-018-9302-x&gt; in ordinalForest.">
@@ -95,44 +95,44 @@
 </h2>
 <p>ordered provides new engines for several models, including all engines for <code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code>, as summarized in the table. Currently only predictions of <code>type = "class"</code> and <code>type = "prob"</code> are supported.</p>
 <table class="table">
-<thead><tr class="header">
+<thead><tr>
 <th align="left">model</th>
 <th align="left">engine</th>
 <th align="left">class</th>
 <th align="left">prob</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td align="left"><code>decision_tree</code></td>
 <td align="left"><code>rpartScore</code></td>
 <td align="left">✔</td>
 <td align="left">✖</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left"><code>gen_additive_mod</code></td>
 <td align="left"><code>vgam</code></td>
 <td align="left">✔</td>
 <td align="left">✔</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left"><code>ordinal_reg</code></td>
 <td align="left"><code>polr</code></td>
 <td align="left">✔</td>
 <td align="left">✔</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left"><code>ordinal_reg</code></td>
 <td align="left"><code>ordinalNet</code></td>
 <td align="left">✔</td>
 <td align="left">✔</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left"><code>ordinal_reg</code></td>
 <td align="left"><code>vglm</code></td>
 <td align="left">✔</td>
 <td align="left">✔</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left"><code>rand_forest</code></td>
 <td align="left"><code>ordinalForest</code></td>
 <td align="left">✔</td>

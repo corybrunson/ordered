@@ -22,6 +22,7 @@ With the `"rpartScore"` engine
 We’ll model satisfaction of householders under varying conditions.
 
 ``` r
+
 library(parsnip)
 library(ordered)
 
@@ -35,6 +36,7 @@ house_test <- house_data[house_sample, ]
 We can define the model with specific parameters:
 
 ``` r
+
 dt_spec <-
   decision_tree() |>
   set_engine("rpartScore", split = "quad") |>
@@ -52,6 +54,7 @@ dt_spec
 Now we create the model fit object:
 
 ``` r
+
 set.seed(1)
 dt_fit <- dt_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
 dt_fit
@@ -75,6 +78,7 @@ dt_fit
 The holdout data can be predicted for the most likely class:
 
 ``` r
+
 predict(dt_fit, house_test, type = "class")
 ```
 
@@ -101,6 +105,7 @@ With the `"vgam"` engine
 We’ll model satisfaction of householders under varying conditions.
 
 ``` r
+
 library(parsnip)
 library(ordered)
 
@@ -114,6 +119,7 @@ house_test <- house_data[house_sample, ]
 We can define the model with specific parameters:
 
 ``` r
+
 gam_spec <-
   gen_additive_mod() |>
   set_engine("vgam", family = "stopping_ratio") |>
@@ -131,6 +137,7 @@ gam_spec
 Now we create the model fit object:
 
 ``` r
+
 set.seed(1)
 gam_fit <- gam_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
 gam_fit
@@ -152,6 +159,7 @@ The holdout data can be predicted for the most likely class or all class
 probabilities:
 
 ``` r
+
 predict(gam_fit, house_test, type = "class")
 ```
 
@@ -172,6 +180,7 @@ predict(gam_fit, house_test, type = "class")
     ## 12 Low
 
 ``` r
+
 predict(gam_fit, house_test, type = "prob")
 ```
 
@@ -198,6 +207,7 @@ With the `"polr"` engine
 We’ll model satisfaction of householders under varying conditions.
 
 ``` r
+
 library(parsnip)
 library(ordered)
 
@@ -211,6 +221,7 @@ house_test <- house_data[house_sample, ]
 We can define the model with specific parameters:
 
 ``` r
+
 or_spec <-
   ordinal_reg(ordinal_link = "probit") |>
   set_engine("polr") |>
@@ -228,6 +239,7 @@ or_spec
 Now we create the model fit object:
 
 ``` r
+
 set.seed(1)
 or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
 or_fit
@@ -255,6 +267,7 @@ The holdout data can be predicted for the most likely class or all class
 probabilities:
 
 ``` r
+
 predict(or_fit, house_test, type = "class")
 ```
 
@@ -275,6 +288,7 @@ predict(or_fit, house_test, type = "class")
     ## 12 Low
 
 ``` r
+
 predict(or_fit, house_test, type = "prob")
 ```
 
@@ -299,6 +313,7 @@ With the `"ordinalNet"` engine
 We’ll model satisfaction of householders under varying conditions.
 
 ``` r
+
 library(parsnip)
 library(ordered)
 
@@ -312,6 +327,7 @@ house_test <- house_data[house_sample, ]
 We can define the model with specific parameters:
 
 ``` r
+
 or_spec <-
   ordinal_reg(penalty = .001, mixture = .5) |>
   set_engine("ordinalNet") |>
@@ -330,6 +346,7 @@ or_spec
 Now we create the model fit object:
 
 ``` r
+
 set.seed(1)
 or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
 or_fit
@@ -467,6 +484,7 @@ The holdout data can be predicted for the most likely class or all class
 probabilities:
 
 ``` r
+
 predict(or_fit, house_test, type = "class")
 ```
 
@@ -487,6 +505,7 @@ predict(or_fit, house_test, type = "class")
     ## 12 Low
 
 ``` r
+
 predict(or_fit, house_test, type = "prob")
 ```
 
@@ -511,6 +530,7 @@ With the `"vglm"` engine
 We’ll model satisfaction of householders under varying conditions.
 
 ``` r
+
 library(parsnip)
 library(ordered)
 
@@ -524,6 +544,7 @@ house_test <- house_data[house_sample, ]
 We can define the model with specific parameters:
 
 ``` r
+
 or_spec <-
   ordinal_reg(odds_link = "continuation_ratio") |>
   set_engine("vglm") |>
@@ -541,6 +562,7 @@ or_spec
 Now we create the model fit object:
 
 ``` r
+
 set.seed(1)
 or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
 or_fit
@@ -568,6 +590,7 @@ The holdout data can be predicted for the most likely class or all class
 probabilities:
 
 ``` r
+
 predict(or_fit, house_test, type = "class")
 ```
 
@@ -588,6 +611,7 @@ predict(or_fit, house_test, type = "class")
     ## 12 Low
 
 ``` r
+
 predict(or_fit, house_test, type = "prob")
 ```
 
@@ -614,6 +638,7 @@ With the `"ordinalForest"` engine
 We’ll model satisfaction of householders under varying conditions.
 
 ``` r
+
 library(parsnip)
 library(ordered)
 
@@ -627,6 +652,7 @@ house_test <- house_data[house_sample, ]
 We can define the model with specific parameters:
 
 ``` r
+
 rf_spec <-
   rand_forest(trees = 1000) |>
   set_engine("ordinalForest", nsets = 100) |>
@@ -647,6 +673,7 @@ rf_spec
 Now we create the model fit object:
 
 ``` r
+
 set.seed(1)
 rf_fit <- rf_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
 rf_fit
@@ -673,6 +700,7 @@ The holdout data can be predicted for the most likely class or all class
 probabilities:
 
 ``` r
+
 predict(rf_fit, house_test, type = "class")
 ```
 
@@ -693,6 +721,7 @@ predict(rf_fit, house_test, type = "class")
     ## 12 Low
 
 ``` r
+
 predict(rf_fit, house_test, type = "prob")
 ```
 
