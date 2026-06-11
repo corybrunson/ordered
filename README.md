@@ -29,6 +29,9 @@ combinations in the parsnip package that can be used, this package adds:
   adjacent categories, continuation ratio, and stopping ratio families
   via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz,
   2021](https://doi.org/10.18637/jss.v099.i06))
+- regularized cumulative probability ordinal regression models via
+  `rms::lrm()` and `rms::orm()` ([Harrell,
+  2015](https://doi.org/10.1007/978-3-319-19425-7))
 - ordinal classification trees via `rpartScore::rpartScore()`
   ([Galimberti, Soffritti, and Di Maso,
   2012](https://doi.org/10.18637/jss.v047.i10))
@@ -78,6 +81,8 @@ predictions of `type = "class"` and `type = "prob"` are supported.
 | `ordinal_reg`      | `polr`          | ✔     | ✔    |
 | `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    |
 | `ordinal_reg`      | `vglm`          | ✔     | ✔    |
+| `ordinal_reg`      | `lrm`           | ✔     | ✔    |
+| `ordinal_reg`      | `orm`           | ✔     | ✔    |
 | `rand_forest`      | `ordinalForest` | ✔     | ✔    |
 
 ## Example
@@ -115,16 +120,16 @@ augment(ord_rf_fit, new_data = caco_test)
 #> # A tibble: 10 × 8
 #>    .pred_class .pred_L .pred_M .pred_H class mol_weight volume  ClogP
 #>    <ord>         <dbl>   <dbl>   <dbl> <ord>      <dbl>  <dbl>  <dbl>
-#>  1 M            0.370    0.384  0.246  M           123.   445.  0.799
-#>  2 M            0.250    0.533  0.217  L           290.   856.  0.534
-#>  3 M            0.178    0.801  0.0212 M           519.  1576.  1.02 
-#>  4 M            0.221    0.736  0.0431 M           533.  1606.  1.58 
-#>  5 M            0.135    0.762  0.103  M           505.  1517.  1.71 
-#>  6 M            0.0698   0.913  0.0176 M           519.  1547.  2.27 
-#>  7 M            0.220    0.738  0.0417 M           517.  1600.  1.78 
-#>  8 M            0.109    0.868  0.0229 M           531.  1631.  2.34 
-#>  9 M            0.0307   0.952  0.0177 M           517.  1572.  2.81 
-#> 10 L            0.603    0.394  0.003  L           588.  1799. -1.85
+#>  1 L            0.374    0.368  0.258  M           123.   445.  0.799
+#>  2 M            0.289    0.512  0.199  L           290.   856.  0.534
+#>  3 M            0.170    0.809  0.0212 M           519.  1576.  1.02 
+#>  4 M            0.209    0.740  0.0503 M           533.  1606.  1.58 
+#>  5 M            0.126    0.762  0.113  M           505.  1517.  1.71 
+#>  6 M            0.0657   0.917  0.0176 M           519.  1547.  2.27 
+#>  7 M            0.213    0.747  0.0401 M           517.  1600.  1.78 
+#>  8 M            0.111    0.859  0.0306 M           531.  1631.  2.34 
+#>  9 M            0.0403   0.932  0.0277 M           517.  1572.  2.81 
+#> 10 L            0.569    0.428  0.003  L           588.  1799. -1.85
 ```
 
 ## Code of Conduct
