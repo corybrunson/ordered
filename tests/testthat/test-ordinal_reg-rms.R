@@ -95,6 +95,84 @@ test_that("model object (orm)", {
   expect_equal(orig_fit$freq, tidy_fit$fit$freq)
 })
 
+# model: case weights ----------------------------------------------------------
+
+test_that("case weights (lrm)", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("rms")
+  house_sub <- get_house()$sub
+
+  set.seed(seed)
+  house_wts <- rpois(n = nrow(house_sub), 2) + 1L
+
+  set.seed(seed)
+  expect_warning(
+    orig_fit <- rms::lrm(
+      Sat ~ Type + Infl + Cont,
+      data = house_sub,
+      weights = house_wts
+    ),
+    regexp = "weights"
+  )
+
+  tidy_spec <- ordinal_reg() |>
+    set_engine("lrm") |>
+    set_mode("classification")
+  set.seed(seed)
+  expect_warning(
+    tidy_fit <- fit(
+      tidy_spec,
+      Sat ~ Type + Infl + Cont,
+      data = house_sub,
+      case_weights = frequency_weights(house_wts)
+    ),
+    regexp = "weights"
+  )
+
+  orig_fit$call <- tidy_fit$fit$call <- NULL
+
+  expect_equal(coef(orig_fit), coef(tidy_fit$fit))
+  expect_equal(orig_fit$freq, tidy_fit$fit$freq)
+})
+
+test_that("case weights (orm)", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("rms")
+  house_sub <- get_house()$sub
+
+  set.seed(seed)
+  house_wts <- rpois(n = nrow(house_sub), 2) + 1L
+
+  set.seed(seed)
+  expect_warning(
+    orig_fit <- rms::orm(
+      Sat ~ Type + Infl + Cont,
+      data = house_sub,
+      weights = house_wts
+    ),
+    regexp = "weights"
+  )
+
+  tidy_spec <- ordinal_reg() |>
+    set_engine("orm") |>
+    set_mode("classification")
+  set.seed(seed)
+  expect_warning(
+    tidy_fit <- fit(
+      tidy_spec,
+      Sat ~ Type + Infl + Cont,
+      data = house_sub,
+      case_weights = frequency_weights(house_wts)
+    ),
+    regexp = "weights"
+  )
+
+  orig_fit$call <- tidy_fit$fit$call <- NULL
+
+  expect_equal(coef(orig_fit), coef(tidy_fit$fit))
+  expect_equal(orig_fit$freq, tidy_fit$fit$freq)
+})
+
 # prediction: class ------------------------------------------------------------
 
 test_that("class prediction (lrm)", {
