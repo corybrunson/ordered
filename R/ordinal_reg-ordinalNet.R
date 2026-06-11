@@ -254,6 +254,13 @@ predict._ordinalNet <- function(
     .check_ordinalNet_penalty_predict(penalty, object, multi)
 
   object$spec <- eval_args(object$spec)
+
+  # intercept linear predictor type; would become unnecessary should
+  # `parsnip::check_pred_type` be revised per its modification here
+  if (! is.null(type) && type == "linear_pred") {
+    return(predict_linear_pred(object, new_data = new_data, ...))
+  }
+
   predict.model_fit(object, new_data = new_data, type = type, opts = opts, ...)
 }
 
