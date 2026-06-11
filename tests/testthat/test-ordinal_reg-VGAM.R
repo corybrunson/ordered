@@ -106,6 +106,10 @@ test_that("case weights", {
 test_that("class prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
+
+  # for proper handling of predictions
+  suppressPackageStartupMessages(library(VGAM))
+
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "vglm") |>
@@ -133,6 +137,10 @@ test_that("class prediction", {
 test_that("probability prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
+
+  # for proper handling of predictions
+  suppressPackageStartupMessages(library(VGAM))
+
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "vglm") |>
