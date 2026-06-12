@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.github$
+^\.opencode$
 
 ^codecov\.yml$
 ^CODE_OF_CONDUCT\.md$

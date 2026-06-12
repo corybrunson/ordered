@@ -3,12 +3,14 @@ Codecov
 Galimberti
 Hanlon
 Hornung
+Keras
 Lifecycle
 Maso
 ORCID
 PBC
 Rathouz
 Soffritti
+VGAM
 Wurm
 Yee
 disaggregated
@@ -16,6 +18,8 @@ doi
 jss
 ordinalForest
 ordinalNet
+param
 partykit
+quant
 rpartScore
 tidymodels

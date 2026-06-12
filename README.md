@@ -14,7 +14,7 @@ status](https://www.r-pkg.org/badges/version/ordered)](https://CRAN.R-project.or
 coverage](https://codecov.io/gh/corybrunson/ordered/branch/main/graph/badge.svg)](https://app.codecov.io/gh/corybrunson/ordered?branch=main)
 <!-- badges: end -->
 
-`ordered` is a [parsnip](https://parsnip.tidymodels.org/) extension to
+ordered is a [parsnip](https://parsnip.tidymodels.org/) extension to
 enable additional classification models for ordinal outcomes (e.g.,
 “low”, “medium”, “high”). While there are several model/engine
 combinations in the parsnip package that can be used, this package adds:
@@ -53,19 +53,24 @@ for ordinal outcomes:
 
 ## Installation
 
-You can install the development version of ordered like so:
+You can install the latest released version of ordered from CRAN via
+
+``` r
+install.packages("ordered")
+```
+
+and the development version of ordered from GitHub via
 
 ``` r
 # install.packages("pak")
-pak::pak("corybrunson/ordered", dependencies = FALSE)
+pak::pak("corybrunson/ordered")
 ```
 
-Currently, ordered relies on engine registration in a parsnip fork and
-dial registration in the current development version:
+or
 
 ``` r
-pak::pak("corybrunson/parsnip@ordered", dependencies = FALSE)
-pak::pak("tidymodels/dials", dependencies = FALSE)
+# install.packages("remotes")
+remotes::install_github("corybrunson/ordered")
 ```
 
 ## Available models, engines, and prediction types
