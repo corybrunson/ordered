@@ -176,7 +176,7 @@ make_ordinal_reg_vglm <- function() {
     value = list(
       pre = NULL,
       post = predict_VGAM_class_post,
-      func = c(fun = "predict", pkg = "VGAM"),
+      func = c(fun = "predictvglm", pkg = "VGAM"),
       args =
         list(
           object = quote(object$fit),
@@ -194,7 +194,7 @@ make_ordinal_reg_vglm <- function() {
     value = list(
       pre = NULL,
       post = predict_VGAM_prob_post,
-      func = c(fun = "predict", pkg = "VGAM"),
+      func = c(fun = "predictvglm", pkg = "VGAM"),
       args =
         list(
           object = quote(object$fit),

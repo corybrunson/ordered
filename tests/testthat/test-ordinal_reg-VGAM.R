@@ -116,13 +116,6 @@ test_that("class prediction", {
     fit(Sat ~ Type + Cont, data = house_sub)
 
   orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
-  # convert to probabilities
-  orig_pred <- plogis(orig_pred)
-  orig_pred <- cbind(
-    orig_pred[, 1],
-    orig_pred[, 2] - orig_pred[, 1],
-    1 - orig_pred[, 2]
-  )
   orig_pred <- apply(orig_pred, 1L, which.max)
   orig_pred <- ordered(tidy_fit$lvl[orig_pred], tidy_fit$lvl)
   orig_pred <- tibble::tibble(.pred_class = orig_pred)
@@ -147,13 +140,6 @@ test_that("probability prediction", {
     fit(Sat ~ Type + Cont, data = house_sub)
 
   orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
-  # convert to probabilities
-  orig_pred <- plogis(orig_pred)
-  orig_pred <- cbind(
-    orig_pred[, 1],
-    orig_pred[, 2] - orig_pred[, 1],
-    1 - orig_pred[, 2]
-  )
   colnames(orig_pred) <- paste0(".pred_", tidy_fit$lvl)
   orig_pred <- tibble::as_tibble(orig_pred)
 
