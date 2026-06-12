@@ -35,7 +35,7 @@ Suggests:
     dplyr,
     MASS,
     ordinalNet,
-    rms,
+    rms (>= 7.0.0),
     VGAM,
     rpartScore,
     ordinalForest,
