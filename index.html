@@ -63,7 +63,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><code>ordered</code> is a <a href="https://parsnip.tidymodels.org/" class="external-link">parsnip</a> extension to enable additional classification models for ordinal outcomes (e.g., “low”, “medium”, “high”). While there are several model/engine combinations in the parsnip package that can be used, this package adds:</p>
+<p>ordered is a <a href="https://parsnip.tidymodels.org/" class="external-link">parsnip</a> extension to enable additional classification models for ordinal outcomes (e.g., “low”, “medium”, “high”). While there are several model/engine combinations in the parsnip package that can be used, this package adds:</p>
 <ul>
 <li>cumulative link (cumulative logit) ordinal regression via <code><a href="https://rdrr.io/pkg/MASS/man/polr.html" class="external-link">MASS::polr()</a></code>
 </li>
@@ -81,14 +81,17 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of ordered like so:</p>
+<p>You can install the latest released version of ordered from CRAN via</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"corybrunson/ordered"</span>, dependencies <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>Currently, ordered relies on engine registration in a parsnip fork and dial registration in the current development version:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ordered"</span><span class="op">)</span></span></code></pre></div>
+<p>and the development version of ordered from GitHub via</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"corybrunson/parsnip@ordered"</span>, dependencies <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"tidymodels/dials"</span>, dependencies <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"corybrunson/ordered"</span><span class="op">)</span></span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"corybrunson/ordered"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="available-models-engines-and-prediction-types">Available models, engines, and prediction types<a class="anchor" aria-label="anchor" href="#available-models-engines-and-prediction-types"></a>
@@ -145,7 +148,7 @@
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>Here is a simple example using computational chemistry data to predict the permeability of a molecule:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
 <span></span>
@@ -175,16 +178,16 @@
 <span><span class="co">#&gt; # A tibble: 10 × 8</span></span>
 <span><span class="co">#&gt;    .pred_class .pred_L .pred_M .pred_H class mol_weight volume  ClogP</span></span>
 <span><span class="co">#&gt;    &lt;ord&gt;         &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;ord&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 M            0.370    0.384  0.246  M           123.   445.  0.799</span></span>
-<span><span class="co">#&gt;  2 M            0.250    0.533  0.217  L           290.   856.  0.534</span></span>
-<span><span class="co">#&gt;  3 M            0.178    0.801  0.0212 M           519.  1576.  1.02 </span></span>
-<span><span class="co">#&gt;  4 M            0.221    0.736  0.0431 M           533.  1606.  1.58 </span></span>
-<span><span class="co">#&gt;  5 M            0.135    0.762  0.103  M           505.  1517.  1.71 </span></span>
-<span><span class="co">#&gt;  6 M            0.0698   0.913  0.0176 M           519.  1547.  2.27 </span></span>
-<span><span class="co">#&gt;  7 M            0.220    0.738  0.0417 M           517.  1600.  1.78 </span></span>
-<span><span class="co">#&gt;  8 M            0.109    0.868  0.0229 M           531.  1631.  2.34 </span></span>
-<span><span class="co">#&gt;  9 M            0.0307   0.952  0.0177 M           517.  1572.  2.81 </span></span>
-<span><span class="co">#&gt; 10 L            0.603    0.394  0.003  L           588.  1799. -1.85</span></span></code></pre></div>
+<span><span class="co">#&gt;  1 L            0.374    0.368  0.258  M           123.   445.  0.799</span></span>
+<span><span class="co">#&gt;  2 M            0.289    0.512  0.199  L           290.   856.  0.534</span></span>
+<span><span class="co">#&gt;  3 M            0.170    0.809  0.0212 M           519.  1576.  1.02 </span></span>
+<span><span class="co">#&gt;  4 M            0.209    0.740  0.0503 M           533.  1606.  1.58 </span></span>
+<span><span class="co">#&gt;  5 M            0.126    0.762  0.113  M           505.  1517.  1.71 </span></span>
+<span><span class="co">#&gt;  6 M            0.0657   0.917  0.0176 M           519.  1547.  2.27 </span></span>
+<span><span class="co">#&gt;  7 M            0.213    0.747  0.0401 M           517.  1600.  1.78 </span></span>
+<span><span class="co">#&gt;  8 M            0.111    0.859  0.0306 M           531.  1631.  2.34 </span></span>
+<span><span class="co">#&gt;  9 M            0.0403   0.932  0.0277 M           517.  1572.  2.81 </span></span>
+<span><span class="co">#&gt; 10 L            0.569    0.428  0.003  L           588.  1799. -1.85</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
