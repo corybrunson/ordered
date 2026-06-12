@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/corybrunson/ordered/branch/main/graph/badge.svg)](https://app.codecov.io/gh/corybrunson/ordered?branch=main)
 <!-- badges: end -->
 
-`ordered` is a [parsnip](https://parsnip.tidymodels.org/) extension to enable additional classification models for ordinal outcomes (e.g., "low", "medium", "high"). While there are several model/engine combinations in the parsnip package that can be used, this package adds:
+ordered is a [parsnip](https://parsnip.tidymodels.org/) extension to enable additional classification models for ordinal outcomes (e.g., "low", "medium", "high"). While there are several model/engine combinations in the parsnip package that can be used, this package adds:
 
  - cumulative link (cumulative logit) ordinal regression via `MASS::polr()`
  - generalized linear and generalized additive ordinal regression models of cumulative link, adjacent categories, continuation ratio, and stopping ratio families via `VGAM::vglm()` and `VGAM::vgam()` ([Yee, 2015](https://doi.org/10.18637/jss.v032.i10))
