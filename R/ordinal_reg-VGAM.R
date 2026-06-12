@@ -153,5 +153,6 @@ predict_VGAM_class_post <- function(x, object) {
 }
 
 predict_VGAM_prob_post <- function(x, object) {
+  colnames(x) <- object$lvl
   tibble::as_tibble(x)
 }

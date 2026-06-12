@@ -100,11 +100,6 @@ make_ordinal_reg_polr <- function() {
 
 }
 
-# FIXME: Ensure that predictions are properly handled, either by attaching
-# `VGAM` before generating them or by calling its tools where needed along the
-# way. Currently, models can be fit by accessing the fitting functions, but
-# predictions will be mishandled if the package is not attached.
-
 # ------------------------------------------------------------------------------
 # `VGAM::vglm` components
 

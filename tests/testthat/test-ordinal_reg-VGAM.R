@@ -107,15 +107,18 @@ test_that("class prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
 
-  # for proper handling of predictions
-  suppressPackageStartupMessages(library(VGAM))
-
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "vglm") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
-  orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
+  # as in `parsnip::set_pred()`, use `VGAM::predictvglm()` to avoid mis-dispatch
+  # when 'VGAM' is not attached and `predict()` calls `stats::predict()`
+  orig_pred <- VGAM::predictvglm(
+    tidy_fit$fit,
+    newdata = house_sub,
+    type = "response"
+  )
   orig_pred <- apply(orig_pred, 1L, which.max)
   orig_pred <- ordered(tidy_fit$lvl[orig_pred], tidy_fit$lvl)
   orig_pred <- tibble::tibble(.pred_class = orig_pred)
@@ -131,15 +134,18 @@ test_that("probability prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
 
-  # for proper handling of predictions
-  suppressPackageStartupMessages(library(VGAM))
-
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "vglm") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
-  orig_pred <- predict(tidy_fit$fit, newdata = house_sub, type = "response")
+  # as in `parsnip::set_pred()`, use `VGAM::predictvglm()` to avoid mis-dispatch
+  # when 'VGAM' is not attached and `predict()` calls `stats::predict()`
+  orig_pred <- VGAM::predictvglm(
+    tidy_fit$fit,
+    newdata = house_sub,
+    type = "response"
+  )
   colnames(orig_pred) <- paste0(".pred_", tidy_fit$lvl)
   orig_pred <- tibble::as_tibble(orig_pred)
 
