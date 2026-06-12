@@ -100,11 +100,6 @@ make_ordinal_reg_polr <- function() {
 
 }
 
-# FIXME: Ensure that predictions are properly handled, either by attaching
-# `VGAM` before generating them or by calling its tools where needed along the
-# way. Currently, models can be fit by accessing the fitting functions, but
-# predictions will be mishandled if the package is not attached.
-
 # ------------------------------------------------------------------------------
 # `VGAM::vglm` components
 
@@ -176,7 +171,7 @@ make_ordinal_reg_vglm <- function() {
     value = list(
       pre = NULL,
       post = predict_VGAM_class_post,
-      func = c(fun = "predict", pkg = "VGAM"),
+      func = c(fun = "predictvglm", pkg = "VGAM"),
       args =
         list(
           object = quote(object$fit),
@@ -194,7 +189,7 @@ make_ordinal_reg_vglm <- function() {
     value = list(
       pre = NULL,
       post = predict_VGAM_prob_post,
-      func = c(fun = "predict", pkg = "VGAM"),
+      func = c(fun = "predictvglm", pkg = "VGAM"),
       args =
         list(
           object = quote(object$fit),
