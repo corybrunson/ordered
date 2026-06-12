@@ -204,6 +204,24 @@ make_ordinal_reg_vglm <- function() {
     )
   )
 
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "vglm",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = predict_VGAM_link_post,
+      func = c(fun = "predict", pkg = "VGAM"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "link"
+        )
+    )
+  )
+
 }
 
 # ------------------------------------------------------------------------------

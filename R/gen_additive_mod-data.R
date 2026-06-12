@@ -107,6 +107,24 @@ make_gen_additive_mod_vgam <- function() {
     )
   )
 
+  parsnip::set_pred(
+    model = "gen_additive_mod",
+    eng = "vgam",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = predict_VGAM_link_post,
+      func = c(fun = "predict", pkg = "VGAM"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "link"
+        )
+    )
+  )
+
 }
 
 # nocov end

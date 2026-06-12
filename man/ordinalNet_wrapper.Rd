@@ -68,7 +68,7 @@ returned by \code{\link[ordinalNet:predict.ordinalNet]{ordinalNet::predict.ordin
 }
 \description{
 The fit wrapper converts the standardized \code{odds_link} options encoded in
-\code{\link[dials:ordinal_link]{dials::values_odds_link}} to the \code{family} options of
+\code{\link[dials:values_odds_link]{dials::values_odds_link}} to the \code{family} options of
 \code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}}. The prediction wrapper interpolates between
 fitted penalties to enable submodel prediction at specified penalties.
 }
