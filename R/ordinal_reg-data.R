@@ -591,4 +591,110 @@ make_ordinal_reg_lrm <- function() {
 
 }
 
+# ------------------------------------------------------------------------------
+# `glmnetcr::glmnetcr` components
+
+make_ordinal_reg_glmnetcr <- function() {
+
+  parsnip::set_model_engine("ordinal_reg", "classification", "glmnetcr")
+  parsnip::set_dependency(
+    "ordinal_reg",
+    eng = "glmnetcr",
+    pkg = "ordered",
+    mode = "classification"
+  )
+  parsnip::set_dependency(
+    "ordinal_reg",
+    eng = "glmnetcr",
+    pkg = "glmnetcr",
+    mode = "classification"
+  )
+
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "glmnetcr",
+    parsnip = "penalty",
+    original = "lambda",
+    func = list(pkg = "dials", fun = "penalty"),
+    has_submodel = TRUE
+  )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "glmnetcr",
+    parsnip = "mixture",
+    original = "alpha",
+    func = list(pkg = "dials", fun = "mixture"),
+    has_submodel = FALSE
+  )
+
+  parsnip::set_fit(
+    model = "ordinal_reg",
+    eng = "glmnetcr",
+    mode = "classification",
+    value = list(
+      interface = "matrix",
+      protect = c("x", "y", "weights"),
+      func = c(pkg = "ordered", fun = "glmnetcr_wrapper"),
+      defaults = list()
+    )
+  )
+
+  parsnip::set_encoding(
+    model = "ordinal_reg",
+    eng = "glmnetcr",
+    mode = "classification",
+    options = list(
+      predictor_indicators = "one_hot",
+      compute_intercept = TRUE,
+      remove_intercept = TRUE,
+      allow_sparse_x = FALSE
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "glmnetcr",
+    mode = "classification",
+    type = "class",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        ordered(x, levels = object$lvl)
+      },
+      func = c(fun = "predict_glmnetcr_wrapper"),
+      args =
+        list(
+          object = quote(object$fit),
+          newx = quote(new_data),
+          type = "class",
+          lambda = quote(object$spec$args$penalty)
+        )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "glmnetcr",
+    mode = "classification",
+    type = "prob",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        x <- tibble::as_tibble(x)
+        x <- set_names(x, paste0(".pred_", colnames(x)))
+        x
+      },
+      func = c(fun = "predict_glmnetcr_wrapper"),
+      args =
+        list(
+          object = quote(object$fit),
+          newx = quote(new_data),
+          type = "prob",
+          lambda = quote(object$spec$args$penalty)
+        )
+    )
+  )
+
+}
+
 # nocov end

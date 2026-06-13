@@ -6,6 +6,10 @@
 
 This version introduces source code and unit tests for new engines:
 * `lrm` and `orm` from the **rms** package
+  - regularized cumulative probability ordinal regression
+* `glmnetcr` from the **glmnetcr** package
+  - elastic net regularized continuation ratio models
+  - penalty paths handled as with `ordinalNet`
 
 ## bug fix
 

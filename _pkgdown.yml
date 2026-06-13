@@ -14,6 +14,7 @@ reference:
     Wrappers for Ordinal Classification Engines
   contents:
   - '`ordinalNet_wrapper`'
+  - '`glmnetcr_wrapper`'
   - '`VGAM_vglm_wrapper`'
   - '`VGAM_vgam_wrapper`'
   - '`rpartScore_wrapper`'

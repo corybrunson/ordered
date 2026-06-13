@@ -108,7 +108,7 @@ test_that("model object (tidy to original)", {
   # extra arguments
 
   tidy_spec <- ordinal_reg(penalty = 0.001, mixture = .5, odds_link = "stopping") |>
-    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
+    set_engine("ordinalNet")
 
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)

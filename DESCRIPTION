@@ -36,6 +36,7 @@ Suggests:
     MASS,
     ordinalNet,
     rms (>= 7.0.0),
+    glmnetcr,
     VGAM,
     rpartScore,
     ordinalForest,
