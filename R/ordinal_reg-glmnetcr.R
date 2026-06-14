@@ -105,6 +105,11 @@ predict_glmnetcr_wrapper <- function(
       "bic" = which.min(pred$BIC)
     )
   } else {
+    # FIXME: `predict.glmnetcr()` returns paths of criterion values, class
+    # predictions, and probability predictions that track the penalty path
+    # (`$lambda`). For this wrapper, linearly (or maybe logistically?)
+    # interpolate between consecutive probabilities and then rescale them to add
+    # to 1.
     s_idx <- which.min(abs(object$lambda - lambda))
   }
 

@@ -134,13 +134,13 @@ test_that("model object (tidy to original)", {
 
 test_that("case weights", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("ordinalNet")
+  skip_if_not_installed("glmnetcr")
   house_data <- get_house()$data
   wt_data <- transform(house_data, Freq = frequency_weights(Freq))
 
   wt_vars <- model.matrix(
     Sat ~ Type + Infl + Cont + 0, data = wt_data,
-    contrasts.arg = lapply(house_data[, 2:4], contrasts, contrasts = FALSE)
+    contrasts.arg = lapply(wt_data[, 2:4], contrasts, contrasts = FALSE)
   )
   attr(wt_vars, "assign") <- NULL
   attr(wt_vars, "contrasts") <- NULL
