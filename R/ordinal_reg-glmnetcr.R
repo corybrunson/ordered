@@ -1,86 +1,9 @@
-#' Wrappers for `glmnetcr`
+#' Prediction wrapper for `glmnetcr`
 #'
-#' The fit wrapper passes arguments to [glmnetcr::glmnetcr()].
-#' The prediction wrapper selects predictions at a specific penalty value from
-#' the regularization path.
-#' @param x The predictor matrix.
-#' @param y The outcome factor.
-#' @param ... Additional arguments to pass to [glmnetcr::glmnetcr()].
-#' @keywords internal
-#' @returns An object of S3 class `glmnetcr` as returned by
-#'   [glmnetcr::glmnetcr()], or a vector of class predictions
-#'   or a tibble of probability predictions.
-
-#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("glmnetcr")
-#' house_data <-
-#'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
-#' house_matrix <- model.matrix(
-#'   Sat ~ Type + Infl + Cont + 0,
-#'   data = house_data,
-#'   contrasts.arg = lapply(house_data[, 2:4], contrasts, contrasts = FALSE)
-#' )
-#' # fit wrapper
-#' pen_vec <- 10 ^ seq(-1, -3, -.5)
-#' ( fit_orig <- glmnetcr::glmnetcr(
-#'   house_matrix, y = house_data$Sat,
-#'   lambda = pen_vec
-#' ) )
-#' ( fit_wrap <- glmnetcr_wrapper(
-#'   house_matrix, y = house_data$Sat,
-#'   lambda = pen_vec
-#' ) )
-#' fit_tidy <-
-#'   ordinal_reg() |>
-#'   set_engine("glmnetcr") |>
-#'   set_args(path_values = pen_vec, penalty = 0.01) |>
-#'   fit(formula = Sat ~ Type + Infl + Cont + 0, data = house_data)
-#' fit_tidy$fit
-#' # predict wrapper
-#' predict(
-#'   fit_orig,
-#'   newx = head(house_matrix)
-#' )$probs[, , which.min(abs(fit_orig$lambda - 0.01))]
-#' predict_glmnetcr_wrapper(
-#'   fit_tidy$fit,
-#'   newx = head(house_matrix),
-#'   type = "prob",
-#'   lambda = 0.01
-#' )
-#' predict(
-#'   fit_orig,
-#'   newx = head(house_matrix)
-#' )$class[, which.min(abs(fit_orig$lambda - 0.01))]
-#' predict_glmnetcr_wrapper(
-#'   fit_tidy$fit,
-#'   newx = head(house_matrix),
-#'   type = "class",
-#'   lambda = 0.01
-#' )
-#' @export
-glmnetcr_wrapper <- function(
-    x, y, weights = NULL,
-    ...
-) {
-  rlang::check_installed("glmnetcr")
-
-  if (is.null(weights)) {
-    cl <- rlang::call2(
-      .fn = "glmnetcr", .ns = "glmnetcr",
-      x = rlang::expr(x), y = rlang::expr(y),
-      ...
-    )
-  } else {
-    cl <- rlang::call2(
-      .fn = "glmnetcr", .ns = "glmnetcr",
-      x = rlang::expr(x), y = rlang::expr(y),
-      weights = rlang::expr(weights),
-      ...
-    )
-  }
-  rlang::eval_tidy(cl)
-}
-
-#' @rdname glmnetcr_wrapper
+#' Selects predictions at a specific penalty value from the regularization path.
+#' When the requested penalty lies between two path values, linearly interpolates
+#' between the probability matrices at the neighboring steps.
+#' @inheritParams glmnetcr::glmnetcr
 #' @param object A `glmnetcr` object.
 #' @param newx A predictor matrix.
 #' @param type Either `"class"` or `"prob"`.
@@ -90,6 +13,45 @@ glmnetcr_wrapper <- function(
 #'   sequence. Defaults to `"bic"` for consistency with
 #'   [glmnetcr::predict.glmnetcr()]. (NB: This contrasts with
 #'   [predict_ordinalNet_wrapper()].)
+#' @keywords internal
+#' @returns A character vector of class predictions or a matrix of class
+#'   probabilities.
+#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("glmnetcr")
+#' house_data <-
+#'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+#' house_matrix <- model.matrix(
+#'   Sat ~ Type + Infl + Cont + 0,
+#'   data = house_data,
+#'   contrasts.arg = lapply(house_data[, 2:4], contrasts, contrasts = FALSE)
+#' )
+#' pen_vec <- 10 ^ seq(-1, -3, -.5)
+#' fit <- glmnetcr::glmnetcr(
+#'   house_matrix, y = house_data$Sat,
+#'   lambda = pen_vec
+#' )
+#' # predictions (may disagree if `lambda` is not on the path `fit$lambda`)
+#' # probability
+#' predict(
+#'   fit,
+#'   newx = head(house_matrix)
+#' )$probs[, , which.min(abs(fit$lambda - 0.02))]
+#' predict_glmnetcr_wrapper(
+#'   fit,
+#'   newx = head(house_matrix),
+#'   type = "prob",
+#'   lambda = 0.02
+#' )
+#' # class
+#' predict(
+#'   fit,
+#'   newx = head(house_matrix)
+#' )$class[, which.min(abs(fit$lambda - 0.02))]
+#' predict_glmnetcr_wrapper(
+#'   fit,
+#'   newx = head(house_matrix),
+#'   type = "class",
+#'   lambda = 0.02
+#' )
 #' @export
 predict_glmnetcr_wrapper <- function(
     object, newx, type, lambda, criteria = c("bic", "aic")
@@ -147,8 +109,8 @@ predict_glmnetcr_wrapper <- function(
 
 # S3 methods for parsnip's model_fit dispatch ----------------------------------
 
-#' @rdname glmnetcr_wrapper
-#' @importFrom parsnip eval_args
+#' @rdname predict_glmnetcr_wrapper
+#' @importFrom parsnip eval_args multi_predict
 #' @param penalty A numeric penalty value. Overrides the penalty stored in the
 #'   model specification.
 #' @export
@@ -164,14 +126,14 @@ predict._glmnetcr <- function(
   predict.model_fit(object, new_data = new_data, type = type, opts = opts, ...)
 }
 
-#' @rdname glmnetcr_wrapper
+#' @rdname predict_glmnetcr_wrapper
 #' @export
 predict_class._glmnetcr <- function(object, new_data, ...) {
   object$spec <- eval_args(object$spec)
   predict_class.model_fit(object, new_data = new_data, ...)
 }
 
-#' @rdname glmnetcr_wrapper
+#' @rdname predict_glmnetcr_wrapper
 #' @export
 predict_classprob._glmnetcr <- function(object, new_data, ...) {
   object$spec <- eval_args(object$spec)
@@ -180,8 +142,7 @@ predict_classprob._glmnetcr <- function(object, new_data, ...) {
 
 # multi_predict methods --------------------------------------------------------
 
-#' @rdname glmnetcr_wrapper
-#' @importFrom parsnip eval_args multi_predict
+#' @rdname predict_glmnetcr_wrapper
 #' @param penalty A numeric vector of penalty values. Overrides the default
 #'   penalty. If `NULL`, the regularization path stored in the model fit is
 #'   used.

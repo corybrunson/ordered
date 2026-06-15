@@ -13,8 +13,8 @@
       Computational engine: glmnetcr 
       
       Model fit template:
-      ordered::glmnetcr_wrapper(x = missing_arg(), y = missing_arg(), 
-          weights = missing_arg(), nlambda = 120L, lambda.min.ratio = 1e-08)
+      glmnetcr::glmnetcr(x = missing_arg(), y = missing_arg(), weights = missing_arg(), 
+          nlambda = 120L, lambda.min.ratio = 1e-08)
 
 ---
 
@@ -29,8 +29,8 @@
       Computational engine: glmnetcr 
       
       Model fit template:
-      ordered::glmnetcr_wrapper(x = missing_arg(), y = missing_arg(), 
-          weights = missing_arg(), nlambda = 120L, lambda.min.ratio = 1e-08)
+      glmnetcr::glmnetcr(x = missing_arg(), y = missing_arg(), weights = missing_arg(), 
+          nlambda = 120L, lambda.min.ratio = 1e-08)
 
 # arguments agree
 
@@ -49,7 +49,6 @@
       Computational engine: glmnetcr 
       
       Model fit template:
-      ordered::glmnetcr_wrapper(x = missing_arg(), y = missing_arg(), 
-          weights = missing_arg(), lambda = pen_vec, alpha = 0.25, 
-          method = "forward")
+      glmnetcr::glmnetcr(x = missing_arg(), y = missing_arg(), weights = missing_arg(), 
+          lambda = pen_vec, alpha = 0.25, method = "forward")
 

@@ -634,7 +634,7 @@ make_ordinal_reg_glmnetcr <- function() {
     value = list(
       interface = "matrix",
       protect = c("x", "y", "weights"),
-      func = c(pkg = "ordered", fun = "glmnetcr_wrapper"),
+      func = c(pkg = "glmnetcr", fun = "glmnetcr"),
       defaults = list()
     )
   )
