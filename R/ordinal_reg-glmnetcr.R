@@ -105,12 +105,10 @@ predict_glmnetcr_wrapper <- function(
       "bic" = which.min(pred$BIC)
     )
   } else {
-    # FIXME: `predict.glmnetcr()` returns paths of criterion values, class
-    # predictions, and probability predictions that track the penalty path
-    # (`$lambda`). For this wrapper, linearly interpolate between consecutive
-    # probabilities and then rescale them to add to 1.
-
-    # s_idx <- which.min(abs(object$lambda - lambda))
+    # `predict.glmnetcr()` returns paths of criterion values, class predictions,
+    # and probability predictions that track the penalty path (`$lambda`). This
+    # wrapper linearly interpolates between consecutive probabilities and then
+    # rescales them to add to 1.
 
     s_idx <- if (lambda < min(object$lambda)) {
       which.min(object$lambda)
@@ -120,8 +118,8 @@ predict_glmnetcr_wrapper <- function(
       match(lambda, object$lambda)
     } else {
       # NB: `$lambda` must be decreasing
-      s0 <- max(which(lambda > object$lambda))
-      s1 <- min(which(lambda < object$lambda))
+      s0 <- max(which(object$lambda > lambda))
+      s1 <- min(which(object$lambda < lambda))
       c(s0, s1)
     }
   }
@@ -133,11 +131,14 @@ predict_glmnetcr_wrapper <- function(
       "prob" = pred$probs[, , s_idx]
     )
   } else {
-    probs <- apply(pred$probs[, , s_idx], 3L, FUN = mean)
+    s0 <- s_idx[1]
+    s1 <- s_idx[2]
+    w <- (lambda - object$lambda[s0]) / (object$lambda[s1] - object$lambda[s0])
+    probs <- (1 - w) * pred$probs[, , s0] + w * pred$probs[, , s1]
     switch(
       type,
-      "class" = colnames(probs)[which.max(probs)],
-      "prob" = sweep(probs, 1L, apply(probs, 1L, sum), "/")
+      "class" = colnames(probs)[max.col(probs, ties.method = "first")],
+      "prob" = sweep(probs, 1L, rowSums(probs), "/")
     )
   }
 
