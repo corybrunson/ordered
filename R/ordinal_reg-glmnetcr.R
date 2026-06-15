@@ -107,17 +107,41 @@ predict_glmnetcr_wrapper <- function(
   } else {
     # FIXME: `predict.glmnetcr()` returns paths of criterion values, class
     # predictions, and probability predictions that track the penalty path
-    # (`$lambda`). For this wrapper, linearly (or maybe logistically?)
-    # interpolate between consecutive probabilities and then rescale them to add
-    # to 1.
-    s_idx <- which.min(abs(object$lambda - lambda))
+    # (`$lambda`). For this wrapper, linearly interpolate between consecutive
+    # probabilities and then rescale them to add to 1.
+
+    # s_idx <- which.min(abs(object$lambda - lambda))
+
+    s_idx <- if (lambda < min(object$lambda)) {
+      which.min(object$lambda)
+    } else if (lambda > max(object$lambda)) {
+      which.max(object$lambda)
+    } else if (lambda %in% object$lambda) {
+      match(lambda, object$lambda)
+    } else {
+      # NB: `$lambda` must be decreasing
+      s0 <- max(which(lambda > object$lambda))
+      s1 <- min(which(lambda < object$lambda))
+      c(s0, s1)
+    }
   }
 
-  switch(
-    type,
-    "class" = pred$class[, s_idx],
-    "prob" = pred$probs[, , s_idx]
-  )
+  res <- if (length(s_idx) == 1L) {
+    switch(
+      type,
+      "class" = pred$class[, s_idx],
+      "prob" = pred$probs[, , s_idx]
+    )
+  } else {
+    probs <- apply(pred$probs[, , s_idx], 3L, FUN = mean)
+    switch(
+      type,
+      "class" = colnames(probs)[which.max(probs)],
+      "prob" = sweep(probs, 1L, apply(probs, 1L, sum), "/")
+    )
+  }
+
+  return(res)
 }
 
 # S3 methods for parsnip's model_fit dispatch ----------------------------------
