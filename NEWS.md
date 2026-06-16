@@ -10,6 +10,8 @@ This version introduces source code and unit tests for new engines:
 * `glmnetcr` from the **glmnetcr** package
   - elastic net regularized continuation ratio models
   - penalty paths handled as with `ordinalNet`
+* `orf` from the **orf** package
+  - ordered random forests
 
 ## bug fix
 

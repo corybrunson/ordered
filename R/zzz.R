@@ -17,6 +17,7 @@
   make_decision_tree_rpartScore()
   # `rand_forest`
   make_rand_forest_ordinalForest()
+  make_rand_forest_orf()
 }
 
 # nocov end

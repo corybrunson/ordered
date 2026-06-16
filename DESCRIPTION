@@ -40,6 +40,7 @@ Suggests:
     VGAM,
     rpartScore,
     ordinalForest,
+    orf,
     QSARdata,
     spelling,
     testthat (>= 3.0.0)

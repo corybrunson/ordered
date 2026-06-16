@@ -19,9 +19,11 @@ reference:
   - '`VGAM_vgam_wrapper`'
   - '`rpartScore_wrapper`'
   - '`ordinalForest_wrapper`'
+  - '`orf_wrapper`'
 - title: "Parameters"
   desc: >
     Tunable Engine Parameters
   contents:
   - '`rpartScore_parameters`'
   - '`ordinalForest_parameters`'
+  - '`orf_parameters`'

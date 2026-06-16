@@ -3,7 +3,6 @@
 #' Selects predictions at a specific penalty value from the regularization path.
 #' When the requested penalty lies between two path values, linearly interpolates
 #' between the probability matrices at the neighboring steps.
-#' @inheritParams glmnetcr::glmnetcr
 #' @param object A `glmnetcr` object.
 #' @param newx A predictor matrix.
 #' @param type Either `"class"` or `"prob"`.
