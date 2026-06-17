@@ -22,9 +22,7 @@ test_that("model object (lrm)", {
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
   orig_fit$call <- tidy_fit$fit$call <- NULL
-
-  expect_equal(coef(orig_fit), coef(tidy_fit$fit))
-  expect_equal(orig_fit$freq, tidy_fit$fit$freq)
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 
   # extra arguments
 
@@ -43,9 +41,7 @@ test_that("model object (lrm)", {
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
   orig_fit$call <- tidy_fit$fit$call <- NULL
-
-  expect_equal(coef(orig_fit), coef(tidy_fit$fit))
-  expect_equal(orig_fit$freq, tidy_fit$fit$freq)
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 })
 
 test_that("model object (orm)", {
@@ -68,9 +64,7 @@ test_that("model object (orm)", {
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
   orig_fit$call <- tidy_fit$fit$call <- NULL
-
-  expect_equal(coef(orig_fit), coef(tidy_fit$fit))
-  expect_equal(orig_fit$freq, tidy_fit$fit$freq)
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 
   # extra arguments
 
@@ -90,9 +84,7 @@ test_that("model object (orm)", {
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
   orig_fit$call <- tidy_fit$fit$call <- NULL
-
-  expect_equal(coef(orig_fit), coef(tidy_fit$fit))
-  expect_equal(orig_fit$freq, tidy_fit$fit$freq)
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 })
 
 # model: case weights ----------------------------------------------------------
@@ -130,9 +122,7 @@ test_that("case weights (lrm)", {
   )
 
   orig_fit$call <- tidy_fit$fit$call <- NULL
-
-  expect_equal(coef(orig_fit), coef(tidy_fit$fit))
-  expect_equal(orig_fit$freq, tidy_fit$fit$freq)
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 })
 
 test_that("case weights (orm)", {
@@ -168,9 +158,7 @@ test_that("case weights (orm)", {
   )
 
   orig_fit$call <- tidy_fit$fit$call <- NULL
-
-  expect_equal(coef(orig_fit), coef(tidy_fit$fit))
-  expect_equal(orig_fit$freq, tidy_fit$fit$freq)
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 })
 
 # prediction: class ------------------------------------------------------------
@@ -187,7 +175,6 @@ test_that("class prediction (lrm)", {
   orig_class <- apply(orig_prob, 1L, which.max)
   orig_class <- ordered(tidy_fit$lvl[orig_class], tidy_fit$lvl)
   orig_pred <- tibble::tibble(.pred_class = orig_class)
-
   tidy_pred <- predict(tidy_fit, house_sub)
 
   expect_equal(orig_pred, tidy_pred)
@@ -205,7 +192,6 @@ test_that("class prediction (orm)", {
   orig_class <- apply(orig_prob, 1L, which.max)
   orig_class <- ordered(tidy_fit$lvl[orig_class], tidy_fit$lvl)
   orig_pred <- tibble::tibble(.pred_class = orig_class)
-
   tidy_pred <- predict(tidy_fit, house_sub)
 
   expect_equal(orig_pred, tidy_pred)
@@ -224,7 +210,6 @@ test_that("probability prediction (lrm)", {
   orig_prob <- predict(tidy_fit$fit, newdata = house_sub, type = "fitted.ind")
   orig_pred <- tibble::as_tibble(orig_prob)
   orig_pred <- set_names(orig_pred, paste0(".pred_", tidy_fit$lvl))
-
   tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
 
   expect_equal(orig_pred, tidy_pred)
@@ -241,7 +226,6 @@ test_that("probability prediction (orm)", {
   orig_prob <- predict(tidy_fit$fit, newdata = house_sub, type = "fitted.ind")
   orig_pred <- tibble::as_tibble(orig_prob)
   orig_pred <- set_names(orig_pred, paste0(".pred_", tidy_fit$lvl))
-
   tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
 
   expect_equal(orig_pred, tidy_pred)
@@ -302,12 +286,9 @@ test_that("interfaces agree (lrm)", {
   expect_snapshot(lrm_xy_fit)
 
   lrm_f_fit$fit$call <- lrm_xy_fit$fit$call <- NULL
-
-  expect_equal(
-    coef(lrm_f_fit$fit),
-    coef(lrm_xy_fit$fit),
-    ignore_attr = TRUE
-  )
+  lrm_f_fit$fit$sformula <- lrm_xy_fit$fit$sformula <- NULL
+  lrm_f_fit$fit$terms <- lrm_xy_fit$fit$terms <- NULL
+  expect_equal(lrm_f_fit$fit, lrm_xy_fit$fit, ignore_attr = TRUE)
 })
 
 test_that("interfaces agree (orm)", {
@@ -333,12 +314,11 @@ test_that("interfaces agree (orm)", {
   expect_snapshot(orm_xy_fit)
 
   orm_f_fit$fit$call <- orm_xy_fit$fit$call <- NULL
-
-  expect_equal(
-    coef(orm_f_fit$fit),
-    coef(orm_xy_fit$fit),
-    ignore_attr = TRUE
-  )
+  orm_f_fit$fit$sformula <- orm_xy_fit$fit$sformula <- NULL
+  orm_f_fit$fit$terms <- orm_xy_fit$fit$terms <- NULL
+  orm_f_fit$fit$yname <- orm_xy_fit$fit$yname <- NULL
+  orm_f_fit$fit$yplabel <- orm_xy_fit$fit$yplabel <- NULL
+  expect_equal(orm_f_fit$fit, orm_xy_fit$fit, ignore_attr = TRUE)
 })
 
 test_that("arguments agree (lrm)", {
