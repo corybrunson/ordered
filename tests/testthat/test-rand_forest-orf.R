@@ -33,16 +33,6 @@ test_that("model object", {
   tidy_fit <- fit(tidy_spec, Sat ~ Infl + Type + Cont, data = house_sub)
 
   expect_equal(orig_fit, tidy_fit$fit)
-
-  # # compare predictions
-  # orig_pred <- predict(orig_fit, newdata = X, type = "probs")
-  # tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
-  #
-  # # compare values ignoring column names (raw orf uses "Category 1" etc.)
-  # expect_equal(
-  #   unname(as.matrix(orig_pred$predictions)),
-  #   unname(as.matrix(tidy_pred))
-  # )
 })
 
 # prediction: class ------------------------------------------------------------
@@ -51,11 +41,8 @@ test_that("class prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("orf")
   house_sub <- get_house()$sub
-
-  house_frame <- model.frame(Sat ~ Type + Cont, data = house_sub)
-  house_terms <- attr(house_frame, "terms")
-  house_mat <- model.matrix(house_terms, house_frame)
-  house_mat <- house_mat[, colnames(house_mat) != "(Intercept)", drop = FALSE]
+  house_train <- house_sub[seq(60), ]
+  house_test <- house_sub[-seq(60), ]
 
   tidy_spec <- rand_forest(trees = 10) |>
     set_engine("orf") |>
@@ -64,12 +51,17 @@ test_that("class prediction", {
       sample.fraction = 0.5, honesty = FALSE
     )
   set.seed(seed)
-  tidy_fit <- fit(tidy_spec, Sat ~ Type + Cont, data = house_sub)
+  tidy_fit <- fit(tidy_spec, Sat ~ Type + Cont, data = house_train)
+
+  house_frame <- model.frame(Sat ~ Type + Cont, data = house_test)
+  house_terms <- attr(house_frame, "terms")
+  house_mat <- model.matrix(house_terms, house_frame)
+  house_mat <- house_mat[, colnames(house_mat) != "(Intercept)", drop = FALSE]
 
   orig_pred <- predict(tidy_fit$fit, newdata = house_mat, type = "c")
   orig_pred <- ordered(tidy_fit$lvl[orig_pred$predictions], tidy_fit$lvl)
   orig_pred <- tibble(.pred_class = orig_pred)
-  tidy_pred <- predict(tidy_fit, house_sub, type = "class")
+  tidy_pred <- predict(tidy_fit, house_test, type = "class")
 
   expect_equal(orig_pred, tidy_pred)
 })
@@ -80,11 +72,8 @@ test_that("probability prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("orf")
   house_sub <- get_house()$sub
-
-  house_frame <- model.frame(Sat ~ Type + Cont, data = house_sub)
-  house_terms <- attr(house_frame, "terms")
-  house_mat <- model.matrix(house_terms, house_frame)
-  house_mat <- house_mat[, colnames(house_mat) != "(Intercept)", drop = FALSE]
+  house_train <- house_sub[seq(60), ]
+  house_test <- house_sub[-seq(60), ]
 
   tidy_spec <- rand_forest(trees = 10) |>
     set_engine("orf") |>
@@ -93,12 +82,17 @@ test_that("probability prediction", {
       sample.fraction = 0.5, honesty = FALSE
     )
   set.seed(seed)
-  tidy_fit <- fit(tidy_spec, Sat ~ Type + Cont, data = house_sub)
+  tidy_fit <- fit(tidy_spec, Sat ~ Type + Cont, data = house_train)
+
+  house_frame <- model.frame(Sat ~ Type + Cont, data = house_test)
+  house_terms <- attr(house_frame, "terms")
+  house_mat <- model.matrix(house_terms, house_frame)
+  house_mat <- house_mat[, colnames(house_mat) != "(Intercept)", drop = FALSE]
 
   orig_pred <- predict(tidy_fit$fit, newdata = house_mat, type = "p")
   orig_pred <- tibble::as_tibble(as.data.frame(orig_pred$predictions))
   names(orig_pred) <- paste0(".pred_", tidy_fit$lvl)
-  tidy_pred <- predict(tidy_fit, house_sub, type = "prob")
+  tidy_pred <- predict(tidy_fit, house_test, type = "prob")
 
   expect_equal(orig_pred, tidy_pred)
 })
