@@ -62,12 +62,12 @@ vgam_spec <-
 
 # --- decision_tree engines ---
 
-# rpartScore: split
+# rpartScore: split + prune
 rpart_spec <-
   decision_tree() |>
   set_engine("rpartScore") |>
   set_mode("classification") |>
-  set_args(split = tune())
+  set_args(split = tune(), prune = tune())
 
 # --- rand_forest engines ---
 
@@ -78,9 +78,12 @@ ordfor_spec <-
   set_mode("classification") |>
   set_args(trees = tune())
 
-# orf: excluded due to excessive runtime and "subscript out of bounds"
-# prediction warnings; see `orf` package prediction bugs referenced in
-# `rand_forest-orf.R`
+# orf: min_n + honesty (short runtime via small trees)
+orf_spec <-
+  rand_forest() |>
+  set_engine("orf") |>
+  set_mode("classification") |>
+  set_args(min_n = tune(), trees = 50, honesty = tune())
 
 # --- tuning grids (all small to limit runtime) ---
 
@@ -111,6 +114,9 @@ rpart_tune <- extract_parameter_set_dials(rpart_spec)
 ordfor_tune <- extract_parameter_set_dials(ordfor_spec)
 ( ordfor_grid <- grid_regular(ordfor_tune, levels = 2L) )
 
+orf_tune <- extract_parameter_set_dials(orf_spec)
+( orf_grid <- grid_regular(orf_tune, levels = 2) )
+
 # assemble and tune workflow set
 workflow_set(
   preproc = list(formula = Sat ~ Infl + Type + Cont),
@@ -123,7 +129,8 @@ workflow_set(
     glmnetcr = glmnetcr_spec,
     vgam = vgam_spec,
     rpart = rpart_spec,
-    ordfor = ordfor_spec
+    ordfor = ordfor_spec,
+    orf = orf_spec
   )
 ) |>
   option_add(grid = polr_grid, id = "formula_polr") |>
@@ -135,6 +142,7 @@ workflow_set(
   option_add(grid = vgam_grid, id = "formula_vgam") |>
   option_add(grid = rpart_grid, id = "formula_rpart") |>
   option_add(grid = ordfor_grid, id = "formula_ordfor") |>
+  option_add(grid = orf_grid, id = "formula_orf") |>
   # for `fit_best()`
   option_add(control = control_grid(save_workflow = TRUE)) |>
   workflow_map(
@@ -151,8 +159,6 @@ house_workflows |>
   rank_results(rank_metric = "kap")
 house_workflows |>
   autoplot(metric = c("accuracy", "kap"))
-house_workflows |>
-  autoplot(metric = c("accuracy", "kap"), id = "formula_polr")
 
 # best fit
 house_workflows |>
