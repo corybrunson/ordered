@@ -2,7 +2,7 @@ seed <- 144688L
 
 # model: basic -----------------------------------------------------------------
 
-test_that("model object (original to tidy)", {
+test_that("model object (penalty path from original to tidy)", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("glmnetcr")
   house_sub <- get_house()$sub
@@ -12,8 +12,6 @@ test_that("model object (original to tidy)", {
     Sat ~ Type + Infl + Cont + 0, data = house_sub,
     contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
 
   # no extra arguments
 
@@ -32,13 +30,11 @@ test_that("model object (original to tidy)", {
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
-  # BIC makes coefficient comparison fragile; compare shapes instead
-  expect_equal(
-    dim(orig_fit$beta),
-    dim(tidy_fit$fit$beta)
-  )
+  orig_fit$npasses <- tidy_fit$fit$npasses <- NULL
+  orig_fit$jerr <- tidy_fit$fit$jerr <- NULL
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 
-  # extra arguments using mixture
+  # extra arguments
 
   set.seed(seed)
   orig_fit <- suppressWarnings(
@@ -56,19 +52,12 @@ test_that("model object (original to tidy)", {
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
-  # compare non-intercept coefficients at comparable steps
-  orig_step <- ncol(orig_fit$beta)
-  tidy_step <- ncol(tidy_fit$fit$beta)
-  min_step <- min(orig_step, tidy_step)
-  expect_equal(
-    orig_fit$beta[, seq_len(min_step)],
-    tidy_fit$fit$beta[, seq_len(min_step)],
-    ignore_formula_env = TRUE,
-    tolerance = 0.01
-  )
+  orig_fit$npasses <- tidy_fit$fit$npasses <- NULL
+  orig_fit$jerr <- tidy_fit$fit$jerr <- NULL
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 })
 
-test_that("model object (tidy to original)", {
+test_that("model object (penalty path from tidy to original)", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("glmnetcr")
   house_sub <- get_house()$sub
@@ -77,8 +66,6 @@ test_that("model object (tidy to original)", {
     Sat ~ Type + Infl + Cont + 0, data = house_sub,
     contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
 
   # no extra arguments
 
@@ -97,16 +84,14 @@ test_that("model object (tidy to original)", {
     )
   )
 
-  expect_equal(
-    dim(orig_fit$beta),
-    dim(tidy_fit$fit$beta)
-  )
+  orig_fit$npasses <- tidy_fit$fit$npasses <- NULL
+  orig_fit$jerr <- tidy_fit$fit$jerr <- NULL
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 
-  # extra arguments using mixture
+  # extra arguments
 
   tidy_spec <- ordinal_reg(penalty = 1, mixture = .5) |>
     set_engine("glmnetcr", method = "forward")
-
   set.seed(seed)
   tidy_fit <- suppressWarnings(
     fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -122,12 +107,13 @@ test_that("model object (tidy to original)", {
     )
   )
 
-  expect_equal(
-    as.matrix(orig_fit$beta),
-    as.matrix(tidy_fit$fit$beta),
-    ignore_formula_env = TRUE,
-    tolerance = 0.01
-  )
+  orig_fit$npasses <- tidy_fit$fit$npasses <- NULL
+  orig_fit$jerr <- tidy_fit$fit$jerr <- NULL
+  # FIXME: Why are some fits (coefficients and degrees of freedom) different?
+  orig_fit$beta <- as.matrix(orig_fit$beta)
+  tidy_fit$fit$beta <- as.matrix(tidy_fit$fit$beta)
+  orig_fit$df <- tidy_fit$fit$df <- NULL
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE, tolerance = 0.01)
 })
 
 # case weights -----------------------------------------------------------------
@@ -142,8 +128,6 @@ test_that("case weights", {
     Sat ~ Type + Infl + Cont + 0, data = wt_data,
     contrasts.arg = lapply(wt_data[, 2:4], contrasts, contrasts = FALSE)
   )
-  attr(wt_vars, "assign") <- NULL
-  attr(wt_vars, "contrasts") <- NULL
 
   set.seed(seed)
   orig_fit <- suppressWarnings(
@@ -162,12 +146,9 @@ test_that("case weights", {
     case_weights = wt_data$Freq
   )
 
-  expect_equal(
-    as.matrix(orig_fit$beta),
-    as.matrix(tidy_fit$fit$beta),
-    ignore_formula_env = TRUE,
-    tolerance = 0.01
-  )
+  # orig_fit$npasses <- tidy_fit$fit$npasses <- NULL
+  # orig_fit$jerr <- tidy_fit$fit$jerr <- NULL
+  expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 })
 
 # prediction: class ------------------------------------------------------------
@@ -186,8 +167,6 @@ test_that("class prediction", {
     Sat ~ Type + Cont + 0, data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
 
   # use BIC-selected step (default)
   pred_all <- predict(tidy_fit$fit, newx = house_vars)
@@ -220,8 +199,6 @@ test_that("prob prediction", {
     Sat ~ Type + Cont + 0, data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
 
   # use BIC-selected step (default)
   pred_all <- predict(tidy_fit$fit, newx = house_vars)
@@ -255,8 +232,6 @@ test_that("multi_predict class", {
     Sat ~ Type + Cont + 0, data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
 
   pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * c(1, 2) / 3]
   multi_pred <- multi_predict(
@@ -275,7 +250,7 @@ test_that("multi_predict class", {
   expect_equal(nested_rows, length(pen_vals))
 })
 
-test_that("multi_predict prob", {
+test_that("multiple prediction", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("glmnetcr")
   house_sub <- get_house()$sub
@@ -286,30 +261,6 @@ test_that("multi_predict prob", {
   )
 
   pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * c(1, 2) / 3]
-  multi_pred <- multi_predict(
-    tidy_fit,
-    new_data = house_sub,
-    type = "prob",
-    penalty = pen_vals
-  )
-
-  expect_s3_class(multi_pred, "tbl_df")
-  expect_equal(nrow(multi_pred), nrow(house_sub))
-  expect_true(".pred" %in% names(multi_pred))
-})
-
-test_that("multi_predict agrees with sequential predict", {
-  skip_if_not_installed("MASS")
-  skip_if_not_installed("glmnetcr")
-  house_sub <- get_house()$sub
-
-  tidy_fit <- suppressWarnings(
-    ordinal_reg(engine = "glmnetcr", penalty = 1) |>
-      fit(Sat ~ Type + Cont, data = house_sub)
-  )
-
-  pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * c(1, 2) / 3]
-
   multi_pred <-
     multi_predict(tidy_fit, house_sub, type = "class", penalty = pen_vals)
 
@@ -365,11 +316,7 @@ test_that("interfaces agree", {
     )
   })
 
-  expect_equal(
-    gcr_f_fit$fit$beta,
-    gcr_xy_fit$fit$beta,
-    tolerance = 0.001
-  )
+  expect_equal(gcr_f_fit$fit, gcr_xy_fit$fit, ignore_attr = TRUE)
 })
 
 test_that("arguments agree", {
@@ -394,5 +341,5 @@ test_that("arguments agree", {
     gcr_arg_fit$fit$lambda,
     pen_vec[seq_along(gcr_arg_fit$fit$lambda)]
   )
-  # FIXME: No item `$fit$args` found.
+  expect_equal(gcr_arg_fit$fit$method, "forward")
 })

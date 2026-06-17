@@ -10,13 +10,13 @@ test_that("model object", {
   # replicate parsnip's formula preprocessing for a direct orf call
   mod_frame <- model.frame(Sat ~ Infl + Type + Cont, data = house_sub)
   mod_terms <- attr(mod_frame, "terms")
-  X <- model.matrix(mod_terms, mod_frame)
-  X <- X[, colnames(X) != "(Intercept)", drop = FALSE]
-  Y <- as.numeric(model.response(mod_frame))
+  house_mat <- model.matrix(mod_terms, mod_frame)
+  house_mat <- house_mat[, colnames(house_mat) != "(Intercept)", drop = FALSE]
+  house_vec <- as.numeric(model.response(mod_frame))
 
   set.seed(seed)
   orig_fit <- orf::orf(
-    X, Y,
+    house_mat, house_vec,
     num.trees = 10, mtry = 4, min.node.size = 5,
     replace = FALSE, sample.fraction = 0.5,
     honesty = FALSE, inference = FALSE, importance = FALSE

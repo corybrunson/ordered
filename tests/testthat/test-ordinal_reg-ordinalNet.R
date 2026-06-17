@@ -2,7 +2,7 @@ seed <- 144688L
 
 # model: basic -----------------------------------------------------------------
 
-test_that("model object (original to tidy)", {
+test_that("model object (penalty path from original to tidy)", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
@@ -68,7 +68,7 @@ test_that("model object (original to tidy)", {
   )
 })
 
-test_that("model object (tidy to original)", {
+test_that("model object (penalty path from tidy to original)", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
