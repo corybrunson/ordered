@@ -26,7 +26,7 @@ ord_metric(values = values_ord_metric)
 values_ord_metric
 }
 \arguments{
-\item{values}{A character string of possible values. See \code{values_ord_metric}.}
+\item{values}{A character string of possible values.}
 
 \item{range}{A two-element vector holding the \emph{defaults} for the smallest and
 largest possible values, respectively. If a transformation is specified,
@@ -48,6 +48,8 @@ These parameters are auxiliary to random forest models that use the
 specified using \code{set_engine("ordinalForest", ...)}.
 }
 \details{
+The vector \code{values_ord_metric} provides options to the \code{ord_metric} dial.
+
 These functions generate parameters for \code{\link[parsnip:rand_forest]{parsnip::rand_forest()}}
 models using the \code{"ordinalForest"} engine. See \code{?ordinalForest::ordfor()}
 for more details on the original parameters. These parameters are
@@ -75,6 +77,7 @@ num_scores()
 num_score_perms()
 num_score_trees()
 num_scores_best()
+values_ord_metric
 ord_metric()
 }
 \seealso{

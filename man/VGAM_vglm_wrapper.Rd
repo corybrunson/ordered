@@ -43,6 +43,10 @@ These wrappers convert the standardized \code{odds_link} options encoded in
 \code{family} argument of \code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
 }
 \details{
+The vector \code{values_ordinal_link_VGAM} extends the default \code{ordinal_link}
+options encoded in \code{\link[dials:values_ordinal_link]{dials::values_ordinal_link}} to those accepted by
+\code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
+
 Note that \code{VGAM::vglm()} and \code{VGAM::vgam()} treat the rows of \code{data}
 as the units of observation: Compressed \code{data} with one row per predictor
 set will be understood as having a multinomial-valued outcome; only
