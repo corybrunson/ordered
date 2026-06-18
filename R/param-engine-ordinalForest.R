@@ -4,8 +4,10 @@
 #' "ordinalForest" engine. They correspond to tuning parameters that would be
 #' specified using `set_engine("ordinalForest", ...)`.
 #'
+#' The vector `values_ord_metric` provides options to the `ord_metric` dial.
+#'
 #' @name ordinalForest_parameters
-#' @param values A character string of possible values. See `values_ord_metric`.
+#' @param values A character string of possible values.
 #' @param range A two-element vector holding the _defaults_ for the smallest and
 #'   largest possible values, respectively. If a transformation is specified,
 #'   these values should be in the _transformed units_.
@@ -49,6 +51,7 @@
 #' num_score_perms()
 #' num_score_trees()
 #' num_scores_best()
+#' values_ord_metric
 #' ord_metric()
 
 #' @export

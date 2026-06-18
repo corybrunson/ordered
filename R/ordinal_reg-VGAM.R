@@ -3,6 +3,10 @@
 #' These wrappers convert the standardized `odds_link` options encoded in
 #' [`dials::values_odds_link`] to [`VGAM::vglmff-class`] objects passed to the
 #' `family` argument of [VGAM::vglm()] and [VGAM::vgam()].
+#'
+#' The vector `values_ordinal_link_VGAM` extends the default `ordinal_link`
+#' options encoded in [`dials::values_ordinal_link`] to those accepted by
+#' [`VGAM::vglm()`] and [`VGAM::vgam()`].
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.
 #' @param ... Additional arguments to pass.
