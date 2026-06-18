@@ -21,6 +21,8 @@ combinations in the parsnip package that can be used, this package adds:
 
 - cumulative link (cumulative logit) ordinal regression via
   `MASS::polr()`
+- cumulative link ordinal regression via `ordinal::clm()` ([Christensen,
+  2023](https://cran.uni-muenster.de/web/packages/ordinal/vignettes/clm_article.pdf))
 - generalized linear and generalized additive ordinal regression models
   of cumulative link, adjacent categories, continuation ratio, and
   stopping ratio families via `VGAM::vglm()` and `VGAM::vgam()` ([Yee,
@@ -91,6 +93,7 @@ predictions of `type = "class"` and `type = "prob"` are supported.
 | `ordinal_reg`      | `polr`          | ✔     | ✔    |
 | `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    |
 | `ordinal_reg`      | `vglm`          | ✔     | ✔    |
+| `ordinal_reg`      | `clm`           | ✔     | ✔    |
 | `ordinal_reg`      | `lrm`           | ✔     | ✔    |
 | `ordinal_reg`      | `orm`           | ✔     | ✔    |
 | `ordinal_reg`      | `glmnetcr`      | ✔     | ✔    |
