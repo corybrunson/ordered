@@ -131,6 +131,6 @@ ord_metric <- function(values = values_ord_metric) {
 #' @rdname ordinalForest_parameters
 #' @export
 values_ord_metric <-
-  # REVIEW: The option `"custom"` is omitted for simplicity as it depends on
+  # NOTE: The option `"custom"` is omitted for simplicity as it depends on
   # another parameter.
   c("equal", "probability", "proportional", "oneclass")

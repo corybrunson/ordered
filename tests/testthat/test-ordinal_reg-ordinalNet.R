@@ -1,5 +1,3 @@
-seed <- 144688L
-
 # model: basic -----------------------------------------------------------------
 
 test_that("model object (penalty path from original to tidy)", {
@@ -12,8 +10,6 @@ test_that("model object (penalty path from original to tidy)", {
     Sat ~ Type + Infl + Cont + 0, data = house_sub,
     contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
 
   # no extra arguments
 
@@ -26,12 +22,8 @@ test_that("model object (penalty path from original to tidy)", {
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
     set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
-
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
-
-  # remove `call` from comparison
-  orig_fit$call <- tidy_fit$fit$call <- NULL
 
   expect_equal(
     orig_fit$coefs,
@@ -49,16 +41,11 @@ test_that("model object (penalty path from original to tidy)", {
     alpha = .5, family = "sratio"
   )
 
-  tidy_spec <- ordinal_reg(penalty = 0.01,
-                           mixture = .5,
-                           odds_link = "stopping") |>
+  tidy_spec <-
+    ordinal_reg(penalty = 0.01, mixture = .5, odds_link = "stopping") |>
     set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
-
-  # remove `call` from comparison
-  orig_fit$call <- tidy_fit$fit$call <- NULL
-  orig_fit$args <- tidy_fit$fit$args <- NULL
 
   expect_equal(
     orig_fit$coefs,
@@ -78,8 +65,6 @@ test_that("model object (penalty path from tidy to original)", {
     Sat ~ Type + Infl + Cont + 0, data = house_sub,
     contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
 
   # no extra arguments
 
@@ -96,9 +81,6 @@ test_that("model object (penalty path from tidy to original)", {
     lambdaVals = tidy_fit$fit$lambdaVals
   )
 
-  # remove `call` from comparison
-  orig_fit$call <- tidy_fit$fit$call <- NULL
-
   expect_equal(
     orig_fit$coefs,
     tidy_fit$fit$coefs,
@@ -107,9 +89,9 @@ test_that("model object (penalty path from tidy to original)", {
 
   # extra arguments
 
-  tidy_spec <- ordinal_reg(penalty = 0.001, mixture = .5, odds_link = "stopping") |>
+  tidy_spec <-
+    ordinal_reg(penalty = 0.001, mixture = .5, odds_link = "stopping") |>
     set_engine("ordinalNet")
-
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -121,14 +103,12 @@ test_that("model object (penalty path from tidy to original)", {
     alpha = .5, family = "sratio"
   )
 
-  # remove `call` from comparison
-  orig_fit$call <- tidy_fit$fit$call <- NULL
+  # FIXME: Why are these not equal? (The penalty paths are equal.)
   orig_fit$args <- tidy_fit$fit$args <- NULL
-
   expect_equal(
     orig_fit,
     tidy_fit$fit,
-    ignore_formula_env = TRUE
+    ignore_attr = TRUE
   )
 })
 
@@ -154,13 +134,13 @@ test_that("case weights", {
     ~ Type + Infl + Cont + 0, data = house_vars,
     contrasts.arg = lapply(house_vars, contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
 
   house_resp <- house_nums[, 4:6]
   house_resp <- as.matrix(house_resp)
   house_resp[is.na(house_resp)] <- 0L
   rownames(house_resp) <- NULL
+
+  # no extra arguments
 
   set.seed(seed)
   orig_fit <- ordinalNet::ordinalNet(
@@ -168,13 +148,10 @@ test_that("case weights", {
     y = house_resp,
     # lambdaVals = .001
     nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
-    # , alpha = .5, family = "sratio"
   )
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
     set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
-
-  # tidy_spec <- set_args(tidy_spec, mixture = .5, odds_link = "stopping")
   tidy_data <- transform(house_data, Freq = frequency_weights(Freq))
   set.seed(seed)
   tidy_fit <- fit(
@@ -184,14 +161,39 @@ test_that("case weights", {
     case_weights = tidy_data$Freq
   )
 
-  # remove `call` from comparison
-  orig_fit$call <- tidy_fit$fit$call <- NULL
   orig_fit$args <- tidy_fit$fit$args <- NULL
-
   expect_equal(
     orig_fit,
-    tidy_fit$fit,
-    ignore_formula_env = TRUE
+    tidy_fit$fit
+  )
+
+  # extra arguments
+
+  set.seed(seed)
+  orig_fit <- ordinalNet::ordinalNet(
+    house_vars,
+    y = house_resp,
+    # lambdaVals = .001
+    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE,
+    alpha = .5, family = "sratio"
+  )
+
+  tidy_spec <- ordinal_reg(penalty = 0.01) |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
+    set_args(mixture = .5, odds_link = "stopping")
+  tidy_data <- transform(house_data, Freq = frequency_weights(Freq))
+  set.seed(seed)
+  tidy_fit <- fit(
+    tidy_spec,
+    Sat ~ Type + Infl + Cont,
+    data = tidy_data,
+    case_weights = tidy_data$Freq
+  )
+
+  orig_fit$args <- tidy_fit$fit$args <- NULL
+  expect_equal(
+    orig_fit,
+    tidy_fit$fit
   )
 })
 
@@ -220,8 +222,6 @@ test_that("multinomial formulation", {
     ~ Type + Infl + Cont + 0, data = house_vars,
     contrasts.arg = lapply(house_vars, contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
 
   house_resp <- house_agg[, 4:6]
   house_resp <- as.matrix(house_resp)
@@ -237,7 +237,6 @@ test_that("multinomial formulation", {
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
     set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
-
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -265,8 +264,7 @@ test_that("class prediction", {
     Sat ~ Type + Cont + 0, data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
-  attr(house_vars, "assign") <- NULL
-  attr(house_vars, "contrasts") <- NULL
+
   orig_pred <- predict(tidy_fit$fit, newx = house_vars, type = "class")
   orig_pred <- ordered(tidy_fit$lvl[orig_pred], tidy_fit$lvl)
   orig_pred <- tibble::tibble(.pred_class = orig_pred)

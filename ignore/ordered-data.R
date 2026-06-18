@@ -66,7 +66,7 @@ tidy_pkgs <- c("datasets", "MASS", "modeldata")
 ?VGAM::car.all
 
 ord_pkgs <- c(
-  "ordinalNet", "rms", "glmpathcr",
+  "ordinalNet", "rms", "glmnetcr", "glmpathcr",
   "ordinalgmifs", "ordinalbayes", "ordinal",
   "rpartScore", "ordinalForest", "orf"
 )

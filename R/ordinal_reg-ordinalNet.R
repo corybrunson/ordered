@@ -60,10 +60,6 @@
 #' @export
 ordinalNet_wrapper <- function(
     x, y, weights = NULL,
-    # REVIEW: Is this the preferred way to handle differences in parameter
-    # names? See the commented alternative in `parsnip::translate.ordinal_reg`.
-    # This solution `translate()`s to `ordered::ordinalNet_wrapper(...)`, which
-    # is certainly disfavored against `ordinalNet::ordinalNet(...)`.
     # TODO: Test whether defaults can be omitted.
     family = "cumulative_link", link = "logistic",
     ...

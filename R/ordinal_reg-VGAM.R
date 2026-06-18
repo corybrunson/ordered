@@ -83,8 +83,6 @@ VGAM_vglm_wrapper <- function(
   rlang::eval_tidy(cl)
 }
 
-# REVIEW: Reduce these to one wrapper function with a `fun = "vglm"` argument?
-
 #' @rdname VGAM_vglm_wrapper
 #' @export
 VGAM_vgam_wrapper <- function(

@@ -155,7 +155,6 @@ make_ordinal_reg_vglm <- function() {
     eng = "vglm",
     mode = "classification",
     options = list(
-      # REVIEW
       predictor_indicators = "traditional",
       compute_intercept = TRUE,
       remove_intercept = TRUE,
@@ -284,9 +283,7 @@ make_ordinal_reg_ordinalNet <- function() {
       # "What do I do about how my model handles factors or categorical data?"
       # https://www.tidyverse.org/blog/2020/07/parsnip-0-1-2/
       predictor_indicators = "one_hot",
-      # REVIEW
       compute_intercept = TRUE,
-      # REVIEW
       remove_intercept = TRUE,
       allow_sparse_x = FALSE
     )
