@@ -24,6 +24,7 @@ reference:
   desc: >
     Tunable Engine Parameters
   contents:
+  - '`clm_parameters`'
   - '`rpartScore_parameters`'
   - '`ordinalForest_parameters`'
   - '`orf_parameters`'

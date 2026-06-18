@@ -34,6 +34,7 @@ Imports:
 Suggests: 
     dplyr,
     MASS,
+    ordinal,
     ordinalNet,
     rms (>= 7.0.0),
     glmnetcr,
