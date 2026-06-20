@@ -1,7 +1,9 @@
-library(devtools); library(tidymodels); load_all()
+library(devtools); library(tidymodels); library(bonsai); load_all()
 
 # reference example:
 # https://workflowsets.tidymodels.org/articles/tuning-and-comparing-models.html
+
+# note: partykit models leverage ordinality when responses are ordered factors
 
 # disaggregated data & partition
 house_data <-
@@ -69,6 +71,13 @@ rpart_spec <-
   set_mode("classification") |>
   set_args(split = tune(), prune = tune())
 
+# partykit: tree_depth + mincriterion (using ctree via bonsai)
+ctree_spec <-
+  decision_tree() |>
+  set_engine("partykit") |>
+  set_mode("classification") |>
+  set_args(tree_depth = tune(), mincriterion = tune())
+
 # --- rand_forest engines ---
 
 # ordinalForest: trees
@@ -84,6 +93,13 @@ orf_spec <-
   set_engine("orf") |>
   set_mode("classification") |>
   set_args(min_n = tune(), trees = 50, honesty = tune())
+
+# partykit: mtry + trees + mincriterion (using cforest via bonsai)
+cforest_spec <-
+  rand_forest() |>
+  set_engine("partykit") |>
+  set_mode("classification") |>
+  set_args(trees = tune(), mincriterion = tune())
 
 # --- tuning grids (all small to limit runtime) ---
 
@@ -111,11 +127,17 @@ vgam_tune <- extract_parameter_set_dials(vgam_spec)
 rpart_tune <- extract_parameter_set_dials(rpart_spec)
 ( rpart_grid <- grid_regular(rpart_tune, levels = Inf) )
 
+ctree_tune <- extract_parameter_set_dials(ctree_spec)
+( ctree_grid <- grid_regular(ctree_tune, levels = 2) )
+
 ordfor_tune <- extract_parameter_set_dials(ordfor_spec)
 ( ordfor_grid <- grid_regular(ordfor_tune, levels = 2L) )
 
 orf_tune <- extract_parameter_set_dials(orf_spec)
 ( orf_grid <- grid_regular(orf_tune, levels = 2) )
+
+cforest_tune <- extract_parameter_set_dials(cforest_spec)
+( cforest_grid <- grid_regular(cforest_tune, levels = 2) )
 
 # assemble and tune workflow set
 workflow_set(
@@ -129,8 +151,10 @@ workflow_set(
     glmnetcr = glmnetcr_spec,
     vgam = vgam_spec,
     rpart = rpart_spec,
+    ctree = ctree_spec,
     ordfor = ordfor_spec,
-    orf = orf_spec
+    orf = orf_spec,
+    cforest = cforest_spec
   )
 ) |>
   option_add(grid = polr_grid, id = "formula_polr") |>
@@ -141,8 +165,10 @@ workflow_set(
   option_add(grid = glmnetcr_grid, id = "formula_glmnetcr") |>
   option_add(grid = vgam_grid, id = "formula_vgam") |>
   option_add(grid = rpart_grid, id = "formula_rpart") |>
+  option_add(grid = ctree_grid, id = "formula_ctree") |>
   option_add(grid = ordfor_grid, id = "formula_ordfor") |>
   option_add(grid = orf_grid, id = "formula_orf") |>
+  option_add(grid = cforest_grid, id = "formula_cforest") |>
   # for `fit_best()`
   option_add(control = control_grid(save_workflow = TRUE)) |>
   workflow_map(
