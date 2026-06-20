@@ -34,12 +34,10 @@ ordered is a [parsnip](https://parsnip.tidymodels.org/) extension to enable addi
  - latent variable ordinal forests via `ordinalForest::ordfor()` ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
  - conditional probability ordered forests via `orf::orf()` ([Lechner and Okasa, 2025](https://doi.org/10.1007/s00181-024-02646-4))
 
-More will be added.
+Some features in other tidymodels packages are useful for ordinal outcomes: 
 
-There are some existing features in tidymodels packages that are useful for ordinal outcomes: 
-
- - The [partykit](https://cran.r-project.org/package=partykit) engines for `parsnip::decision_tree()` and `parsnip::rand_forest()` use the ordered nature of the factors to train the model. 
- - The yardstick package has `yardstick::kap()` for weighted and unweighted Kappa statistics (the former being of more interest). Also, `yardstick::classification_cost()` can utilize more complex cost structures and uses the class probabilities for estimation. 
+ - The [partykit](https://cran.r-project.org/package=partykit) engines for `parsnip::decision_tree()` and `parsnip::rand_forest()`, provided by [bonsai](https://bonsai.tidymodels.org/), use the ordinal nature of ordered factors to train the model, yielding different fits than for unordered factors. 
+ - The [yardstick](https://yardstick.tidymodels.org/) package has `yardstick::kap()` for weighted and unweighted Kappa statistics (the former being of more interest). Also, `yardstick::classification_cost()` can utilize more complex cost structures and uses the class probabilities for estimation. 
 
 ## Installation
 
