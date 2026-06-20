@@ -128,3 +128,7 @@ augment(ord_rf_fit, new_data = caco_test)
 Please note that the ordered project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
 
 To voice support for or volunteer to contribute additional engines, please comment on [this issue](https://github.com/corybrunson/ordered/issues/15).
+
+## Acknowledgments
+
+Jason Cory Brunson was supported in part by [NIH/NIDCD R01DC022733](https://reporter.nih.gov/search/oglGXI8zaU2b_BVRqwNHEA/project-details/11122743).
