@@ -274,6 +274,110 @@ test_that("class prediction", {
   expect_equal(orig_pred, tidy_pred)
 })
 
+# multiple prediction ----------------------------------------------------------
+
+test_that("multiple prediction structure", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = 1) |>
+      fit(Sat ~ Type + Cont, data = house_sub)
+
+  house_vars <- model.matrix(
+    Sat ~ Type + Cont + 0, data = house_sub,
+    contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
+  )
+
+  pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * seq(4) / 5]
+
+  # class
+
+  multi_pred <- multi_predict(
+    tidy_fit,
+    new_data = house_sub,
+    type = "class",
+    penalty = pen_vals
+  )
+
+  # class & outer structure
+  expect_s3_class(multi_pred, "tbl_df")
+  expect_equal(nrow(multi_pred), nrow(house_sub))
+  expect_true(".pred" %in% names(multi_pred))
+  # one row per penalty value
+  nested_rows <- unique(purrr::map_int(multi_pred$.pred, nrow))
+  expect_equal(nested_rows, length(pen_vals))
+  # one column for prediction + one column for penalty
+  nested_cols <- unique(purrr::map_int(multi_pred$.pred, ncol))
+  expect_equal(nested_cols, 2L)
+
+  # probability
+
+  multi_pred <- multi_predict(
+    tidy_fit,
+    new_data = house_sub,
+    type = "prob",
+    penalty = pen_vals
+  )
+
+  # class & outer structure
+  expect_s3_class(multi_pred, "tbl_df")
+  expect_equal(nrow(multi_pred), nrow(house_sub))
+  expect_true(".pred" %in% names(multi_pred))
+  # one row per penalty value
+  nested_rows <- unique(purrr::map_int(multi_pred$.pred, nrow))
+  expect_equal(nested_rows, length(pen_vals))
+  # one column per class + one column for penalty
+  nested_cols <- unique(purrr::map_int(multi_pred$.pred, ncol))
+  expect_equal(nested_cols, length(tidy_fit$lvl) + 1L)
+})
+
+test_that("multiple prediction values match sequential prediction values", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("tidyr")
+  skip_if_not_installed("ordinalNet")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = 1) |>
+      fit(Sat ~ Type + Cont, data = house_sub)
+
+  pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * seq(4) / 5]
+
+  # class
+
+  multi_pred <- tidy_fit |>
+    multi_predict(house_sub, type = "class", penalty = pen_vals) |>
+    tidyr::unnest(cols = c(.pred))
+  for (i in seq_along(pen_vals)) {
+    single_pred <- predict(
+      tidy_fit, house_sub, type = "class", penalty = pen_vals[i]
+    )
+    expect_equal(
+      multi_pred |>
+        filter(penalty == pen_vals[i]) |>
+        dplyr::select(-penalty),
+      single_pred
+    )
+  }
+
+  # probability
+
+  multi_pred <- tidy_fit |>
+    multi_predict(house_sub, type = "prob", penalty = pen_vals) |>
+    tidyr::unnest(cols = c(.pred))
+  for (i in seq_along(pen_vals)) {
+    single_pred <- predict(
+      tidy_fit, house_sub, type = "prob", penalty = pen_vals[i]
+    )
+    expect_equal(
+      multi_pred |>
+        filter(penalty == pen_vals[i]) |>
+        dplyr::select(-penalty),
+      single_pred
+    )
+  }
+})
+
 # translation & interfaces -----------------------------------------------------
 
 test_that("interfaces agree", {

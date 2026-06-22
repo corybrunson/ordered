@@ -216,9 +216,9 @@ test_that("prob prediction", {
   expect_equal(orig_pred, tidy_pred, tolerance = 0.0001)
 })
 
-# multi_predict ----------------------------------------------------------------
+# multiple prediction ----------------------------------------------------------
 
-test_that("multi_predict class", {
+test_that("multiple prediction structure", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("glmnetcr")
   house_sub <- get_house()$sub
@@ -233,7 +233,10 @@ test_that("multi_predict class", {
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
 
-  pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * c(1, 2) / 3]
+  pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * seq(4) / 5]
+
+  # class
+
   multi_pred <- multi_predict(
     tidy_fit,
     new_data = house_sub,
@@ -241,17 +244,41 @@ test_that("multi_predict class", {
     penalty = pen_vals
   )
 
+  # class & outer structure
   expect_s3_class(multi_pred, "tbl_df")
   expect_equal(nrow(multi_pred), nrow(house_sub))
   expect_true(".pred" %in% names(multi_pred))
-
-  # each nested tibble should have one row per penalty value
+  # one row per penalty value
   nested_rows <- unique(purrr::map_int(multi_pred$.pred, nrow))
   expect_equal(nested_rows, length(pen_vals))
+  # one column for prediction + one column for penalty
+  nested_cols <- unique(purrr::map_int(multi_pred$.pred, ncol))
+  expect_equal(nested_cols, 2L)
+
+  # probability
+
+  multi_pred <- multi_predict(
+    tidy_fit,
+    new_data = house_sub,
+    type = "prob",
+    penalty = pen_vals
+  )
+
+  # class & outer structure
+  expect_s3_class(multi_pred, "tbl_df")
+  expect_equal(nrow(multi_pred), nrow(house_sub))
+  expect_true(".pred" %in% names(multi_pred))
+  # one row per penalty value
+  nested_rows <- unique(purrr::map_int(multi_pred$.pred, nrow))
+  expect_equal(nested_rows, length(pen_vals))
+  # one column per class + one column for penalty
+  nested_cols <- unique(purrr::map_int(multi_pred$.pred, ncol))
+  expect_equal(nested_cols, length(tidy_fit$lvl) + 1L)
 })
 
-test_that("multiple prediction", {
+test_that("multiple prediction values match sequential prediction values", {
   skip_if_not_installed("MASS")
+  skip_if_not_installed("tidyr")
   skip_if_not_installed("glmnetcr")
   house_sub <- get_house()$sub
 
@@ -260,19 +287,39 @@ test_that("multiple prediction", {
       fit(Sat ~ Type + Cont, data = house_sub)
   )
 
-  pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * c(1, 2) / 3]
-  multi_pred <-
-    multi_predict(tidy_fit, house_sub, type = "class", penalty = pen_vals)
+  pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * seq(4) / 5]
 
-  # compare multi_predict result with sequential predict at each penalty
+  # class
+
+  multi_pred <- tidy_fit |>
+    multi_predict(house_sub, type = "class", penalty = pen_vals) |>
+    tidyr::unnest(cols = c(.pred))
   for (i in seq_along(pen_vals)) {
     single_pred <- predict(
-      tidy_fit, house_sub, type = "class",
-      penalty = pen_vals[i]
+      tidy_fit, house_sub, type = "class", penalty = pen_vals[i]
     )
     expect_equal(
-      sapply(multi_pred$.pred, function(x) x$.pred_class[i]),
-      single_pred$.pred_class
+      multi_pred |>
+        filter(penalty == pen_vals[i]) |>
+        dplyr::select(-penalty),
+      single_pred
+    )
+  }
+
+  # probability
+
+  multi_pred <- tidy_fit |>
+    multi_predict(house_sub, type = "prob", penalty = pen_vals) |>
+    tidyr::unnest(cols = c(.pred))
+  for (i in seq_along(pen_vals)) {
+    single_pred <- predict(
+      tidy_fit, house_sub, type = "prob", penalty = pen_vals[i]
+    )
+    expect_equal(
+      multi_pred |>
+        filter(penalty == pen_vals[i]) |>
+        dplyr::select(-penalty),
+      single_pred
     )
   }
 })
