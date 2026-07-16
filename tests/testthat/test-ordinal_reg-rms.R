@@ -231,6 +231,36 @@ test_that("probability prediction (orm)", {
   expect_equal(orig_pred, tidy_pred)
 })
 
+# prediction: linear_pred ------------------------------------------------------
+
+test_that("linear_pred prediction (lrm)", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("rms")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(engine = "lrm") |>
+    fit(Sat ~ Type + Cont, data = house_sub)
+
+  orig_link <- predict(tidy_fit$fit, newdata = house_sub, type = "lp")
+  orig_pred <- tibble::tibble(.pred_link = unname(orig_link))
+  tidy_pred <- predict(tidy_fit, house_sub, type = "linear_pred")
+  expect_equal(orig_pred, tidy_pred)
+})
+
+test_that("linear_pred prediction (orm)", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("rms")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(engine = "orm") |>
+    fit(Sat ~ Type + Cont, data = house_sub)
+
+  orig_link <- predict(tidy_fit$fit, newdata = house_sub, type = "lp")
+  orig_pred <- tibble::tibble(.pred_link = unname(orig_link))
+  tidy_pred <- predict(tidy_fit, house_sub, type = "linear_pred")
+  expect_equal(orig_pred, tidy_pred)
+})
+
 # prediction: tibble input -----------------------------------------------------
 
 test_that("tibble input (lrm)", {

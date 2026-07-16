@@ -483,25 +483,25 @@ make_ordinal_reg_lrm <- function() {
     )
   )
 
-  # parsnip::set_pred(
-  #   model = "ordinal_reg",
-  #   eng = "lrm",
-  #   mode = "classification",
-  #   type = "linear_pred",
-  #   value = list(
-  #     pre = NULL,
-  #     post = function(x, object) {
-  #       tibble::tibble(.pred_link = unname(x))
-  #     },
-  #     func = c(fun = "predict"),
-  #     args =
-  #       list(
-  #         object = quote(object$fit),
-  #         newdata = quote(new_data),
-  #         type = "lp"
-  #       )
-  #   )
-  # )
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "lrm",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        tibble::tibble(.pred_link = unname(x))
+      },
+      func = c(fun = "predict"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "lp"
+        )
+    )
+  )
 
   # ----------------------------------------------------------------------------
   # `rms::orm` components
@@ -600,6 +600,26 @@ make_ordinal_reg_lrm <- function() {
           object = quote(object$fit),
           newdata = quote(new_data),
           type = "fitted.ind"
+        )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "orm",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        tibble::tibble(.pred_link = unname(x))
+      },
+      func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "lp"
         )
     )
   )
@@ -816,6 +836,36 @@ make_ordinal_reg_clm <- function() {
           object = quote(object$fit),
           newdata = quote(new_data),
           type = "prob"
+        )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "clm",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = function(new_data, object) {
+        resp <- all.vars(object$fit$terms[[2L]])
+        if (resp %in% names(new_data)) {
+          new_data <- new_data[, !names(new_data) %in% resp, drop = FALSE]
+        }
+        new_data
+      },
+      post = function(x, object) {
+        # `predict(type = "linear.predictor")` returns `eta1[,j] = alpha_j -
+        # eta` where `eta = X * beta` is the linear predictor. Extract `eta` by
+        # subtracting the first column of `eta1` from the first threshold.
+        eta <- object$fit$alpha[1] - x$eta1[, 1]
+        tibble::tibble(.pred_link = unname(eta))
+      },
+      func = c(fun = "predict"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "linear.predictor"
         )
     )
   )
