@@ -278,11 +278,12 @@ test_that("class prediction", {
 
 test_that("multiple prediction structure", {
   skip_if_not_installed("MASS")
+  skip_if_not_installed("tidyr")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = 1) |>
-      fit(Sat ~ Type + Cont, data = house_sub)
+    fit(Sat ~ Type + Cont, data = house_sub)
 
   house_vars <- model.matrix(
     Sat ~ Type + Cont + 0, data = house_sub,
@@ -334,12 +335,11 @@ test_that("multiple prediction structure", {
 
 test_that("multiple prediction values match sequential prediction values", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("tidyr")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = 1) |>
-      fit(Sat ~ Type + Cont, data = house_sub)
+    fit(Sat ~ Type + Cont, data = house_sub)
 
   pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * seq(4) / 5]
 
@@ -376,6 +376,69 @@ test_that("multiple prediction values match sequential prediction values", {
       single_pred
     )
   }
+})
+
+# prediction: linear_pred ------------------------------------------------------
+
+test_that("linear_pred prediction", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(penalty = 0.01, engine = "ordinalNet") |>
+  fit(Sat ~ Type + Infl + Cont, data = house_sub)
+
+  tidy_link <- predict(tidy_fit, house_sub, type = "linear_pred")
+
+  lvl <- levels(house_sub$Sat)
+
+  # output structure
+  expect_s3_class(tidy_link, "tbl_df")
+  expect_equal(nrow(tidy_link), nrow(house_sub))
+  expect_equal(ncol(tidy_link), length(lvl) - 1L)
+  expect_named(
+    tidy_link,
+    paste(".pred_link", lvl[-length(lvl)], lvl[-1L], sep = "_")
+  )
+
+  # compare with raw ordinalNet link predictions
+  house_vars <- model.matrix(
+    Sat ~ Type + Infl + Cont + 0, data = house_sub,
+    contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
+  )
+  attr(house_vars, "assign") <- NULL
+  attr(house_vars, "contrasts") <- NULL
+  orig_link <- predict(tidy_fit$fit, newx = house_vars, type = "link")
+  orig_link <- tibble::as_tibble(orig_link)
+
+  expect_equal(tidy_link, orig_link, ignore_attr = TRUE)
+})
+
+test_that("linear_pred prediction with single observation", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(penalty = 0.01, engine = "ordinalNet") |>
+    fit(Sat ~ Type + Infl + Cont, data = house_sub)
+
+  one_row <- house_sub[1L, ]
+  tidy_link <- predict(tidy_fit, one_row, type = "linear_pred")
+
+  expect_equal(nrow(tidy_link), 1L)
+  expect_equal(ncol(tidy_link), length(levels(house_sub$Sat)) - 1L)
+
+  # compare with raw ordinalNet link prediction
+  house_vars <- model.matrix(
+    Sat ~ Type + Infl + Cont + 0, data = one_row,
+    contrasts.arg = lapply(one_row[, 2:4], contrasts, contrasts = FALSE)
+  )
+  attr(house_vars, "assign") <- NULL
+  attr(house_vars, "contrasts") <- NULL
+  orig_link <- predict(tidy_fit$fit, newx = house_vars, type = "link")
+  orig_link <- tibble::as_tibble(orig_link)
+
+  expect_equal(tidy_link, tibble::as_tibble(orig_link), ignore_attr = TRUE)
 })
 
 # translation & interfaces -----------------------------------------------------

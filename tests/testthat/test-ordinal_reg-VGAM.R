@@ -152,6 +152,37 @@ test_that("probability prediction", {
   expect_equal(orig_pred, tidy_pred)
 })
 
+# prediction: linear predictor -------------------------------------------------
+
+test_that("linear_pred prediction", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("VGAM")
+
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(engine = "vglm") |>
+    fit(Sat ~ Type + Cont, data = house_sub)
+
+  # as in `parsnip::set_pred()`, use `VGAM::predictvglm()` to avoid mis-dispatch
+  # when 'VGAM' is not attached and `predict()` calls `stats::predict()`
+  orig_link <- VGAM::predictvglm(
+    tidy_fit$fit,
+    newdata = house_sub,
+    type = "link"
+  )
+  orig_link <- tibble::as_tibble(orig_link)
+  nl <- length(tidy_fit$lvl)
+  orig_link <- rlang::set_names(orig_link, paste(
+    ".pred_link",
+    tidy_fit$lvl[seq(nl - 1L)], tidy_fit$lvl[seq(2L, nl)],
+    sep = "_"
+  ))
+
+  tidy_link <- predict(tidy_fit, house_sub, type = "linear_pred")
+
+  expect_equal(orig_link, tidy_link)
+})
+
 # translation & interfaces -----------------------------------------------------
 
 test_that("interfaces agree", {

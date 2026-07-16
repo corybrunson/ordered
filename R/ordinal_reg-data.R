@@ -198,6 +198,24 @@ make_ordinal_reg_vglm <- function() {
     )
   )
 
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "vglm",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = predict_VGAM_link_post,
+      func = c(fun = "predict", pkg = "VGAM"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "link"
+        )
+    )
+  )
+
 }
 
 # ------------------------------------------------------------------------------
@@ -336,34 +354,34 @@ make_ordinal_reg_ordinalNet <- function() {
     )
   )
 
-  # # REVIEW: Only {censored} also enables `type = "linear_pred"`. Why is it not
-  # # made available for all GLMs? Would it be useful here?
-  # parsnip::set_pred(
-  #   model = "ordinal_reg",
-  #   eng = "ordinalNet",
-  #   mode = "classification",
-  #   type = "linear_pred",
-  #   value = list(
-  #     pre = NULL,
-  #     post = function(x, object) {
-  #       x <- tibble::as_tibble(x)
-  #       nl <- length(object$lvl)
-  #       x <- set_names(x, paste(
-  #         ".pred_link",
-  #         object$lvl[seq(nl - 1L)], object$lvl[seq(2L, nl)],
-  #         sep = "_"
-  #       ))
-  #       x
-  #     },
-  #     func = c(fun = "predict"),
-  #     args =
-  #       list(
-  #         object = quote(object$fit),
-  #         newx = quote(new_data),
-  #         type = "link"
-  #       )
-  #   )
-  # )
+  # REVIEW: `check_pred_type()` restricts `type = "linear_pred"` to censored
+  # regression. I suggest enabling it for ordinal regression as well.
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "ordinalNet",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        x <- tibble::as_tibble(x)
+        nl <- length(object$lvl)
+        x <- set_names(x, paste(
+          ".pred_link",
+          object$lvl[seq(nl - 1L)], object$lvl[seq(2L, nl)],
+          sep = "_"
+        ))
+        x
+      },
+      func = c(fun = "predict"),
+      args =
+        list(
+          object = quote(object$fit),
+          newx = quote(new_data),
+          type = "link"
+        )
+    )
+  )
 
 }
 
