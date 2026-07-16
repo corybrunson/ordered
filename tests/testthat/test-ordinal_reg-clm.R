@@ -122,17 +122,13 @@ test_that("linear_pred prediction", {
   tidy_fit <- ordinal_reg(engine = "clm") |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
-  # `predict(type = "linear.predictor")` returns `eta1[,j] = alpha_j - eta`
-  # where `eta = X * beta` is the linear predictor (note the minus sign in the
-  # clm parameterization).  Recover `eta` by subtracting the first column of
-  # `eta1` from the first threshold.
   orig_link <- predict(
     tidy_fit$fit,
     newdata = house_sub[, !names(house_sub) %in% "Sat"],
     type = "linear.predictor"
   )
-  orig_link <- tidy_fit$fit$alpha[1] - orig_link$eta1[, 1]
-  orig_pred <- tibble::tibble(.pred_link = unname(orig_link))
+  orig_pred <- tidy_fit$fit$alpha[1] - orig_link$eta1[, 1]
+  orig_pred <- tibble::tibble(.pred_linear_pred = unname(orig_pred))
   tidy_pred <- predict(tidy_fit, house_sub, type = "linear_pred")
   expect_equal(orig_pred, tidy_pred)
 })

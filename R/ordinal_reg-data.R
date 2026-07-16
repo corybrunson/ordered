@@ -205,7 +205,11 @@ make_ordinal_reg_vglm <- function() {
     type = "linear_pred",
     value = list(
       pre = NULL,
-      post = predict_VGAM_link_post,
+      post = function(x, object) {
+        # x = alpha_j + X*beta for each j; negate because engine uses P(Y <= j)
+        beta_x <- coef(object$fit)[1] - x[, 1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
+      },
       func = c(fun = "predict", pkg = "VGAM"),
       args =
         list(
@@ -354,8 +358,6 @@ make_ordinal_reg_ordinalNet <- function() {
     )
   )
 
-  # REVIEW: `check_pred_type()` restricts `type = "linear_pred"` to censored
-  # regression. I suggest enabling it for ordinal regression as well.
   parsnip::set_pred(
     model = "ordinal_reg",
     eng = "ordinalNet",
@@ -364,14 +366,10 @@ make_ordinal_reg_ordinalNet <- function() {
     value = list(
       pre = NULL,
       post = function(x, object) {
-        x <- tibble::as_tibble(x)
-        nl <- length(object$lvl)
-        x <- set_names(x, paste(
-          ".pred_link",
-          object$lvl[seq(nl - 1L)], object$lvl[seq(2L, nl)],
-          sep = "_"
-        ))
-        x
+        # x = alpha_j + X*beta for each j; negate because engine uses P(Y <= j)
+        alpha_1 <- object$fit$coefs[nrow(object$fit$coefs), 1]
+        beta_x <- alpha_1 - x[, 1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(fun = "predict"),
       args =
@@ -491,7 +489,9 @@ make_ordinal_reg_lrm <- function() {
     value = list(
       pre = NULL,
       post = function(x, object) {
-        tibble::tibble(.pred_link = unname(x))
+        # x = alpha_1 + X*beta
+        beta_x <- x - coef(object$fit)[1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(fun = "predict"),
       args =
@@ -612,7 +612,9 @@ make_ordinal_reg_lrm <- function() {
     value = list(
       pre = NULL,
       post = function(x, object) {
-        tibble::tibble(.pred_link = unname(x))
+        # x = alpha_1 + X*beta
+        beta_x <- x - coef(object$fit)[1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
       args =
@@ -854,11 +856,9 @@ make_ordinal_reg_clm <- function() {
         new_data
       },
       post = function(x, object) {
-        # `predict(type = "linear.predictor")` returns `eta1[,j] = alpha_j -
-        # eta` where `eta = X * beta` is the linear predictor. Extract `eta` by
-        # subtracting the first column of `eta1` from the first threshold.
-        eta <- object$fit$alpha[1] - x$eta1[, 1]
-        tibble::tibble(.pred_link = unname(eta))
+        # x$eta1 = alpha_j - X*beta for each j; engine uses P(Y >= j)
+        beta_x <- object$fit$alpha[1] - x$eta1[, 1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(fun = "predict"),
       args =
