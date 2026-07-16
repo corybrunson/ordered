@@ -22,7 +22,7 @@ combinations in the parsnip package that can be used, this package adds:
 - cumulative link (cumulative logit) ordinal regression via
   `MASS::polr()`
 - cumulative link ordinal regression via `ordinal::clm()` ([Christensen,
-  2023](https://cran.uni-muenster.de/web/packages/ordinal/vignettes/clm_article.pdf))
+  2023](https://cran.r-project.org/web/packages/ordinal/vignettes/clm_article.pdf))
 - generalized linear and generalized additive ordinal regression models
   of cumulative link, adjacent categories, continuation ratio, and
   stopping ratio families via `VGAM::vglm()` and `VGAM::vgam()` ([Yee,
