@@ -159,17 +159,6 @@ predict_VGAM_prob_post <- function(x, object) {
   tibble::as_tibble(x)
 }
 
-predict_VGAM_link_post <- function(x, object) {
-  x <- tibble::as_tibble(x)
-  nl <- length(object$lvl)
-  x <- set_names(x, paste(
-    ".pred_link",
-    object$lvl[seq(nl - 1L)], object$lvl[seq(2L, nl)],
-    sep = "_"
-  ))
-  x
-}
-
 #' @export
 predict._vglm <- function(object, new_data, type = NULL, opts = list(), ...) {
   if (! is.null(type) && type == "linear_pred") {

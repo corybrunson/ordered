@@ -179,17 +179,10 @@ test_that("linear_pred prediction", {
     fit(class ~ s(mol_weight) + volume + s(ClogP), data = caco_train)
 
   orig_link <- predict(tidy_fit$fit, newdata = caco_train, type = "link")
-  orig_link <- tibble::as_tibble(orig_link)
-  nl <- length(tidy_fit$lvl)
-  orig_link <- rlang::set_names(orig_link, paste(
-    ".pred_link",
-    tidy_fit$lvl[seq(nl - 1L)], tidy_fit$lvl[seq(2L, nl)],
-    sep = "_"
-  ))
-
-  tidy_link <- predict(tidy_fit, caco_train, type = "linear_pred")
-
-  expect_equal(orig_link, tidy_link)
+  orig_pred <- coef(tidy_fit$fit)[1] - orig_link[, 1]
+  orig_pred <- tibble::tibble(.pred_linear_pred = unname(orig_pred))
+  tidy_pred <- predict(tidy_fit, caco_train, type = "linear_pred")
+  expect_equal(orig_pred, tidy_pred)
 })
 
 # translation & interfaces -----------------------------------------------------

@@ -23,7 +23,7 @@ Engine additions were coordinated with [parsnip PR #1384](https://github.com/tid
 
 ## linear predictions
 
-Linear predictions are enabled for the `clm`, `lrm`, `orm`, `vglm`, and `ordinalNet` ordinal regression engines.
+Linear predictions are enabled for the `clm`, `lrm`, `orm`, `vglm`, and `ordinalNet` ordinal regression engines and for the `vgam` generalized additive model engine.
 They consistently return a single column of linear predictors (without threshold contributions).
 
 ## bug fix

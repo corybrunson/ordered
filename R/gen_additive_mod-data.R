@@ -114,7 +114,10 @@ make_gen_additive_mod_vgam <- function() {
     type = "linear_pred",
     value = list(
       pre = NULL,
-      post = predict_VGAM_link_post,
+      post = function(x, object) {
+        beta_x <- coef(object$fit)[1] - x[, 1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
+      },
       func = c(fun = "predict", pkg = "VGAM"),
       args =
         list(
