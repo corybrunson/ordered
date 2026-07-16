@@ -23,7 +23,7 @@ Description: Bindings, methods, and tuners for using ordinal classification
     in 'ordinalForest'.
 License: MIT + file LICENSE
 Depends: 
-    parsnip (>= 1.5)
+    parsnip (> 1.6.0)
 Imports: 
     cli,
     dials (>= 1.4.3),
