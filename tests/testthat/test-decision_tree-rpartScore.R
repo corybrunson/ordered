@@ -93,10 +93,10 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   odt_spec <-
-    decision_tree() %>%
-    set_mode("classification") %>%
+    decision_tree() |>
+    set_mode("classification") |>
     set_engine("rpartScore")
-  expect_snapshot(odt_spec %>% translate())
+  expect_snapshot(odt_spec |> translate())
 
   expect_no_error({
     set.seed(13)
@@ -126,15 +126,15 @@ test_that("arguments agree", {
 
   odt_def_spec <-
     decision_tree() |>
-    set_mode("classification") %>%
+    set_mode("classification") |>
     set_engine("rpartScore")
-  expect_snapshot(odt_def_spec %>% translate())
+  expect_snapshot(odt_def_spec |> translate())
 
   odt_arg_spec <-
     decision_tree(cost_complexity = .01, tree_depth = 3, min_n = 7) |>
-    set_mode("classification") %>%
+    set_mode("classification") |>
     set_engine("rpartScore", split = "quad", prune = "mr")
-  expect_snapshot(odt_arg_spec %>% translate())
+  expect_snapshot(odt_arg_spec |> translate())
 
   expect_snapshot({
     set.seed(13)

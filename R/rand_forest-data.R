@@ -184,4 +184,138 @@ make_rand_forest_ordinalForest <- function() {
   )
 }
 
+# ------------------------------------------------------------------------------
+# `orf::orf` components
+
+make_rand_forest_orf <- function() {
+
+  parsnip::set_model_engine("rand_forest", "classification", "orf")
+  parsnip::set_dependency(
+    "rand_forest",
+    eng = "orf",
+    pkg = "orf",
+    mode = "classification"
+  )
+  parsnip::set_dependency(
+    "rand_forest",
+    eng = "orf",
+    pkg = "ordered",
+    mode = "classification"
+  )
+
+  # dials provided in {dials}
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "orf",
+    parsnip = "mtry",
+    original = "mtry",
+    func = list(pkg = "dials", fun = "mtry"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "orf",
+    parsnip = "trees",
+    original = "num.trees",
+    func = list(pkg = "dials", fun = "trees"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "orf",
+    parsnip = "min_n",
+    original = "min.node.size",
+    func = list(pkg = "dials", fun = "min_n"),
+    has_submodel = FALSE
+  )
+
+  # engine-specific arguments
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "orf",
+    parsnip = "sample.fraction",
+    original = "sample.fraction",
+    func = list(pkg = "ordered", fun = "sample_fraction"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "orf",
+    parsnip = "honesty",
+    original = "honesty",
+    func = list(pkg = "ordered", fun = "honesty"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "orf",
+    parsnip = "honesty.fraction",
+    original = "honesty.fraction",
+    func = list(pkg = "ordered", fun = "honesty_fraction"),
+    has_submodel = FALSE
+  )
+
+  # Fit information
+  parsnip::set_fit(
+    model = "rand_forest",
+    eng = "orf",
+    mode = "classification",
+    value = list(
+      interface = "data.frame",
+      data = c(x = "X", y = "Y"),
+      protect = c("X", "Y"),
+      func = c(pkg = "ordered", fun = "orf_wrapper"),
+      defaults = list()
+    )
+  )
+
+  parsnip::set_encoding(
+    model = "rand_forest",
+    eng = "orf",
+    mode = "classification",
+    options = list(
+      predictor_indicators = "traditional",
+      compute_intercept = FALSE,
+      remove_intercept = TRUE,
+      allow_sparse_x = FALSE
+    )
+  )
+
+  parsnip::set_pred(
+    model = "rand_forest",
+    eng = "orf",
+    mode = "classification",
+    type = "class",
+    value = list(
+      pre = NULL,
+      post = orf_class_post,
+      func = c(fun = "predict"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "class"
+        )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "rand_forest",
+    eng = "orf",
+    mode = "classification",
+    type = "prob",
+    value = list(
+      pre = NULL,
+      post = orf_prob_post,
+      func = c(fun = "predict"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "probs"
+        )
+    )
+  )
+}
+
 # nocov end

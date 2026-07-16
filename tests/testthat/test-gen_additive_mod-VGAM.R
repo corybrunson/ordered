@@ -129,7 +129,9 @@ test_that("class prediction", {
   tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
     fit(class ~ s(mol_weight) + volume + s(ClogP), data = caco_train)
 
-  orig_pred <- predict(tidy_fit$fit, newdata = caco_train, type = "response")
+  orig_pred <- VGAM::predict(
+    tidy_fit$fit, newdata = caco_train, type = "response"
+  )
   orig_pred <- apply(orig_pred, 1L, which.max)
   orig_pred <- ordered(tidy_fit$lvl[orig_pred], tidy_fit$lvl)
   orig_pred <- tibble::tibble(.pred_class = orig_pred)
@@ -152,7 +154,9 @@ test_that("probability prediction", {
   tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
     fit(class ~ mol_weight + s(volume) + s(ClogP), data = caco_train)
 
-  orig_pred <- predict(tidy_fit$fit, newdata = caco_train, type = "response")
+  orig_pred <- VGAM::predict(
+    tidy_fit$fit, newdata = caco_train, type = "response"
+  )
   orig_pred <- tibble::as_tibble(orig_pred)
   names(orig_pred) <- paste0(".pred_", names(orig_pred))
 
@@ -168,10 +172,10 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
-    gen_additive_mod() %>%
-    set_mode("classification") %>%
+    gen_additive_mod() |>
+    set_mode("classification") |>
     set_engine("vgam")
-  expect_snapshot(onet_spec %>% translate())
+  expect_snapshot(onet_spec |> translate())
 
   expect_no_error({
     set.seed(13)
@@ -201,10 +205,10 @@ test_that("arguments agree", {
 
   onet_arg_spec <-
     gen_additive_mod() |>
-    set_mode("classification") %>%
-    set_engine("vgam") %>%
+    set_mode("classification") |>
+    set_engine("vgam") |>
     set_args(link = "cloglog", family = "stopping")
-  expect_snapshot(onet_arg_spec %>% translate())
+  expect_snapshot(onet_arg_spec |> translate())
 
   expect_snapshot({
     set.seed(13)

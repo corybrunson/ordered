@@ -1,7 +1,7 @@
 # interfaces agree
 
     Code
-      olpr_spec %>% translate()
+      translate(olpr_spec)
     Output
       Ordinal Regression Model Specification (classification)
       
@@ -55,7 +55,7 @@
 # arguments agree
 
     Code
-      olpr_arg_spec %>% translate()
+      translate(olpr_arg_spec)
     Output
       Ordinal Regression Model Specification (classification)
       

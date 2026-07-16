@@ -1,7 +1,7 @@
 # interfaces agree
 
     Code
-      onet_spec %>% translate()
+      translate(onet_spec)
     Output
       GAM Model Specification (classification)
       
@@ -48,7 +48,7 @@
 # arguments agree
 
     Code
-      onet_arg_spec %>% translate()
+      translate(onet_arg_spec)
     Output
       GAM Model Specification (classification)
       

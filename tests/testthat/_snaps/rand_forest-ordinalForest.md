@@ -1,7 +1,7 @@
 # interfaces agree
 
     Code
-      orf_spec %>% translate()
+      translate(orf_spec)
     Output
       Random Forest Model Specification (classification)
       
@@ -61,7 +61,7 @@
 # arguments agree
 
     Code
-      orf_arg_spec %>% translate()
+      translate(orf_arg_spec)
     Output
       Random Forest Model Specification (classification)
       

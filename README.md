@@ -21,6 +21,8 @@ combinations in the parsnip package that can be used, this package adds:
 
 - cumulative link (cumulative logit) ordinal regression via
   `MASS::polr()`
+- cumulative link ordinal regression via `ordinal::clm()` ([Christensen,
+  2023](https://cran.r-project.org/web/packages/ordinal/vignettes/clm_article.pdf))
 - generalized linear and generalized additive ordinal regression models
   of cumulative link, adjacent categories, continuation ratio, and
   stopping ratio families via `VGAM::vglm()` and `VGAM::vgam()` ([Yee,
@@ -29,11 +31,19 @@ combinations in the parsnip package that can be used, this package adds:
   adjacent categories, continuation ratio, and stopping ratio families
   via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz,
   2021](https://doi.org/10.18637/jss.v099.i06))
+- regularized cumulative probability ordinal regression models via
+  `rms::lrm()` and `rms::orm()` ([Harrell,
+  2015](https://doi.org/10.1007/978-3-319-19425-7))
+- regularized elastic net continuation ratio ordinal regression via
+  `glmnetcr::glmnetcr()` ([Archer and Williams,
+  2012](https://doi.org/10.1002/sim.4484))
 - ordinal classification trees via `rpartScore::rpartScore()`
   ([Galimberti, Soffritti, and Di Maso,
   2012](https://doi.org/10.18637/jss.v047.i10))
 - latent variable ordinal forests via `ordinalForest::ordfor()`
   ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
+- conditional probability ordered forests via `orf::orf()` ([Lechner and
+  Okasa, 2025](https://doi.org/10.1007/s00181-024-02646-4))
 
 More will be added.
 
@@ -83,7 +93,12 @@ predictions of `type = "class"` and `type = "prob"` are supported.
 | `ordinal_reg`      | `polr`          | ✔     | ✔    |
 | `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    |
 | `ordinal_reg`      | `vglm`          | ✔     | ✔    |
+| `ordinal_reg`      | `clm`           | ✔     | ✔    |
+| `ordinal_reg`      | `lrm`           | ✔     | ✔    |
+| `ordinal_reg`      | `orm`           | ✔     | ✔    |
+| `ordinal_reg`      | `glmnetcr`      | ✔     | ✔    |
 | `rand_forest`      | `ordinalForest` | ✔     | ✔    |
+| `rand_forest`      | `orf`           | ✔     | ✔    |
 
 ## Example
 

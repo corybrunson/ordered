@@ -1,0 +1,70 @@
+# interfaces agree
+
+    Code
+      translate(clm_spec)
+    Output
+      Ordinal Regression Model Specification (classification)
+      
+      Computational engine: clm 
+      
+      Model fit template:
+      ordinal::clm(formula = missing_arg(), data = missing_arg(), weights = missing_arg())
+
+---
+
+    Code
+      clm_f_fit
+    Output
+      parsnip model object
+      
+      formula: class ~ mol_weight + volume + ClogP
+      data:    data
+      
+       link  threshold nobs logLik AIC    niter max.grad cond.H 
+       logit flexible  54   -53.45 116.90 4(0)  3.60e-08 6.9e+07
+      
+      Coefficients:
+      mol_weight     volume      ClogP 
+       -0.012801   0.003473   0.006768 
+      
+      Threshold coefficients:
+          L|M     M|H 
+      -2.0509 -0.3989 
+
+---
+
+    Code
+      clm_xy_fit
+    Output
+      parsnip model object
+      
+      formula: ..y ~ mol_weight + volume + ClogP
+      data:    data
+      
+       link  threshold nobs logLik AIC    niter max.grad cond.H 
+       logit flexible  54   -53.45 116.90 4(0)  3.60e-08 6.9e+07
+      
+      Coefficients:
+      mol_weight     volume      ClogP 
+       -0.012801   0.003473   0.006768 
+      
+      Threshold coefficients:
+          L|M     M|H 
+      -2.0509 -0.3989 
+
+# arguments agree
+
+    Code
+      translate(clm_arg_spec)
+    Output
+      Ordinal Regression Model Specification (classification)
+      
+      Main Arguments:
+        ordinal_link = probit
+      
+      Computational engine: clm 
+      
+      Model fit template:
+      ordinal::clm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(), 
+          link = "probit")
+

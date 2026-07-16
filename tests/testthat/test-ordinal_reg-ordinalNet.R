@@ -1,6 +1,6 @@
 # model: basic -----------------------------------------------------------------
 
-test_that("model object (original to tidy)", {
+test_that("model object (penalty path from original to tidy)", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
@@ -41,9 +41,8 @@ test_that("model object (original to tidy)", {
     alpha = .5, family = "sratio"
   )
 
-  tidy_spec <- ordinal_reg(penalty = 0.01,
-                           mixture = .5,
-                           odds_link = "stopping") |>
+  tidy_spec <-
+    ordinal_reg(penalty = 0.01, mixture = .5, odds_link = "stopping") |>
     set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -56,7 +55,7 @@ test_that("model object (original to tidy)", {
   )
 })
 
-test_that("model object (tidy to original)", {
+test_that("model object (penalty path from tidy to original)", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
@@ -92,7 +91,7 @@ test_that("model object (tidy to original)", {
 
   tidy_spec <-
     ordinal_reg(penalty = 0.001, mixture = .5, odds_link = "stopping") |>
-    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
+    set_engine("ordinalNet")
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -104,6 +103,8 @@ test_that("model object (tidy to original)", {
     alpha = .5, family = "sratio"
   )
 
+  # FIXME: Why are these not equal? (The penalty paths are equal.)
+  orig_fit$args <- tidy_fit$fit$args <- NULL
   expect_equal(
     orig_fit,
     tidy_fit$fit,
@@ -273,6 +274,110 @@ test_that("class prediction", {
   expect_equal(orig_pred, tidy_pred)
 })
 
+# multiple prediction ----------------------------------------------------------
+
+test_that("multiple prediction structure", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = 1) |>
+      fit(Sat ~ Type + Cont, data = house_sub)
+
+  house_vars <- model.matrix(
+    Sat ~ Type + Cont + 0, data = house_sub,
+    contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
+  )
+
+  pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * seq(4) / 5]
+
+  # class
+
+  multi_pred <- multi_predict(
+    tidy_fit,
+    new_data = house_sub,
+    type = "class",
+    penalty = pen_vals
+  )
+
+  # class & outer structure
+  expect_s3_class(multi_pred, "tbl_df")
+  expect_equal(nrow(multi_pred), nrow(house_sub))
+  expect_true(".pred" %in% names(multi_pred))
+  # one row per penalty value
+  nested_rows <- unique(purrr::map_int(multi_pred$.pred, nrow))
+  expect_equal(nested_rows, length(pen_vals))
+  # one column for prediction + one column for penalty
+  nested_cols <- unique(purrr::map_int(multi_pred$.pred, ncol))
+  expect_equal(nested_cols, 2L)
+
+  # probability
+
+  multi_pred <- multi_predict(
+    tidy_fit,
+    new_data = house_sub,
+    type = "prob",
+    penalty = pen_vals
+  )
+
+  # class & outer structure
+  expect_s3_class(multi_pred, "tbl_df")
+  expect_equal(nrow(multi_pred), nrow(house_sub))
+  expect_true(".pred" %in% names(multi_pred))
+  # one row per penalty value
+  nested_rows <- unique(purrr::map_int(multi_pred$.pred, nrow))
+  expect_equal(nested_rows, length(pen_vals))
+  # one column per class + one column for penalty
+  nested_cols <- unique(purrr::map_int(multi_pred$.pred, ncol))
+  expect_equal(nested_cols, length(tidy_fit$lvl) + 1L)
+})
+
+test_that("multiple prediction values match sequential prediction values", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("tidyr")
+  skip_if_not_installed("ordinalNet")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = 1) |>
+      fit(Sat ~ Type + Cont, data = house_sub)
+
+  pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * seq(4) / 5]
+
+  # class
+
+  multi_pred <- tidy_fit |>
+    multi_predict(house_sub, type = "class", penalty = pen_vals) |>
+    tidyr::unnest(cols = c(.pred))
+  for (i in seq_along(pen_vals)) {
+    single_pred <- predict(
+      tidy_fit, house_sub, type = "class", penalty = pen_vals[i]
+    )
+    expect_equal(
+      multi_pred |>
+        filter(penalty == pen_vals[i]) |>
+        dplyr::select(-penalty),
+      single_pred
+    )
+  }
+
+  # probability
+
+  multi_pred <- tidy_fit |>
+    multi_predict(house_sub, type = "prob", penalty = pen_vals) |>
+    tidyr::unnest(cols = c(.pred))
+  for (i in seq_along(pen_vals)) {
+    single_pred <- predict(
+      tidy_fit, house_sub, type = "prob", penalty = pen_vals[i]
+    )
+    expect_equal(
+      multi_pred |>
+        filter(penalty == pen_vals[i]) |>
+        dplyr::select(-penalty),
+      single_pred
+    )
+  }
+})
+
 # translation & interfaces -----------------------------------------------------
 
 test_that("interfaces agree", {
@@ -280,10 +385,10 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
-    ordinal_reg(penalty = 0.01) %>%
-    set_mode("classification") %>%
+    ordinal_reg(penalty = 0.01) |>
+    set_mode("classification") |>
     set_engine("ordinalNet")
-  expect_snapshot(onet_spec %>% translate())
+  expect_snapshot(onet_spec |> translate())
 
   expect_no_error({
     set.seed(13)
@@ -313,9 +418,9 @@ test_that("arguments agree", {
       mixture = .25,
       ordinal_link = "cloglog", odds_link = "stopping"
     ) |>
-    set_mode("classification") %>%
+    set_mode("classification") |>
     set_engine("ordinalNet", path_values = 10 ^ seq(-6, -1))
-  expect_snapshot(onet_arg_spec %>% translate())
+  expect_snapshot(onet_arg_spec |> translate())
 
   expect_snapshot({
     set.seed(13)

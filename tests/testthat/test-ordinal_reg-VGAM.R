@@ -159,10 +159,10 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
-    ordinal_reg() %>%
-    set_mode("classification") %>%
+    ordinal_reg() |>
+    set_mode("classification") |>
     set_engine("vglm")
-  expect_snapshot(onet_spec %>% translate())
+  expect_snapshot(onet_spec |> translate())
 
   expect_no_error({
     set.seed(13)
@@ -194,9 +194,9 @@ test_that("arguments agree", {
     ordinal_reg(
       ordinal_link = "cloglog", odds_link = "stopping"
     ) |>
-    set_mode("classification") %>%
+    set_mode("classification") |>
     set_engine("vglm")
-  expect_snapshot(onet_arg_spec %>% translate())
+  expect_snapshot(onet_arg_spec |> translate())
 
   expect_snapshot({
     set.seed(13)
