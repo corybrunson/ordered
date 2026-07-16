@@ -7,10 +7,10 @@
 .onLoad <- function(libname, pkgname) {
   # `ordinal_reg`
   make_ordinal_reg_polr()
-  make_ordinal_reg_ordinalNet()
-  make_ordinal_reg_vglm()
   make_ordinal_reg_clm()
   make_ordinal_reg_lrm()
+  make_ordinal_reg_vglm()
+  make_ordinal_reg_ordinalNet()
   make_ordinal_reg_glmnetcr()
   # `gen_additive_mod`
   make_gen_additive_mod_vgam()
