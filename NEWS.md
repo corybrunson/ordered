@@ -2,16 +2,24 @@
 
 ## additional engines
 
-**TODO:** Coordinated additions to **parsnip** are required.
-
 This version introduces source code and unit tests for new engines:
+* `clm` from the **ordinal** package
+  - cumulative link ordinal regression
+  - additional `ordinal_link` dial values
+  - dial for `threshold` argument
 * `lrm` and `orm` from the **rms** package
   - regularized cumulative probability ordinal regression
+  - shared prediction wrapper
 * `glmnetcr` from the **glmnetcr** package
   - elastic net regularized continuation ratio models
   - penalty paths handled as with `ordinalNet`
+  - prediction wrapper
 * `orf` from the **orf** package
-  - ordered random forests
+  - conditional probability ordered random forests
+  - fit wrapper
+  - dials for `sample.fraction`, `honesty`, and `honesty.fraction` arguments
+
+Engine additions were coordinated with [parsnip PR #1384](https://github.com/tidymodels/parsnip/pull/1384).
 
 ## bug fix
 
