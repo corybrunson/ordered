@@ -45,16 +45,17 @@ combinations in the parsnip package that can be used, this package adds:
 - conditional probability ordered forests via `orf::orf()` ([Lechner and
   Okasa, 2025](https://doi.org/10.1007/s00181-024-02646-4))
 
-More will be added.
-
-There are some existing features in tidymodels packages that are useful
-for ordinal outcomes:
+Some features in other tidymodels packages are useful for ordinal
+outcomes:
 
 - The [partykit](https://cran.r-project.org/package=partykit) engines
-  for `parsnip::decision_tree()` and `parsnip::rand_forest()` use the
-  ordered nature of the factors to train the model.
-- The yardstick package has `yardstick::kap()` for weighted and
-  unweighted Kappa statistics (the former being of more interest). Also,
+  for `parsnip::decision_tree()` and `parsnip::rand_forest()`, provided
+  by [bonsai](https://bonsai.tidymodels.org/), use the ordinal nature of
+  ordered factors to train the model, yielding different fits than for
+  unordered factors.
+- The [yardstick](https://yardstick.tidymodels.org/) package has
+  `yardstick::kap()` for weighted and unweighted Kappa statistics (the
+  former being of more interest). Also,
   `yardstick::classification_cost()` can utilize more complex cost
   structures and uses the class probabilities for estimation.
 
@@ -86,19 +87,19 @@ ordered provides new engines for several models, including all engines
 for `ordinal_reg()`, as summarized in the table. Currently only
 predictions of `type = "class"` and `type = "prob"` are supported.
 
-| model              | engine          | class | prob |
-|:-------------------|:----------------|:------|:-----|
-| `decision_tree`    | `rpartScore`    | ✔     | ✖    |
-| `gen_additive_mod` | `vgam`          | ✔     | ✔    |
-| `ordinal_reg`      | `polr`          | ✔     | ✔    |
-| `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    |
-| `ordinal_reg`      | `vglm`          | ✔     | ✔    |
-| `ordinal_reg`      | `clm`           | ✔     | ✔    |
-| `ordinal_reg`      | `lrm`           | ✔     | ✔    |
-| `ordinal_reg`      | `orm`           | ✔     | ✔    |
-| `ordinal_reg`      | `glmnetcr`      | ✔     | ✔    |
-| `rand_forest`      | `ordinalForest` | ✔     | ✔    |
-| `rand_forest`      | `orf`           | ✔     | ✔    |
+| model              | engine          | class | prob | linear_pred |
+|:-------------------|:----------------|:------|:-----|:------------|
+| `decision_tree`    | `rpartScore`    | ✔     | ✖    | ✖           |
+| `gen_additive_mod` | `vgam`          | ✔     | ✔    | ✔           |
+| `ordinal_reg`      | `polr`          | ✔     | ✔    | ✖           |
+| `ordinal_reg`      | `clm`           | ✔     | ✔    | ✔           |
+| `ordinal_reg`      | `lrm`           | ✔     | ✔    | ✔           |
+| `ordinal_reg`      | `orm`           | ✔     | ✔    | ✔           |
+| `ordinal_reg`      | `vglm`          | ✔     | ✔    | ✔           |
+| `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    | ✔           |
+| `ordinal_reg`      | `glmnetcr`      | ✔     | ✔    | ✖           |
+| `rand_forest`      | `ordinalForest` | ✔     | ✔    | ✖           |
+| `rand_forest`      | `orf`           | ✔     | ✔    | ✖           |
 
 ## Example
 
@@ -157,3 +158,8 @@ By contributing to this project, you agree to abide by its terms.
 To voice support for or volunteer to contribute additional engines,
 please comment on [this
 issue](https://github.com/corybrunson/ordered/issues/15).
+
+## Acknowledgments
+
+Jason Cory Brunson was supported in part by [NIH/NIDCD
+R01DC022733](https://reporter.nih.gov/search/oglGXI8zaU2b_BVRqwNHEA/project-details/11122743).
