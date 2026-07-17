@@ -219,6 +219,7 @@ make_ordinal_reg_ordinalNet <- function() {
     mode = "classification"
   )
 
+  # dials provided in {dials}
   parsnip::set_model_arg(
     model = "ordinal_reg",
     eng = "ordinalNet",
@@ -251,6 +252,16 @@ make_ordinal_reg_ordinalNet <- function() {
     parsnip = "odds_link",
     original = "family",
     func = list(pkg = "dials", fun = "odds_link"),
+    has_submodel = FALSE
+  )
+
+  # engine-specific arguments
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "ordinalNet",
+    parsnip = "parallelPenaltyFactor",
+    original = "parallelPenaltyFactor",
+    func = list(pkg = "ordered", fun = "parallel_penalty_factor"),
     has_submodel = FALSE
   )
 

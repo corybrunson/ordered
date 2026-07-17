@@ -1,3 +1,8 @@
+test_that("ordinalNet::ordinalNet dial customization", {
+  expect_equal(parallel_penalty_factor(range = c(-2, 2))$range,
+               list(lower = -2, upper = 2))
+})
+
 test_that("rpartScore::rpartScore dial customization", {
   expect_equal(split_func(letters[1:3])$values, letters[1:3])
   expect_equal(prune_func(letters[1:3])$values, letters[1:3])
