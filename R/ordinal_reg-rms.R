@@ -32,23 +32,3 @@ predict_lrm_wrapper <- function(object, newdata, type, ...) {
   }
   stats::predict(object, newdata = newdata, type = type, ...)
 }
-
-#' @export
-predict._lrm <- function(object, new_data, type = NULL, opts = list(), ...) {
-  if (! is.null(type) && type == "linear_pred") {
-    return(predict_linear_pred(object, new_data = new_data, ...))
-  }
-  predict.model_fit(
-    object, new_data = new_data, type = type, opts = opts, ...
-  )
-}
-
-#' @export
-predict._orm <- function(object, new_data, type = NULL, opts = list(), ...) {
-  if (! is.null(type) && type == "linear_pred") {
-    return(predict_linear_pred(object, new_data = new_data, ...))
-  }
-  predict.model_fit(
-    object, new_data = new_data, type = type, opts = opts, ...
-  )
-}
