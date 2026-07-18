@@ -165,6 +165,26 @@ test_that("probability prediction", {
   expect_equal(orig_pred, tidy_pred)
 })
 
+# prediction: linear predictor -------------------------------------------------
+
+test_that("linear_pred prediction", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("VGAM")
+  skip_if_not_installed("QSARdata")
+
+  # for `s()` and friends in GAM formula
+  suppressPackageStartupMessages(library(VGAM))
+
+  tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
+    fit(class ~ s(mol_weight) + volume + s(ClogP), data = caco_train)
+
+  orig_link <- predict(tidy_fit$fit, newdata = caco_train, type = "link")
+  orig_pred <- coef(tidy_fit$fit)[1] - orig_link[, 1]
+  orig_pred <- tibble::tibble(.pred_linear_pred = unname(orig_pred))
+  tidy_pred <- predict(tidy_fit, caco_train, type = "linear_pred")
+  expect_equal(orig_pred, tidy_pred)
+})
+
 # translation & interfaces -----------------------------------------------------
 
 test_that("interfaces agree", {

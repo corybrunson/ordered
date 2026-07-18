@@ -21,6 +21,11 @@ This version introduces source code and unit tests for new engines:
 
 Engine additions were coordinated with [parsnip PR #1384](https://github.com/tidymodels/parsnip/pull/1384).
 
+## linear predictions
+
+Linear predictions are enabled for the `clm`, `lrm`, `orm`, `vglm`, and `ordinalNet` ordinal regression engines and for the `vgam` generalized additive model engine.
+They consistently return a single column of linear predictors (without threshold contributions).
+
 ## bug fix
 
 A bug in the prediction of `vglm` models, and associated tests, were patched.

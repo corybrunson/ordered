@@ -113,6 +113,27 @@ test_that("probability prediction", {
   expect_equal(orig_pred, tidy_pred)
 })
 
+# prediction: linear_pred ------------------------------------------------------
+
+test_that("linear_pred prediction", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinal")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(engine = "clm") |>
+    fit(Sat ~ Type + Cont, data = house_sub)
+
+  orig_link <- predict(
+    tidy_fit$fit,
+    newdata = house_sub[, !names(house_sub) %in% "Sat"],
+    type = "linear.predictor"
+  )
+  orig_pred <- tidy_fit$fit$alpha[1] - orig_link$eta1[, 1]
+  orig_pred <- tibble::tibble(.pred_linear_pred = unname(orig_pred))
+  tidy_pred <- predict(tidy_fit, house_sub, type = "linear_pred")
+  expect_equal(orig_pred, tidy_pred)
+})
+
 # translation & interfaces -----------------------------------------------------
 
 test_that("interfaces agree", {
