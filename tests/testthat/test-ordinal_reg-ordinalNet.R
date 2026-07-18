@@ -278,11 +278,12 @@ test_that("class prediction", {
 
 test_that("multiple prediction structure", {
   skip_if_not_installed("MASS")
+  skip_if_not_installed("tidyr")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = 1) |>
-      fit(Sat ~ Type + Cont, data = house_sub)
+    fit(Sat ~ Type + Cont, data = house_sub)
 
   house_vars <- model.matrix(
     Sat ~ Type + Cont + 0, data = house_sub,
@@ -334,12 +335,11 @@ test_that("multiple prediction structure", {
 
 test_that("multiple prediction values match sequential prediction values", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("tidyr")
   skip_if_not_installed("ordinalNet")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "ordinalNet", penalty = 1) |>
-      fit(Sat ~ Type + Cont, data = house_sub)
+    fit(Sat ~ Type + Cont, data = house_sub)
 
   pen_vals <- tidy_fit$fit$lambda[length(tidy_fit$fit$lambda) * seq(4) / 5]
 
@@ -376,6 +376,27 @@ test_that("multiple prediction values match sequential prediction values", {
       single_pred
     )
   }
+})
+
+# prediction: linear_pred ------------------------------------------------------
+
+test_that("linear_pred prediction", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- ordinal_reg(penalty = 0.01, engine = "ordinalNet") |>
+  fit(Sat ~ Type + Infl + Cont, data = house_sub)
+
+  house_vars <- model.matrix(
+    Sat ~ Type + Infl + Cont + 0, data = house_sub,
+    contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
+  )
+  orig_link <- predict(tidy_fit$fit, newx = house_vars, type = "link")
+  orig_pred <- tidy_fit$fit$coefs[nrow(tidy_fit$fit$coefs), 1] - orig_link[, 1]
+  orig_pred <- tibble::tibble(.pred_linear_pred = unname(orig_pred))
+  tidy_pred <- predict(tidy_fit, house_sub, type = "linear_pred")
+  expect_equal(orig_pred, tidy_pred)
 })
 
 # translation & interfaces -----------------------------------------------------

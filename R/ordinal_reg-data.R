@@ -198,6 +198,28 @@ make_ordinal_reg_vglm <- function() {
     )
   )
 
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "vglm",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        # x = alpha_j + X*beta for each j; negate because engine uses P(Y <= j)
+        beta_x <- coef(object$fit)[1] - x[, 1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
+      },
+      func = c(fun = "predict", pkg = "VGAM"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "link"
+        )
+    )
+  )
+
 }
 
 # ------------------------------------------------------------------------------
@@ -336,34 +358,28 @@ make_ordinal_reg_ordinalNet <- function() {
     )
   )
 
-  # # REVIEW: Only {censored} also enables `type = "linear_pred"`. Why is it not
-  # # made available for all GLMs? Would it be useful here?
-  # parsnip::set_pred(
-  #   model = "ordinal_reg",
-  #   eng = "ordinalNet",
-  #   mode = "classification",
-  #   type = "linear_pred",
-  #   value = list(
-  #     pre = NULL,
-  #     post = function(x, object) {
-  #       x <- tibble::as_tibble(x)
-  #       nl <- length(object$lvl)
-  #       x <- set_names(x, paste(
-  #         ".pred_link",
-  #         object$lvl[seq(nl - 1L)], object$lvl[seq(2L, nl)],
-  #         sep = "_"
-  #       ))
-  #       x
-  #     },
-  #     func = c(fun = "predict"),
-  #     args =
-  #       list(
-  #         object = quote(object$fit),
-  #         newx = quote(new_data),
-  #         type = "link"
-  #       )
-  #   )
-  # )
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "ordinalNet",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        # x = alpha_j + X*beta for each j; negate because engine uses P(Y <= j)
+        alpha_1 <- object$fit$coefs[nrow(object$fit$coefs), 1]
+        beta_x <- alpha_1 - x[, 1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
+      },
+      func = c(fun = "predict"),
+      args =
+        list(
+          object = quote(object$fit),
+          newx = quote(new_data),
+          type = "link"
+        )
+    )
+  )
 
 }
 
@@ -465,25 +481,27 @@ make_ordinal_reg_lrm <- function() {
     )
   )
 
-  # parsnip::set_pred(
-  #   model = "ordinal_reg",
-  #   eng = "lrm",
-  #   mode = "classification",
-  #   type = "linear_pred",
-  #   value = list(
-  #     pre = NULL,
-  #     post = function(x, object) {
-  #       tibble::tibble(.pred_link = unname(x))
-  #     },
-  #     func = c(fun = "predict"),
-  #     args =
-  #       list(
-  #         object = quote(object$fit),
-  #         newdata = quote(new_data),
-  #         type = "lp"
-  #       )
-  #   )
-  # )
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "lrm",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        # x = alpha_1 + X*beta
+        beta_x <- x - coef(object$fit)[1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
+      },
+      func = c(fun = "predict"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "lp"
+        )
+    )
+  )
 
   # ----------------------------------------------------------------------------
   # `rms::orm` components
@@ -582,6 +600,28 @@ make_ordinal_reg_lrm <- function() {
           object = quote(object$fit),
           newdata = quote(new_data),
           type = "fitted.ind"
+        )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "orm",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        # x = alpha_1 + X*beta
+        beta_x <- x - coef(object$fit)[1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
+      },
+      func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "lp"
         )
     )
   )
@@ -798,6 +838,34 @@ make_ordinal_reg_clm <- function() {
           object = quote(object$fit),
           newdata = quote(new_data),
           type = "prob"
+        )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "clm",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = function(new_data, object) {
+        resp <- all.vars(object$fit$terms[[2L]])
+        if (resp %in% names(new_data)) {
+          new_data <- new_data[, !names(new_data) %in% resp, drop = FALSE]
+        }
+        new_data
+      },
+      post = function(x, object) {
+        # x$eta1 = alpha_j - X*beta for each j; engine uses P(Y >= j)
+        beta_x <- object$fit$alpha[1] - x$eta1[, 1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
+      },
+      func = c(fun = "predict"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "linear.predictor"
         )
     )
   )

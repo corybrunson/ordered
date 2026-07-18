@@ -250,6 +250,7 @@ predict._ordinalNet <- function(
     .check_ordinalNet_penalty_predict(penalty, object, multi)
 
   object$spec <- eval_args(object$spec)
+
   predict.model_fit(object, new_data = new_data, type = type, opts = opts, ...)
 }
 

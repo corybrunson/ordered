@@ -107,6 +107,27 @@ make_gen_additive_mod_vgam <- function() {
     )
   )
 
+  parsnip::set_pred(
+    model = "gen_additive_mod",
+    eng = "vgam",
+    mode = "classification",
+    type = "linear_pred",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        beta_x <- coef(object$fit)[1] - x[, 1]
+        tibble::tibble(.pred_linear_pred = unname(beta_x))
+      },
+      func = c(fun = "predict", pkg = "VGAM"),
+      args =
+        list(
+          object = quote(object$fit),
+          newdata = quote(new_data),
+          type = "link"
+        )
+    )
+  )
+
 }
 
 # nocov end
