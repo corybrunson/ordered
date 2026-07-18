@@ -35,14 +35,19 @@ test_that("model object", {
   orig_fit <- VGAM::vglm(
     Sat ~ Type + Infl + Cont,
     # NB: Unused model parameters are ignored without comment.
-    family = VGAM::cratio(link = "probitlink", parallel = TRUE),
+    family = VGAM::cratio(
+      link = "probitlink", parallel = TRUE, Thresh = "symm1"
+    ),
     data = house_sub
   )
 
   tidy_spec <- ordinal_reg() |>
     set_engine("vglm") |>
     set_mode("classification") |>
-    set_args(ordinal_link = "probit", odds_link = "continuation_ratio")
+    set_args(
+      ordinal_link = "probit", odds_link = "continuation_ratio",
+      threshold_structure = "symmetric_median"
+    )
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 

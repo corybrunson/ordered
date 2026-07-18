@@ -29,13 +29,14 @@ test_that("model object", {
     Sat ~ Type + Infl + Cont,
     data = house_sub,
     link = "probit",
-    threshold = "equidistant"
+    threshold = "symmetric"
   )
 
-  tidy_spec <- ordinal_reg() |>
+  tidy_spec <- ordinal_reg(
+    ordinal_link = "probit", threshold_structure = "symmetric_median"
+  ) |>
     set_engine("clm") |>
-    set_mode("classification") |>
-    set_args(ordinal_link = "probit", threshold = "equidistant")
+    set_mode("classification")
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 

@@ -7,8 +7,15 @@
 #' The vector `values_ordinal_link_VGAM` extends the default `ordinal_link`
 #' options encoded in [`dials::values_ordinal_link`] to those accepted by
 #' [`VGAM::vglm()`] and [`VGAM::vgam()`].
+#'
+#' The vector `values_threshold_structure_VGAM` extends the default
+#' `threshold_structure` options encoded in
+#' [`dials::values_threshold_structure`] to those accepted by [`VGAM::vglm()`]
+#' and [`VGAM::vgam()`].
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.
+#' @param Thresh The threshold structure for the cutpoints. See
+#'   [dials::threshold_structure()] for details.
 #' @param ... Additional arguments to pass.
 #' @details Note that `VGAM::vglm()` and `VGAM::vgam()` treat the rows of `data`
 #'   as the units of observation: Compressed `data` with one row per predictor
@@ -24,6 +31,8 @@
 #' @examples
 #' values_ordinal_link_VGAM
 #' dials::ordinal_link(values = values_ordinal_link_VGAM)
+#' values_threshold_structure_VGAM
+#' dials::threshold_structure(values = values_threshold_structure_VGAM)
 
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM")
 #' house_data <-
@@ -31,12 +40,14 @@
 #' # fit wrapper for linear model
 #' ( fit_orig <- VGAM::vglm(
 #'   Sat ~ Type + Infl + Cont,
-#'   family = VGAM::sratio(link = "probitlink", parallel = TRUE),
+#'   family = VGAM::sratio(
+#'     link = "probitlink", parallel = TRUE, Thresh = "symm0"
+#'   ),
 #'   data = house_data
 #' ) )
 #' ( fit_wrap <- VGAM_vglm_wrapper(
 #'   Sat ~ Type + Infl + Cont,
-#'   family = "stopping_ratio", link = "probit",
+#'   family = "stopping_ratio", link = "probit", Thresh = "symmetric_zero",
 #'   data = house_data
 #' ) )
 #' # fit wrapper for additive model
@@ -55,6 +66,7 @@ VGAM_vglm_wrapper <- function(
     formula, data,
     family = "cumulative_link", link = "logistic",
     parallel = TRUE,
+    Thresh = NULL,
     ...
 ) {
   rlang::check_installed("VGAM")
@@ -65,14 +77,27 @@ VGAM_vglm_wrapper <- function(
   # TODO: Ensure that `formula = cbind(...) ~ ...` is disallowed, for this and
   # for other `ordinal_reg()` engines.
 
-  # match and convert odds link options
+  # match and convert model arguments
   family <- match_VGAM_family(family)
   link <- match_VGAM_link(link)
+  Thresh <- match_VGAM_Thresh(Thresh)
+
+  # `acat()` does not support certain link functions
+  if (family == "acat" &&
+      link %in% c("logitlink", "probitlink", "clogloglink")) {
+    cli::cli_abort(
+      c(
+        "The {.val adjacent_categories} family is not compatible with
+         the {.val {link}} link function.",
+        "i" = "Use {.val cauchitlink} or {.val identitylink} instead."
+      )
+    )
+  }
 
   # execute nested call on modified inputs
   family_call <- rlang::call2(
     .fn = family, .ns = "VGAM",
-    link = link, parallel = parallel
+    link = link, parallel = parallel, Thresh = Thresh
   )
   cl <- rlang::call2(
     .fn = "vglm", .ns = "VGAM",
@@ -80,7 +105,7 @@ VGAM_vglm_wrapper <- function(
     family = family_call,
     ...
   )
-  rlang::eval_tidy(cl)
+  suppressWarnings(rlang::eval_tidy(cl))
 }
 
 #' @rdname VGAM_vglm_wrapper
@@ -89,6 +114,7 @@ VGAM_vgam_wrapper <- function(
     formula, data,
     family = "cumulative_link", link = "logistic",
     parallel = TRUE,
+    Thresh = NULL,
     ...
 ) {
   rlang::check_installed("VGAM")
@@ -96,14 +122,27 @@ VGAM_vgam_wrapper <- function(
   # for now, require `parallel` to be logical
   check_logical(parallel)
 
-  # match and convert odds link options
+  # match and convert model arguments
   family <- match_VGAM_family(family)
   link <- match_VGAM_link(link)
+  Thresh <- match_VGAM_Thresh(Thresh)
+
+  # `acat()` does not support certain link functions
+  if (family == "acat" &&
+      link %in% c("logitlink", "probitlink", "clogloglink")) {
+    cli::cli_abort(
+      c(
+        "The {.val adjacent_categories} family is not compatible with
+         the {.val {link}} link function.",
+        "i" = "Use {.val cauchitlink} or {.val identitylink} instead."
+      )
+    )
+  }
 
   # execute nested call on modified inputs
   family_call <- rlang::call2(
     .fn = family, .ns = "VGAM",
-    link = link, parallel = parallel
+    link = link, parallel = parallel, Thresh = Thresh
   )
   cl <- rlang::call2(
     .fn = "vgam", .ns = "VGAM",
@@ -111,7 +150,7 @@ VGAM_vgam_wrapper <- function(
     family = family_call,
     ...
   )
-  rlang::eval_tidy(cl)
+  suppressWarnings(rlang::eval_tidy(cl))
 }
 
 #' @rdname VGAM_vglm_wrapper
@@ -120,6 +159,13 @@ values_ordinal_link_VGAM <- c(
   dials::values_ordinal_link,
   # TODO: Expand to include link functions to other domains than [0,1].
   c("foldsqrt", "logc", "gord", "pord", "nbord")
+)
+
+#' @rdname VGAM_vglm_wrapper
+#' @export
+values_threshold_structure_VGAM <- c(
+  dials::values_threshold_structure,
+  "qnorm"
 )
 
 match_VGAM_family <- function(family) {
@@ -146,6 +192,21 @@ match_VGAM_link <- function(link) {
     )
   }
   paste0(link, "link")
+}
+
+match_VGAM_Thresh <- function(Thresh) {
+  if (is.null(Thresh)) {
+    return(NULL)
+  }
+  Thresh <- match.arg(Thresh, values_threshold_structure_VGAM)
+  switch(
+    Thresh,
+    flexible = "free",
+    symmetric_median = "symm1",
+    symmetric_zero = "symm0",
+    equidistant = "equid",
+    qnorm = "qnorm"
+  )
 }
 
 predict_VGAM_class_post <- function(x, object) {

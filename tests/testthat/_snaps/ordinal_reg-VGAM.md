@@ -21,7 +21,7 @@
       
       Call:
       VGAM::vglm(formula = formula, family = VGAM::cumulative(link = "logitlink", 
-          parallel = TRUE), data = data)
+          parallel = TRUE, Thresh = NULL), data = data)
       
       
       Coefficients:
@@ -42,7 +42,7 @@
       
       Call:
       VGAM::vglm(formula = formula, family = VGAM::cumulative(link = "logitlink", 
-          parallel = TRUE), data = data)
+          parallel = TRUE, Thresh = NULL), data = data)
       
       
       Coefficients:

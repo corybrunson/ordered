@@ -135,6 +135,14 @@ make_ordinal_reg_vglm <- function() {
     func = list(pkg = "dials", fun = "odds_link"),
     has_submodel = FALSE
   )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "vglm",
+    parsnip = "threshold_structure",
+    original = "Thresh",
+    func = list(pkg = "dials", fun = "threshold_structure"),
+    has_submodel = FALSE
+  )
 
   parsnip::set_fit(
     model = "ordinal_reg",
@@ -735,9 +743,9 @@ make_ordinal_reg_clm <- function() {
   parsnip::set_model_arg(
     model = "ordinal_reg",
     eng = "clm",
-    parsnip = "threshold",
+    parsnip = "threshold_structure",
     original = "threshold",
-    func = list(pkg = "ordered", fun = "threshold_structure"),
+    func = list(pkg = "dials", fun = "threshold_structure"),
     has_submodel = FALSE
   )
 

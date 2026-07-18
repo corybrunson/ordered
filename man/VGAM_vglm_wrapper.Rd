@@ -4,6 +4,7 @@
 \alias{VGAM_vglm_wrapper}
 \alias{VGAM_vgam_wrapper}
 \alias{values_ordinal_link_VGAM}
+\alias{values_threshold_structure_VGAM}
 \title{Wrappers for \code{VGAM}}
 \usage{
 VGAM_vglm_wrapper(
@@ -12,6 +13,7 @@ VGAM_vglm_wrapper(
   family = "cumulative_link",
   link = "logistic",
   parallel = TRUE,
+  Thresh = NULL,
   ...
 )
 
@@ -21,15 +23,21 @@ VGAM_vgam_wrapper(
   family = "cumulative_link",
   link = "logistic",
   parallel = TRUE,
+  Thresh = NULL,
   ...
 )
 
 values_ordinal_link_VGAM
+
+values_threshold_structure_VGAM
 }
 \arguments{
 \item{formula}{The formula to pass.}
 
 \item{data}{The data frame to pass.}
+
+\item{Thresh}{The threshold structure for the cutpoints. See
+\code{\link[dials:threshold_structure]{dials::threshold_structure()}} for details.}
 
 \item{...}{Additional arguments to pass.}
 }
@@ -47,6 +55,11 @@ The vector \code{values_ordinal_link_VGAM} extends the default \code{ordinal_lin
 options encoded in \code{\link[dials:values_ordinal_link]{dials::values_ordinal_link}} to those accepted by
 \code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
 
+The vector \code{values_threshold_structure_VGAM} extends the default
+\code{threshold_structure} options encoded in
+\code{\link[dials:values_threshold_structure]{dials::values_threshold_structure}} to those accepted by \code{\link[VGAM:vglm]{VGAM::vglm()}}
+and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
+
 Note that \code{VGAM::vglm()} and \code{VGAM::vgam()} treat the rows of \code{data}
 as the units of observation: Compressed \code{data} with one row per predictor
 set will be understood as having a multinomial-valued outcome; only
@@ -59,18 +72,22 @@ single ordinal outcome column and therefore do not accept the convenient
 \examples{
 values_ordinal_link_VGAM
 dials::ordinal_link(values = values_ordinal_link_VGAM)
+values_threshold_structure_VGAM
+dials::threshold_structure(values = values_threshold_structure_VGAM)
 \dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("VGAM")) withAutoprint(\{ # examplesIf}
 house_data <-
   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
 # fit wrapper for linear model
 ( fit_orig <- VGAM::vglm(
   Sat ~ Type + Infl + Cont,
-  family = VGAM::sratio(link = "probitlink", parallel = TRUE),
+  family = VGAM::sratio(
+    link = "probitlink", parallel = TRUE, Thresh = "symm0"
+  ),
   data = house_data
 ) )
 ( fit_wrap <- VGAM_vglm_wrapper(
   Sat ~ Type + Infl + Cont,
-  family = "stopping_ratio", link = "probit",
+  family = "stopping_ratio", link = "probit", Thresh = "symmetric_zero",
   data = house_data
 ) )
 # fit wrapper for additive model
