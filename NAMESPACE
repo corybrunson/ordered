@@ -2,13 +2,8 @@
 
 S3method(multi_predict,"_glmnetcr")
 S3method(multi_predict,"_ordinalNet")
-S3method(predict,"_clm")
 S3method(predict,"_glmnetcr")
-S3method(predict,"_lrm")
 S3method(predict,"_ordinalNet")
-S3method(predict,"_orm")
-S3method(predict,"_vgam")
-S3method(predict,"_vglm")
 S3method(predict_class,"_glmnetcr")
 S3method(predict_class,"_ordinalNet")
 S3method(predict_classprob,"_glmnetcr")
