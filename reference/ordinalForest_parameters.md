@@ -22,15 +22,11 @@ ord_metric(values = values_ord_metric)
 values_ord_metric
 ```
 
-## Format
-
-An object of class `character` of length 4.
-
 ## Arguments
 
 - values:
 
-  A character string of possible values. See `values_ord_metric`.
+  A character string of possible values.
 
 - range:
 
@@ -55,6 +51,9 @@ An object of S3 parent class `param` and primary class `qual_param` or
 and \[dials::new_quant_param().
 
 ## Details
+
+The vector `values_ord_metric` provides options to the `ord_metric`
+dial.
 
 These functions generate parameters for
 [`parsnip::rand_forest()`](https://parsnip.tidymodels.org/reference/rand_forest.html)
@@ -107,6 +106,8 @@ num_score_trees()
 num_scores_best()
 #> # Top Score Sets (quantitative)
 #> Range: [2, 20]
+values_ord_metric
+#> [1] "equal"        "probability"  "proportional" "oneclass"    
 ord_metric()
 #> Ordinal Performance Function (qualitative)
 #> 4 possible values include:

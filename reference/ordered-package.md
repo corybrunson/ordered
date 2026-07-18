@@ -22,6 +22,9 @@ Useful links:
 
 Authors:
 
+- Jason Cory Brunson <cornelioid@gmail.com>
+  ([ORCID](https://orcid.org/0000-0003-3126-9494))
+
 - Max Kuhn <max@posit.co>
   ([ORCID](https://orcid.org/0000-0003-2402-136X))
 

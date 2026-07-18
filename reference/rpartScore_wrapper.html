@@ -17,7 +17,7 @@ data accordingly."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ordered</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,15 +96,19 @@ to be numeric rather than ordered or factor; the wrapper edits the input
 <span class="r-out co"><span class="r-pr">#&gt;</span> node), split, n, deviance, yval</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       * denotes terminal node</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1) root 336 247 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2) Infl=Low,Medium 262 187 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      4) Type=Apartment,Terrace 172 124 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        8) Infl=Medium 88  60 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        9) Infl=Low 84  56 1  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         18) Type=Apartment 60  43 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         19) Type=Terrace 24   9 1 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      5) Type=Tower,Atrium 90  63 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3) Infl=High 74  38 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1) root 336 245 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2) Infl=High 79  45 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3) Infl=Low,Medium 257 181 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      6) Type=Apartment,Atrium 160 109 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       12) Infl=Low 90  65 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         24) Type=Apartment 65  45 1 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         25) Type=Atrium 25  15 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       13) Infl=Medium 70  44 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      7) Type=Tower,Terrace 97  72 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       14) Type=Tower 56  43 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         28) Cont=Low 32  23 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         29) Cont=High 24  16 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       15) Type=Terrace 41  22 1 *</span>
 <span class="r-in"><span><span class="op">(</span> <span class="va">fit_wrap</span> <span class="op">&lt;-</span> <span class="fu">rpartScore_wrapper</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  formula <span class="op">=</span> <span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>,</span></span>
 <span class="r-in"><span>  data <span class="op">=</span> <span class="va">house_data</span></span></span>
@@ -114,15 +118,19 @@ to be numeric rather than ordered or factor; the wrapper edits the input
 <span class="r-out co"><span class="r-pr">#&gt;</span> node), split, n, deviance, yval</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       * denotes terminal node</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  1) root 336 247 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    2) Infl=Low,Medium 262 187 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      4) Type=Apartment,Terrace 172 124 2  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        8) Infl=Medium 88  60 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        9) Infl=Low 84  56 1  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         18) Type=Apartment 60  43 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         19) Type=Terrace 24   9 1 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      5) Type=Tower,Atrium 90  63 2 *</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    3) Infl=High 74  38 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  1) root 336 245 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    2) Infl=High 79  45 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    3) Infl=Low,Medium 257 181 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      6) Type=Apartment,Atrium 160 109 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       12) Infl=Low 90  65 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         24) Type=Apartment 65  45 1 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         25) Type=Atrium 25  15 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       13) Infl=Medium 70  44 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      7) Type=Tower,Terrace 97  72 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       14) Type=Tower 56  43 2  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         28) Cont=Low 32  23 2 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         29) Cont=High 24  16 3 *</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       15) Type=Terrace 41  22 1 *</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -134,7 +142,7 @@ to be numeric rather than ordered or factor; the wrapper edits the input
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

@@ -24,6 +24,15 @@ Wrappers for Ordinal Classification Engines
 
   Wrappers for `ordinalNet`
 
+- [`predict_glmnetcr_wrapper()`](https://corybrunson.github.io/ordered/reference/predict_glmnetcr_wrapper.md)
+  [`predict(`*`<_glmnetcr>`*`)`](https://corybrunson.github.io/ordered/reference/predict_glmnetcr_wrapper.md)
+  [`predict_class(`*`<_glmnetcr>`*`)`](https://corybrunson.github.io/ordered/reference/predict_glmnetcr_wrapper.md)
+  [`predict_classprob(`*`<_glmnetcr>`*`)`](https://corybrunson.github.io/ordered/reference/predict_glmnetcr_wrapper.md)
+  [`multi_predict(`*`<_glmnetcr>`*`)`](https://corybrunson.github.io/ordered/reference/predict_glmnetcr_wrapper.md)
+  :
+
+  Prediction wrapper for `glmnetcr`
+
 - [`VGAM_vglm_wrapper()`](https://corybrunson.github.io/ordered/reference/VGAM_vglm_wrapper.md)
   [`VGAM_vgam_wrapper()`](https://corybrunson.github.io/ordered/reference/VGAM_vglm_wrapper.md)
   [`values_ordinal_link_VGAM`](https://corybrunson.github.io/ordered/reference/VGAM_vglm_wrapper.md)
@@ -41,9 +50,20 @@ Wrappers for Ordinal Classification Engines
 
   A wrapper for `ordinalForest`
 
+- [`orf_wrapper()`](https://corybrunson.github.io/ordered/reference/orf_wrapper.md)
+  :
+
+  A wrapper for `orf`
+
 ## Parameters
 
 Tunable Engine Parameters
+
+- [`threshold_structure()`](https://corybrunson.github.io/ordered/reference/clm_parameters.md)
+  [`values_ordinal_link_clm`](https://corybrunson.github.io/ordered/reference/clm_parameters.md)
+  :
+
+  Dials for `ordinal` engine parameters
 
 - [`split_func()`](https://corybrunson.github.io/ordered/reference/rpartScore_parameters.md)
   [`prune_func()`](https://corybrunson.github.io/ordered/reference/rpartScore_parameters.md)
@@ -61,3 +81,10 @@ Tunable Engine Parameters
   :
 
   Dials for `ordinalForest` engine parameters
+
+- [`sample_fraction()`](https://corybrunson.github.io/ordered/reference/orf_parameters.md)
+  [`honesty()`](https://corybrunson.github.io/ordered/reference/orf_parameters.md)
+  [`honesty_fraction()`](https://corybrunson.github.io/ordered/reference/orf_parameters.md)
+  :
+
+  Dials for `orf` engine parameters

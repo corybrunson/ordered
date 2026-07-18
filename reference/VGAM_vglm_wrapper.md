@@ -31,10 +31,6 @@ VGAM_vgam_wrapper(
 values_ordinal_link_VGAM
 ```
 
-## Format
-
-An object of class `character` of length 10.
-
 ## Arguments
 
 - formula:
@@ -56,6 +52,13 @@ as returned by [`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html)
 and [`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html).
 
 ## Details
+
+The vector `values_ordinal_link_VGAM` extends the default `ordinal_link`
+options encoded in
+[`dials::values_ordinal_link`](https://dials.tidymodels.org/reference/ordinal_link.html)
+to those accepted by
+[`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
+[`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html).
 
 Note that [`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
 [`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html) treat the rows
