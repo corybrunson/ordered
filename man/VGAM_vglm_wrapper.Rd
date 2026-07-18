@@ -13,6 +13,7 @@ VGAM_vglm_wrapper(
   family = "cumulative_link",
   link = "logistic",
   parallel = TRUE,
+  parallel_reg = NULL,
   Thresh = NULL,
   ...
 )
@@ -23,6 +24,7 @@ VGAM_vgam_wrapper(
   family = "cumulative_link",
   link = "logistic",
   parallel = TRUE,
+  parallel_reg = NULL,
   Thresh = NULL,
   ...
 )
@@ -36,8 +38,8 @@ values_threshold_structure_VGAM
 
 \item{data}{The data frame to pass.}
 
-\item{Thresh}{The threshold structure for the cutpoints. See
-\code{\link[dials:threshold_structure]{dials::threshold_structure()}} for details.}
+\item{Thresh}{The threshold constraints. See \code{\link[dials:threshold_structure]{dials::threshold_structure()}}
+for details.}
 
 \item{...}{Additional arguments to pass.}
 }

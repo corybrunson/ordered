@@ -143,6 +143,14 @@ make_ordinal_reg_vglm <- function() {
     func = list(pkg = "dials", fun = "threshold_structure"),
     has_submodel = FALSE
   )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "vglm",
+    parsnip = "parallel_reg",
+    original = "parallel_reg",
+    func = list(pkg = "dials", fun = "parallel_reg"),
+    has_submodel = FALSE
+  )
 
   parsnip::set_fit(
     model = "ordinal_reg",
@@ -294,6 +302,14 @@ make_ordinal_reg_ordinalNet <- function() {
     func = list(pkg = "ordered", fun = "parallel_penalty_factor"),
     has_submodel = FALSE
   )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "ordinalNet",
+    parsnip = "parallel_reg",
+    original = "parallel_reg",
+    func = list(pkg = "dials", fun = "parallel_reg"),
+    has_submodel = FALSE
+  )
 
   parsnip::set_fit(
     model = "ordinal_reg",
@@ -432,7 +448,6 @@ make_ordinal_reg_lrm <- function() {
     func = list(pkg = "dials", fun = "penalty"),
     has_submodel = FALSE
   )
-
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "lrm",
@@ -555,7 +570,6 @@ make_ordinal_reg_lrm <- function() {
     func = list(pkg = "dials", fun = "penalty"),
     has_submodel = FALSE
   )
-
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "orm",
@@ -682,7 +696,6 @@ make_ordinal_reg_glmnetcr <- function() {
     func = list(pkg = "dials", fun = "mixture"),
     has_submodel = FALSE
   )
-
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "glmnetcr",
@@ -788,6 +801,14 @@ make_ordinal_reg_clm <- function() {
     func = list(pkg = "dials", fun = "threshold_structure"),
     has_submodel = FALSE
   )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "clm",
+    parsnip = "parallel_reg",
+    original = "parallel_reg",
+    func = list(pkg = "dials", fun = "parallel_reg"),
+    has_submodel = FALSE
+  )
 
   parsnip::set_fit(
     model = "ordinal_reg",
@@ -796,7 +817,7 @@ make_ordinal_reg_clm <- function() {
     value = list(
       interface = "formula",
       protect = c("formula", "data", "weights"),
-      func = c(pkg = "ordinal", fun = "clm"),
+      func = c(pkg = "ordered", fun = "clm_wrapper"),
       defaults = list()
     )
   )

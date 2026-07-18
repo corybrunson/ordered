@@ -14,8 +14,8 @@
 #' and [`VGAM::vgam()`].
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.
-#' @param Thresh The threshold structure for the cutpoints. See
-#'   [dials::threshold_structure()] for details.
+#' @param Thresh The threshold constraints. See [dials::threshold_structure()]
+#'   for details.
 #' @param ... Additional arguments to pass.
 #' @details Note that `VGAM::vglm()` and `VGAM::vgam()` treat the rows of `data`
 #'   as the units of observation: Compressed `data` with one row per predictor
@@ -66,13 +66,20 @@ VGAM_vglm_wrapper <- function(
     formula, data,
     family = "cumulative_link", link = "logistic",
     parallel = TRUE,
+    parallel_reg = NULL,
     Thresh = NULL,
     ...
 ) {
   rlang::check_installed("VGAM")
 
-  # for now, require `parallel` to be logical
-  check_logical(parallel)
+  if (! is.null(parallel_reg)) {
+    parallel <- parallel_reg_to_vglm_parallel(parallel_reg, formula)
+  }
+
+  # `parallel` can be logical or formula (VGAM supports both)
+  if (! is.logical(parallel) && ! inherits(parallel, "formula")) {
+    stop_input_type(parallel, "a logical vector or formula")
+  }
 
   # TODO: Ensure that `formula = cbind(...) ~ ...` is disallowed, for this and
   # for other `ordinal_reg()` engines.
@@ -114,13 +121,19 @@ VGAM_vgam_wrapper <- function(
     formula, data,
     family = "cumulative_link", link = "logistic",
     parallel = TRUE,
+    parallel_reg = NULL,
     Thresh = NULL,
     ...
 ) {
   rlang::check_installed("VGAM")
 
-  # for now, require `parallel` to be logical
-  check_logical(parallel)
+  if (! is.null(parallel_reg)) {
+    parallel <- parallel_reg_to_vglm_parallel(parallel_reg, formula)
+  }
+  # `parallel` can be logical or formula (VGAM supports both)
+  if (! is.logical(parallel) && ! inherits(parallel, "formula")) {
+    stop_input_type(parallel, "a logical vector or formula")
+  }
 
   # match and convert model arguments
   family <- match_VGAM_family(family)
@@ -218,4 +231,107 @@ predict_VGAM_class_post <- function(x, object) {
 predict_VGAM_prob_post <- function(x, object) {
   colnames(x) <- object$lvl
   tibble::as_tibble(x)
+}
+
+# ------------------------------------------------------------------------------
+
+#' Translate `parallel_reg` to VGAM `parallel` argument
+#'
+#' @param parallel_reg A parallel regression specification.
+#' @param formula The model formula (used to extract predictor names for list
+#'   forms).
+#' @keywords internal
+#' @returns A logical or formula suitable for the `parallel` argument of VGAM
+#'   family functions.
+parallel_reg_to_vglm_parallel <- function(parallel_reg, formula) {
+  # single logical
+  if (is.logical(parallel_reg) && length(parallel_reg) == 1L) {
+    return(parallel_reg)
+  }
+
+  # single formula
+  # TRUE  ~ vars → TRUE  ~ -1 + vars
+  # FALSE ~ vars → FALSE ~  1 + vars
+  if (inherits(parallel_reg, "formula")) {
+    return(formula_to_vglm_parallel(parallel_reg))
+  }
+
+  # list
+  if (is.list(parallel_reg)) {
+    return(list_to_vglm_parallel(parallel_reg, formula))
+  }
+
+  cli::cli_abort("Invalid {.arg parallel_reg} specification.")
+}
+
+#' @keywords internal
+formula_to_vglm_parallel <- function(pr_formula) {
+  lhs <- pr_formula[[2L]]
+  rhs_vars <- all.vars(pr_formula[[3L]])
+
+  if (isTRUE(lhs)) {
+    # RHS names parallel terms; VGAM: TRUE ~ -1 + vars
+    rhs <- paste("-1 +", paste(rhs_vars, collapse = " + "))
+  } else {
+    # RHS names non-parallel terms; VGAM: FALSE ~ -1 + vars
+    rhs <- paste("-1 +", paste(rhs_vars, collapse = " + "))
+  }
+  as.formula(paste(format(lhs), "~", rhs))
+}
+
+#' @keywords internal
+list_to_vglm_parallel <- function(lst, formula) {
+  parallel_vars <- character(0L)
+  nonparallel_vars <- character(0L)
+  has_bare_logical <- FALSE
+
+  for (el in lst) {
+    if (is.logical(el) && length(el) == 1L) {
+      has_bare_logical <- TRUE
+      if (isTRUE(el)) {
+        parallel_vars <- all.vars(formula[[3L]])
+      }
+      # bare FALSE: no action needed (non-parallel is VGAM default)
+    } else if (inherits(el, "formula")) {
+      lhs <- el[[2L]]
+      rhs_vars <- all.vars(el[[3L]])
+      if (isTRUE(lhs)) {
+        parallel_vars <- union(parallel_vars, rhs_vars)
+      } else {
+        nonparallel_vars <- union(nonparallel_vars, rhs_vars)
+      }
+    }
+  }
+
+  # check overlap
+  overlap <- intersect(parallel_vars, nonparallel_vars)
+  if (length(overlap) > 0L) {
+    cli::cli_abort(
+      "Variable{?s} {.val {overlap}} appear{?s/} in both parallel and
+      non-parallel specifications."
+    )
+  }
+
+  # when no bare logical is present, every predictor must appear
+  # in at least one formula entry
+  if (!has_bare_logical) {
+    all_pred_vars <- all.vars(formula[[3L]])
+    covered <- union(parallel_vars, nonparallel_vars)
+    missing <- setdiff(all_pred_vars, covered)
+    if (length(missing) > 0L) {
+      cli::cli_abort(
+        "Variable{?s} {.val {missing}} not specified in {.arg parallel_reg}
+        list. Either use a bare logical ({.val TRUE}/{.val FALSE}) to set
+        defaults, or include all predictors in the formula entries."
+      )
+    }
+  }
+
+  if (length(parallel_vars) > 0L) {
+    return(as.formula(paste(
+      "TRUE ~ -1 +", paste(parallel_vars, collapse = " + ")
+    )))
+  }
+
+  return(FALSE)
 }

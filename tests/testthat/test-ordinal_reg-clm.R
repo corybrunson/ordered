@@ -188,3 +188,99 @@ test_that("arguments agree", {
   })
   expect_equal(clm_arg_fit$fit$link, "probit")
 })
+
+# parallel regression ----------------------------------------------------------
+
+test_that("parallel regression argument handles logicals", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinal")
+  house_sub <- get_house()$sub
+
+  # all parallel regression
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(parallel_reg = TRUE, engine = "clm") |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- ordinal::clm(
+    Sat ~ Infl + Cont, data = house_sub
+  )
+
+  tidy_fit$fit$call <- orig_fit$call <- NULL
+  tidy_fit$fit$formulas <- orig_fit$formulas <- NULL
+  expect_equal(tidy_fit$fit, orig_fit, ignore_formula_env = TRUE)
+
+  # all category-specific
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(parallel_reg = FALSE, engine = "clm") |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- ordinal::clm(
+    Sat ~ Infl + Cont, data = house_sub,
+    nominal = ~ Infl + Cont
+  )
+
+  tidy_fit$fit$call <- orig_fit$call <- NULL
+  tidy_fit$fit$formulas <- orig_fit$formulas <- NULL
+  expect_equal(tidy_fit$fit, orig_fit, ignore_formula_env = TRUE)
+})
+
+test_that("parallel regression argument handles formulae", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinal")
+  house_sub <- get_house()$sub
+
+  set.seed(seed)
+  tidy_fit1 <- ordinal_reg(parallel_reg = FALSE ~ Cont, engine = "clm") |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  tidy_fit2 <- ordinal_reg(parallel_reg = TRUE ~ Infl, engine = "clm") |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- ordinal::clm(
+    Sat ~ Infl + Cont, data = house_sub,
+    nominal = ~ Cont
+  )
+
+  tidy_fit1$fit$call <- tidy_fit2$fit$call <- orig_fit$call <- NULL
+  tidy_fit1$fit$formulas <- tidy_fit2$fit$formulas <- orig_fit$formulas <- NULL
+  expect_equal(tidy_fit1$fit, orig_fit, ignore_formula_env = TRUE)
+  expect_equal(tidy_fit2$fit, orig_fit, ignore_formula_env = TRUE)
+})
+
+test_that("parallel regression argument handles lists", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinal")
+  house_sub <- get_house()$sub
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(
+    parallel_reg = list(TRUE ~ Infl, FALSE ~ Cont),
+    engine = "clm"
+  ) |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- ordinal::clm(
+    Sat ~ Infl + Cont, data = house_sub,
+    nominal = ~ Cont
+  )
+
+  tidy_fit$fit$call <- orig_fit$call <- NULL
+  tidy_fit$fit$formulas <- orig_fit$formulas <- NULL
+  expect_equal(tidy_fit$fit, orig_fit, ignore_formula_env = TRUE)
+
+  expect_snapshot(
+    ordinal_reg(
+      parallel_reg = list(FALSE ~ Infl, TRUE ~ Infl + Cont),
+      engine = "clm"
+    ) |>
+      fit(Sat ~ Infl + Cont, data = house_sub),
+    error = TRUE
+  )
+})

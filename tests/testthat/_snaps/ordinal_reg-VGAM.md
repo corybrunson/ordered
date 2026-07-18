@@ -77,3 +77,12 @@
       set.seed(13)
       onet_arg_fit <- fit(onet_arg_spec, class ~ ., data = caco_train)
 
+# parallel regression argument handles lists
+
+    Code
+      fit(ordinal_reg(parallel_reg = list(TRUE ~ Infl, FALSE ~ Infl + Cont), engine = "vglm"),
+      Sat ~ Infl + Cont, data = house_sub)
+    Condition
+      Error in `list_to_vglm_parallel()`:
+      ! Variable "Infl" appears in both parallel and non-parallel specifications.
+

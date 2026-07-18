@@ -41,3 +41,13 @@
       set.seed(13)
       onet_arg_fit <- fit(onet_arg_spec, class ~ ., data = caco_train)
 
+# parallel regression argument handles formulae
+
+    Code
+      fit(ordinal_reg(parallel_reg = TRUE ~ Infl, penalty = 0.01, engine = "ordinalNet"),
+      Sat ~ Cont, data = house_sub)
+    Condition
+      Error in `parallel_reg_to_ordinalNet()`:
+      ! The "ordinalNet" engine does not support partial parallelism.
+      i Use engine "clm" or "vglm" for partial parallelism.
+
