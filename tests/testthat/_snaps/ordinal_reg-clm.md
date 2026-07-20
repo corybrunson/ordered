@@ -69,12 +69,12 @@
       ordered::clm_wrapper(formula = missing_arg(), data = missing_arg(), 
           weights = missing_arg(), link = "probit")
 
-# parallel_reg errors for overlapping variables
+# parallel regression argument handles lists
 
     Code
       fit(ordinal_reg(parallel_reg = list(FALSE ~ Infl, TRUE ~ Infl + Cont), engine = "clm"),
       Sat ~ Infl + Cont, data = house_sub)
     Condition
       Error in `list_to_clm_nominal()`:
-      ! Variable "Infl" appears in both parallel and non-parallel specifications. Each predictor must be assigned to exactly one side: parallel regression or category-specific.
+      ! Variable "Infl" appears in both parallel and non-parallel specifications. The `clm` engine must treat each predictor as either parallel regression or category-specific (not both).
 
