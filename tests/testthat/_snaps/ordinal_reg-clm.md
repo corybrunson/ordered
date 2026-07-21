@@ -76,5 +76,5 @@
       Sat ~ Infl + Cont, data = house_sub)
     Condition
       Error in `list_to_clm_nominal()`:
-      ! Variable "Infl" appears in both parallel and non-parallel specifications. The `clm` engine must treat each predictor as either parallel regression or category-specific (not both).
+      ! Variable "Infl" appears in both parallel and non-parallel specifications. The "clm" engine must treat each predictor as either parallel regression or category-specific (not both).
 

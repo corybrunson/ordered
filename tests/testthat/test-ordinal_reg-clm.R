@@ -1,5 +1,25 @@
 seed <- 144688L
 
+# specification: arguments -----------------------------------------------------
+
+test_that("specification handles model parameters", {
+  skip_if_not_installed("MASS")
+  house_sub <- get_house()$sub
+
+  # a legitimate ordinal link function not recognized by {dials}
+  ao_spec <- ordinal_reg(engine = "clm", ordinal_link = "Aranda-Ordaz")
+  expect_no_error(suppressWarnings(suppressMessages(
+    fit(ao_spec, Sat ~ Infl + Cont, data = house_sub)
+  )))
+
+  # an unavailable odds link function
+  acat_spec <- ordinal_reg(engine = "clm", odds_link = "adjacent_categories")
+  expect_warning(
+    fit(acat_spec, Sat ~ Type + Infl + Cont, data = house_sub),
+    "clm.*cumulative[ \\_]link"
+  )
+})
+
 # model: basic -----------------------------------------------------------------
 
 test_that("model object", {

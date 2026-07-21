@@ -132,14 +132,14 @@ list_to_clm_nominal <- function(lst, model_formula) {
   if (length(overlap) > 0L) {
     cli::cli_abort(
       "Variable{?s} {.val {overlap}} appear{?s/} in both parallel and
-      non-parallel specifications. The {.code clm} engine must treat each
+      non-parallel specifications. The {.val clm} engine must treat each
       predictor as either parallel regression or category-specific (not both)."
     )
   }
 
   # when no bare logical is present, every predictor must appear
   # in at least one formula entry
-  if (!has_bare_logical) {
+  if (! has_bare_logical) {
     all_pred_vars <- all.vars(model_formula[[3L]])
     covered <- union(parallel_vars, nonparallel_vars)
     missing <- setdiff(all_pred_vars, covered)
