@@ -135,6 +135,22 @@ make_ordinal_reg_vglm <- function() {
     func = list(pkg = "dials", fun = "odds_link"),
     has_submodel = FALSE
   )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "vglm",
+    parsnip = "threshold_structure",
+    original = "Thresh",
+    func = list(pkg = "dials", fun = "threshold_structure"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "vglm",
+    parsnip = "parallel_reg",
+    original = "parallel_reg",
+    func = list(pkg = "dials", fun = "parallel_reg"),
+    has_submodel = FALSE
+  )
 
   parsnip::set_fit(
     model = "ordinal_reg",
@@ -241,6 +257,7 @@ make_ordinal_reg_ordinalNet <- function() {
     mode = "classification"
   )
 
+  # dials provided in {dials}
   parsnip::set_model_arg(
     model = "ordinal_reg",
     eng = "ordinalNet",
@@ -273,6 +290,24 @@ make_ordinal_reg_ordinalNet <- function() {
     parsnip = "odds_link",
     original = "family",
     func = list(pkg = "dials", fun = "odds_link"),
+    has_submodel = FALSE
+  )
+
+  # engine-specific arguments
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "ordinalNet",
+    parsnip = "parallelPenaltyFactor",
+    original = "parallelPenaltyFactor",
+    func = list(pkg = "ordered", fun = "parallel_penalty_factor"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "ordinalNet",
+    parsnip = "parallel_reg",
+    original = "parallel_reg",
+    func = list(pkg = "dials", fun = "parallel_reg"),
     has_submodel = FALSE
   )
 
@@ -413,7 +448,6 @@ make_ordinal_reg_lrm <- function() {
     func = list(pkg = "dials", fun = "penalty"),
     has_submodel = FALSE
   )
-
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "lrm",
@@ -536,7 +570,6 @@ make_ordinal_reg_lrm <- function() {
     func = list(pkg = "dials", fun = "penalty"),
     has_submodel = FALSE
   )
-
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "orm",
@@ -663,7 +696,6 @@ make_ordinal_reg_glmnetcr <- function() {
     func = list(pkg = "dials", fun = "mixture"),
     has_submodel = FALSE
   )
-
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "glmnetcr",
@@ -764,9 +796,17 @@ make_ordinal_reg_clm <- function() {
   parsnip::set_model_arg(
     model = "ordinal_reg",
     eng = "clm",
-    parsnip = "threshold",
+    parsnip = "threshold_structure",
     original = "threshold",
-    func = list(pkg = "ordered", fun = "threshold_structure"),
+    func = list(pkg = "dials", fun = "threshold_structure"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "clm",
+    parsnip = "parallel_reg",
+    original = "parallel_reg",
+    func = list(pkg = "dials", fun = "parallel_reg"),
     has_submodel = FALSE
   )
 
@@ -777,7 +817,7 @@ make_ordinal_reg_clm <- function() {
     value = list(
       interface = "formula",
       protect = c("formula", "data", "weights"),
-      func = c(pkg = "ordinal", fun = "clm"),
+      func = c(pkg = "ordered", fun = "clm_wrapper"),
       defaults = list()
     )
   )

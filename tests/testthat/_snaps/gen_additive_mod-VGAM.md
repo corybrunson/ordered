@@ -21,7 +21,7 @@
       
       Call:
       VGAM::vgam(formula = formula, family = VGAM::cumulative(link = "logitlink", 
-          parallel = TRUE), data = data)
+          parallel = TRUE, Thresh = NULL), data = data)
       
       
       Degrees of Freedom: 108 Total; 103 Residual
@@ -38,7 +38,7 @@
       
       Call:
       VGAM::vgam(formula = formula, family = VGAM::cumulative(link = "logitlink", 
-          parallel = TRUE), data = data)
+          parallel = TRUE, Thresh = NULL), data = data)
       
       
       Degrees of Freedom: 108 Total; 103 Residual

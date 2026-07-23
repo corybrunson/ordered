@@ -16,6 +16,7 @@ ordinalNet_wrapper(
   weights = NULL,
   family = "cumulative_link",
   link = "logistic",
+  parallel_reg = NULL,
   ...
 )
 

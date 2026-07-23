@@ -35,14 +35,19 @@ test_that("model object", {
   orig_fit <- VGAM::vglm(
     Sat ~ Type + Infl + Cont,
     # NB: Unused model parameters are ignored without comment.
-    family = VGAM::cratio(link = "probitlink", parallel = TRUE),
+    family = VGAM::cratio(
+      link = "probitlink", parallel = TRUE, Thresh = "symm1"
+    ),
     data = house_sub
   )
 
   tidy_spec <- ordinal_reg() |>
     set_engine("vglm") |>
     set_mode("classification") |>
-    set_args(ordinal_link = "probit", odds_link = "continuation_ratio")
+    set_args(
+      ordinal_link = "probit", odds_link = "continuation_ratio",
+      threshold_structure = "symmetric_median"
+    )
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
 
@@ -227,4 +232,140 @@ test_that("arguments agree", {
   expect_equal(onet_arg_fit$fit@family@infos()$link, "clogloglink")
   expect_equal(onet_arg_fit$fit@family@infos()$parallel, TRUE)
   expect_equal(onet_arg_fit$fit@family@vfamily[1L], "sratio")
+})
+
+# parallel regression ----------------------------------------------------------
+
+test_that("parallel regression argument handles logicals", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("VGAM")
+  house_sub <- get_house()$sub
+
+  # all parallel regression
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(parallel_reg = TRUE, engine = "vglm") |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- VGAM::vglm(
+    Sat ~ Infl + Cont,
+    family = VGAM::cumulative(parallel = TRUE),
+    data = house_sub
+  )
+
+  skip_slots <- c("call", "misc")
+  for (s in setdiff(slotNames(tidy_fit$fit), skip_slots)) {
+    expect_equal(
+      slot(tidy_fit$fit, s),
+      slot(orig_fit, s),
+      ignore_attr = TRUE, ignore_formula_env = TRUE
+    )
+  }
+
+  # all category-specific
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(parallel_reg = FALSE, engine = "vglm") |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- VGAM::vglm(
+    Sat ~ Infl + Cont,
+    family = VGAM::cumulative(parallel = FALSE),
+    data = house_sub
+  )
+
+  skip_slots <- c("call", "misc")
+  for (s in setdiff(slotNames(tidy_fit$fit), skip_slots)) {
+    expect_equal(
+      slot(tidy_fit$fit, s),
+      slot(orig_fit, s),
+      ignore_attr = TRUE, ignore_formula_env = TRUE
+    )
+  }
+})
+
+test_that("parallel regression argument handles formulae", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("VGAM")
+  house_sub <- get_house()$sub
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(parallel_reg = TRUE ~ Cont, engine = "vglm") |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- VGAM::vglm(
+    Sat ~ Infl + Cont,
+    family = VGAM::cumulative(parallel = TRUE ~ -1 + Cont),
+    data = house_sub
+  )
+
+  skip_slots <- c("call", "misc")
+  for (s in setdiff(slotNames(tidy_fit$fit), skip_slots)) {
+    expect_equal(
+      slot(tidy_fit$fit, s),
+      slot(orig_fit, s),
+      ignore_attr = TRUE, ignore_formula_env = TRUE
+    )
+  }
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(parallel_reg = FALSE ~ Cont, engine = "vglm") |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- suppressWarnings(VGAM::vglm(
+    Sat ~ Infl + Cont,
+    family = VGAM::cumulative(parallel = FALSE ~ -1 + Cont),
+    data = house_sub
+  ))
+
+  skip_slots <- c("call", "misc")
+  for (s in setdiff(slotNames(tidy_fit$fit), skip_slots)) {
+    expect_equal(
+      slot(tidy_fit$fit, s),
+      slot(orig_fit, s),
+      ignore_attr = TRUE, ignore_formula_env = TRUE
+    )
+  }
+})
+
+test_that("parallel regression argument handles lists", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("VGAM")
+  house_sub <- get_house()$sub
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(
+    parallel_reg = list(TRUE ~ Infl, FALSE ~ Type + Cont),
+    engine = "vglm"
+  ) |>
+    fit(Sat ~ Type + Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- VGAM::vglm(
+    Sat ~ Type + Infl + Cont,
+    family = VGAM::cumulative(parallel = TRUE ~ -1 + Infl),
+    data = house_sub
+  )
+
+  skip_slots <- c("call", "misc")
+  for (s in setdiff(slotNames(tidy_fit$fit), skip_slots)) {
+    expect_equal(
+      slot(tidy_fit$fit, s),
+      slot(orig_fit, s),
+      ignore_attr = TRUE, ignore_formula_env = TRUE
+    )
+  }
+
+  expect_snapshot(
+    ordinal_reg(
+      parallel_reg = list(TRUE ~ Infl, FALSE ~ Infl + Cont),
+      engine = "vglm"
+    ) |>
+      fit(Sat ~ Infl + Cont, data = house_sub),
+    error = TRUE
+  )
 })

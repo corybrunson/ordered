@@ -1,6 +1,12 @@
 # next version
 
-## additional engines
+## bug fix
+
+A bug in the prediction of `vglm` models, and associated tests, were patched.
+Previously, `predict()` was used, which triggers S3 dispatch when **VGAM** is not attached but S4 dispatched when it is.
+Now `predictvglm()` is used instead.
+
+## additional ordinal regression and random forest engines
 
 This version introduces source code and unit tests for new engines:
 * `clm` from the **ordinal** package
@@ -19,18 +25,25 @@ This version introduces source code and unit tests for new engines:
   - fit wrapper
   - dials for `sample.fraction`, `honesty`, and `honesty.fraction` arguments
 
-Engine additions were coordinated with [parsnip PR #1384](https://github.com/tidymodels/parsnip/pull/1384).
+Coordinated with [parsnip PR #1384](https://github.com/tidymodels/parsnip/pull/1384).
 
-## linear predictions
+## linear prediction type
 
 Linear predictions are enabled for the `clm`, `lrm`, `orm`, `vglm`, and `ordinalNet` ordinal regression engines and for the `vgam` generalized additive model engine.
 They consistently return a single column of linear predictors (without threshold contributions).
 
-## bug fix
+Coordinated with [parsnip PR #1391](https://github.com/tidymodels/parsnip/pull/1391).
 
-A bug in the prediction of `vglm` models, and associated tests, were patched.
-Previously, `predict()` was used, which triggers S3 dispatch when **VGAM** is not attached but S4 dispatched when it is.
-Now `predictvglm()` is used instead.
+## threshold structure and parallel regression model arguments
+
+The `threshold_structure` model argument for `ordinal_reg()` controls what constraints, if any, are imposed on the ordered thresholds. It can be used by the `clm` and `vglm` engines.
+
+The `parallel_reg` model argument for `ordinal_reg()` provides a unified interface for controlling the parallel regression assumption. It accepts a logical value (applied to all terms), a formula with a logical LHS naming parallel or non-parallel terms, or a list combining both; the engines `clm`, `vglm`, and `ordinalNet` are compatible with different subsets of specifications:
+* `clm_wrapper()` (new) translates the `parallel_reg` specification to a formula accepted by `ordinal::clm(nominal)`
+* `VGAM_vglm_wrapper()` and `VGAM_vgam_wrapper()` accept a `parallel_reg` argument and translate it for the VGAM `parallel` argument
+* `ordinalNet_wrapper()` accepts a `parallel_reg` argument and translates it for the `parallelTerms` and `nonparallelTerms` arguments
+
+Coordinated with forthcoming PRs to parsnip and to dials.
 
 # ordered 0.1.0
 

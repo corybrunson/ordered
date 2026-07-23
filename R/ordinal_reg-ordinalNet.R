@@ -62,9 +62,19 @@ ordinalNet_wrapper <- function(
     x, y, weights = NULL,
     # TODO: Test whether defaults can be omitted.
     family = "cumulative_link", link = "logistic",
+    parallel_reg = NULL,
     ...
 ) {
   rlang::check_installed("ordinalNet")
+
+  # `ordinalNet` supports only all-or-nothing parallel regression (or both)
+  parallelTerms <- TRUE
+  nonparallelTerms <- FALSE
+  if (! is.null(parallel_reg)) {
+    pt_nt <- parallel_reg_to_ordinalNet(parallel_reg)
+    parallelTerms <- pt_nt$parallelTerms
+    nonparallelTerms <- pt_nt$nonparallelTerms
+  }
 
   # match and convert odds link options
   family <- match.arg(family, dials::values_odds_link)
@@ -103,6 +113,8 @@ ordinalNet_wrapper <- function(
     .fn = "ordinalNet", .ns = "ordinalNet",
     x = rlang::expr(x), y = rlang::expr(y),
     family = rlang::expr(family), link = rlang::expr(link),
+    parallelTerms = parallelTerms,
+    nonparallelTerms = nonparallelTerms,
     ...
   )
   rlang::eval_tidy(cl)
@@ -226,7 +238,7 @@ approx_prediction_row <- function(values, adjacent, penalty) {
 #   multi_predict_<type>_ordinal_net()    <-- vectorizes prediction over penalty
 #    predict._ordinalNet(multi = FALSE)   <-- (see above)
 
-#' @importFrom stats approx predict
+#' @importFrom stats approx as.formula coef predict
 #' @importFrom parsnip eval_args predict_raw multi_predict
 #' @param penalty A numeric vector of penalty values.
 
@@ -397,4 +409,31 @@ multi_predict_class_ordinal_net <- function(object, new_data, penalty) {
   ) %>%
     tidyr::nest(.by = .row, .key = ".pred") %>%
     dplyr::select(-.row)
+}
+
+#' Translate `parallel_reg` to `ordinalNet(parallelTerms, nonparallelTerms)`
+#'
+#' @param parallel_reg A parallel regression specification. Must be one or two
+#'   logical values; formulae are not supported.
+#' @keywords internal
+#' @returns A list with logical elements `parallelTerms` and `nonparallelTerms`.
+parallel_reg_to_ordinalNet <- function(parallel_reg) {
+  if (is.logical(parallel_reg)) {
+    if (length(parallel_reg) == 1L) {
+      if (isTRUE(parallel_reg)) {
+        return(list(parallelTerms = TRUE, nonparallelTerms = FALSE))
+      } else {
+        return(list(parallelTerms = FALSE, nonparallelTerms = TRUE))
+      }
+    } else {
+      return(list(parallelTerms = TRUE, nonparallelTerms = TRUE))
+    }
+  }
+
+  cli::cli_abort(
+    c(
+      "The {.val ordinalNet} engine does not support partial parallelism.",
+      "i" = "Use engine {.val clm} or {.val vglm} for partial parallelism."
+    )
+  )
 }

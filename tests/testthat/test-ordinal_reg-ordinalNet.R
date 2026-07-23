@@ -452,3 +452,102 @@ test_that("arguments agree", {
   expect_equal(onet_arg_fit$fit$args$link, "cloglog")
   expect_equal(onet_arg_fit$fit$args$family, "sratio")
 })
+
+# parallel regression ----------------------------------------------------------
+
+house_sub <- get_house()$sub |>
+  dplyr::filter(Type == "Apartment") |>
+  dplyr::select(-Type)
+house_vars <- model.matrix(
+  Sat ~ Infl + Cont + 0, data = house_sub,
+  contrasts.arg = lapply(house_sub[, 2:3], contrasts, contrasts = FALSE)
+)
+
+test_that("parallel regression argument handles logicals", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
+
+  # all parallel regression
+
+  set.seed(seed)
+  orig_fit <- ordinalNet::ordinalNet(
+    house_vars,
+    y = house_sub$Sat,
+    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
+  )
+
+  set.seed(seed)
+  tidy_default <- ordinal_reg(penalty = 0.01) |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(parallel_reg = TRUE, penalty = 0.01) |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  expect_equal(tidy_fit$fit, tidy_default$fit)
+  expect_equal(orig_fit$coefs, tidy_fit$fit$coefs)
+
+  # all category-specific
+
+  set.seed(seed)
+  expect_warning(
+    orig_fit <- ordinalNet::ordinalNet(
+      house_vars,
+      y = house_sub$Sat,
+      nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE,
+      nonparallelTerms = TRUE, parallelTerms = FALSE
+    ),
+    "nonparallelTerms"
+  )
+
+  set.seed(seed)
+  expect_warning(
+    tidy_fit <- ordinal_reg(parallel_reg = FALSE, penalty = 0.01) |>
+      set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
+      fit(Sat ~ Infl + Cont, data = house_sub),
+    "nonparallelTerms"
+  )
+
+  expect_equal(orig_fit$coefs, tidy_fit$fit$coefs)
+})
+
+test_that("parallel regression argument handles formulae", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
+
+  expect_snapshot(
+    ordinal_reg(
+      parallel_reg = TRUE ~ Infl, penalty = 0.01, engine = "ordinalNet"
+    ) |>
+      fit(Sat ~ Cont, data = house_sub),
+    error = TRUE
+  )
+})
+
+test_that("parallel regression argument handles lists", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
+
+  set.seed(seed)
+  expect_warning(
+    orig_fit <- ordinalNet::ordinalNet(
+      house_vars,
+      y = house_sub$Sat,
+      nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE,
+      nonparallelTerms = TRUE, parallelTerms = TRUE
+    ),
+    "nonparallelTerms"
+  )
+
+  set.seed(seed)
+  expect_warning(
+    tidy_fit <- ordinal_reg(parallel_reg = c(FALSE, TRUE), penalty = 0.01) |>
+      set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
+      fit(Sat ~ Infl + Cont, data = house_sub),
+    "nonparallelTerms"
+  )
+
+  expect_equal(orig_fit$coefs, tidy_fit$fit$coefs)
+})
