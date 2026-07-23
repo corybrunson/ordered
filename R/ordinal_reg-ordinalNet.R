@@ -411,14 +411,12 @@ multi_predict_class_ordinal_net <- function(object, new_data, penalty) {
     dplyr::select(-.row)
 }
 
-# ------------------------------------------------------------------------------
-
-#' Translate `parallel_reg` to ordinalNet `parallelTerms`/`nonparallelTerms`
+#' Translate `parallel_reg` to `ordinalNet(parallelTerms, nonparallelTerms)`
 #'
 #' @param parallel_reg A parallel regression specification. Must be one or two
 #'   logical values; formulae are not supported.
 #' @keywords internal
-#' @returns A list with elements `parallelTerms` and `nonparallelTerms`.
+#' @returns A list with logical elements `parallelTerms` and `nonparallelTerms`.
 parallel_reg_to_ordinalNet <- function(parallel_reg) {
   if (is.logical(parallel_reg)) {
     if (length(parallel_reg) == 1L) {

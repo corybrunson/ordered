@@ -233,13 +233,10 @@ predict_VGAM_prob_post <- function(x, object) {
   tibble::as_tibble(x)
 }
 
-# ------------------------------------------------------------------------------
-
-#' Translate `parallel_reg` to VGAM `parallel` argument
+#' Translate `parallel_reg` to `vg*m(parallel)`
 #'
 #' @param parallel_reg A parallel regression specification.
-#' @param formula The model formula (used to extract predictor names for list
-#'   forms).
+#' @param formula The model formula (used to extract predictor names.
 #' @keywords internal
 #' @returns A logical or formula suitable for the `parallel` argument of VGAM
 #'   family functions.
@@ -270,11 +267,11 @@ formula_to_vglm_parallel <- function(pr_formula) {
   rhs_vars <- all.vars(pr_formula[[3L]])
 
   if (isTRUE(lhs)) {
-    # RHS names parallel terms; VGAM: TRUE ~ -1 + vars
+    # RHS names parallel terms
     rhs <- paste("-1 +", paste(rhs_vars, collapse = " + "))
   } else {
-    # RHS names non-parallel terms; VGAM: FALSE ~ -1 + vars
-    rhs <- paste("-1 +", paste(rhs_vars, collapse = " + "))
+    # RHS names non-parallel terms
+    rhs <- paste("1 +", paste(rhs_vars, collapse = " + "))
   }
   as.formula(paste(format(lhs), "~", rhs))
 }
@@ -303,6 +300,7 @@ list_to_vglm_parallel <- function(lst, formula) {
     }
   }
 
+  # REVIEW: Move this check to parsnip?
   # check overlap
   overlap <- intersect(parallel_vars, nonparallel_vars)
   if (length(overlap) > 0L) {
@@ -312,6 +310,7 @@ list_to_vglm_parallel <- function(lst, formula) {
     )
   }
 
+  # REVIEW: Move this check to parsnip?
   # when no bare logical is present, every predictor must appear
   # in at least one formula entry
   if (!has_bare_logical) {

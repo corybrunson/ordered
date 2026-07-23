@@ -49,7 +49,7 @@ clm_wrapper <- function(
   rlang::eval_tidy(cl)
 }
 
-#' Translate `parallel_reg` to clm `nominal` formula
+#' Translate `parallel_reg` to `clm(nominal)`
 #'
 #' @param parallel_reg A parallel regression specification.
 #' @param formula The model formula (used to extract predictor names).
@@ -62,7 +62,6 @@ parallel_reg_to_clm_nominal <- function(parallel_reg, formula) {
     if (isTRUE(parallel_reg)) {
       return(NULL)
     }
-    # FALSE: all non-parallel
     pred_vars <- all.vars(formula[[3L]])
     return(as.formula(paste("~", paste(pred_vars, collapse = " + "))))
   }
@@ -91,15 +90,15 @@ formula_to_clm_nominal <- function(pr_formula, model_formula) {
       return(NULL)
     }
     return(as.formula(paste("~", paste(rhs_vars, collapse = " + "))))
+  } else {
+    # RHS names parallel terms
+    all_pred_vars <- all.vars(model_formula[[3L]])
+    nonparallel <- setdiff(all_pred_vars, rhs_vars)
+    if (length(nonparallel) == 0L) {
+      return(NULL)
+    }
+    return(as.formula(paste("~", paste(nonparallel, collapse = " + "))))
   }
-
-  # TRUE: RHS names parallel terms; non-parallel = complement
-  all_pred_vars <- all.vars(model_formula[[3L]])
-  nonparallel <- setdiff(all_pred_vars, rhs_vars)
-  if (length(nonparallel) == 0L) {
-    return(NULL)
-  }
-  return(as.formula(paste("~", paste(nonparallel, collapse = " + "))))
 }
 
 #' @keywords internal
@@ -127,6 +126,7 @@ list_to_clm_nominal <- function(lst, model_formula) {
     }
   }
 
+  # REVIEW: Move this check to parsnip?
   # check overlap between explicit formula entries
   overlap <- intersect(parallel_vars, nonparallel_vars)
   if (length(overlap) > 0L) {
@@ -137,6 +137,7 @@ list_to_clm_nominal <- function(lst, model_formula) {
     )
   }
 
+  # REVIEW: Move this check to parsnip?
   # when no bare logical is present, every predictor must appear
   # in at least one formula entry
   if (! has_bare_logical) {
@@ -156,26 +157,12 @@ list_to_clm_nominal <- function(lst, model_formula) {
   all_pred_vars <- all.vars(model_formula[[3L]])
 
   if (length(nonparallel_vars) > 0L) {
-    # if parallel vars were also specified (via "all" or formulas),
-    # the nonparallel vars are the ones to put in nominal
-    if (length(parallel_vars) > 0L &&
-        !identical(sort(parallel_vars), sort(all_pred_vars))) {
-      # both sides specified explicitly: use nonparallel vars
-      return(as.formula(paste("~", paste(nonparallel_vars, collapse = " + "))))
-    }
-    # only nonparallel specified (or parallel = "all"): use nonparallel vars
     return(as.formula(paste("~", paste(nonparallel_vars, collapse = " + "))))
+  } else if (length(parallel_vars) > 0L) {
+    # in case only parallel vars were specified
+    nonparallel_vars <- setdiff(all_pred_vars, parallel_vars)
+    return(as.formula(paste("~", paste(nonparallel_vars, collapse = " + "))))
+  } else {
+    return(NULL)
   }
-
-  if (length(parallel_vars) > 0L) {
-    # only parallel specified: nonparallel = complement
-    nonparallel <- setdiff(all_pred_vars, parallel_vars)
-    if (length(nonparallel) == 0L) {
-      return(NULL)
-    }
-    return(as.formula(paste("~", paste(nonparallel, collapse = " + "))))
-  }
-
-  # neither specified: default PO
-  return(NULL)
 }
