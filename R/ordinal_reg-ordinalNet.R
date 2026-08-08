@@ -1,11 +1,22 @@
 #' Wrappers for `ordinalNet`
 #'
-#' The fit wrapper converts the standardized `odds_link` options encoded in
-#' [`dials::values_odds_link`] to the `family` options of
-#' [ordinalNet::ordinalNet()]. The prediction wrapper interpolates between
-#' fitted penalties to enable submodel prediction at specified penalties.
+#' The fit wrapper restructures case weights and reorganizes arguments into a
+#' call to [ordinalNet::ordinalNet()]. The prediction wrapper interpolates
+#' between fitted penalties to enable submodel prediction at specified
+#' penalties.
 #' @param x The predictor data.
 #' @param y The outcome vector.
+#' @param weights An optional numeric vector of case weights. When provided,
+#'   the outcome is restructured into a multinomial matrix of weighted
+#'   indicators.
+#' @param family The `ordinalNet` family function, as a character string (e.g.
+#'   `"cumulative"`, `"sratio"`, `"cratio"`, `"acat"`).
+#' @param link The `ordinalNet` link function, as a character string (e.g.
+#'   `"logit"`, `"probit"`, `"cloglog"`, `"cauchit"`).
+#' @param parallelTerms Logical; whether to use parallel terms.
+#' @param nonparallelTerms Logical; whether to use non-parallel terms.
+#' @param parallelPenaltyFactor Numeric; scale factor applied to the penalty on
+#'   parallel terms. Errs when used without parallel terms.
 #' @param ... Additional arguments to pass.
 #' @keywords internal
 #' @returns An object of S3 class `ordinalNet` as returned by
@@ -29,7 +40,7 @@
 #' ) )
 #' ( fit_wrap <- ordinalNet_wrapper(
 #'   house_matrix, y = house_data$Sat,
-#'   family = "stopping_ratio", link = "logistic",
+#'   family = "sratio", link = "logit",
 #'   lambdaVals = pen_vec
 #' ) )
 #' fit_tidy <-
@@ -60,44 +71,16 @@
 #' @export
 ordinalNet_wrapper <- function(
     x, y, weights = NULL,
-    # TODO: Test whether defaults can be omitted.
-    family = "cumulative_link", link = "logistic",
-    parallel_reg = NULL,
+    family = "cumulative",
+    link = "logit",
+    parallelTerms = TRUE, nonparallelTerms = FALSE, parallelPenaltyFactor = 1,
     ...
 ) {
   rlang::check_installed("ordinalNet")
 
-  # `ordinalNet` supports only all-or-nothing parallel regression (or both)
-  parallelTerms <- TRUE
-  nonparallelTerms <- FALSE
-  if (! is.null(parallel_reg)) {
-    pt_nt <- parallel_reg_to_ordinalNet(parallel_reg)
-    parallelTerms <- pt_nt$parallelTerms
-    nonparallelTerms <- pt_nt$nonparallelTerms
-  }
-
-  # match and convert odds link options
-  family <- match.arg(family, dials::values_odds_link)
-  family <- switch(
-    family,
-    cumulative_link = "cumulative",
-    adjacent_categories = "acat",
-    continuation_ratio = "cratio",
-    stopping_ratio = "sratio"
-  )
-  # REVIEW: There may be a standard way to do this. In particular, can this be
-  # robust to upgrades in {ordinalNet}? How can errors and duplication be
-  # prevented in tuning routines?
-  link <- match.arg(link, dials::values_ordinal_link)
-  # REVIEW: Change `logistic` to `logit` in {dials}?
-  if (link == "logistic") link <- "logit"
-  if (link == "loglog") {
-    cli::cli_abort(
-      c(
-        "The `ordinalNet` engine does not support the log-log ordinal link.",
-        "i" = "See `?ordinalNet::ordinalNet` for provided link functions."
-      )
-    )
+  # throw error if penalty factor would go unused
+  if (! parallelTerms && parallelPenaltyFactor != 1) {
+    abort("{.arg parallelPenaltyFactor} cannot be used without parallel terms.")
   }
 
   # restructure based on weights (requires `y` to be a factor)
@@ -115,6 +98,7 @@ ordinalNet_wrapper <- function(
     family = rlang::expr(family), link = rlang::expr(link),
     parallelTerms = parallelTerms,
     nonparallelTerms = nonparallelTerms,
+    parallelPenaltyFactor = parallelPenaltyFactor,
     ...
   )
   rlang::eval_tidy(cl)
@@ -409,31 +393,4 @@ multi_predict_class_ordinal_net <- function(object, new_data, penalty) {
   ) %>%
     tidyr::nest(.by = .row, .key = ".pred") %>%
     dplyr::select(-.row)
-}
-
-#' Translate `parallel_reg` to `ordinalNet(parallelTerms, nonparallelTerms)`
-#'
-#' @param parallel_reg A parallel regression specification. Must be one or two
-#'   logical values; formulae are not supported.
-#' @keywords internal
-#' @returns A list with logical elements `parallelTerms` and `nonparallelTerms`.
-parallel_reg_to_ordinalNet <- function(parallel_reg) {
-  if (is.logical(parallel_reg)) {
-    if (length(parallel_reg) == 1L) {
-      if (isTRUE(parallel_reg)) {
-        return(list(parallelTerms = TRUE, nonparallelTerms = FALSE))
-      } else {
-        return(list(parallelTerms = FALSE, nonparallelTerms = TRUE))
-      }
-    } else {
-      return(list(parallelTerms = TRUE, nonparallelTerms = TRUE))
-    }
-  }
-
-  cli::cli_abort(
-    c(
-      "The {.val ordinalNet} engine does not support partial parallelism.",
-      "i" = "Use engine {.val clm} or {.val vglm} for partial parallelism."
-    )
-  )
 }

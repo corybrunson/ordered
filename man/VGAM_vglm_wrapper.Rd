@@ -10,10 +10,9 @@
 VGAM_vglm_wrapper(
   formula,
   data,
-  family = "cumulative_link",
-  link = "logistic",
-  parallel = TRUE,
-  parallel_reg = NULL,
+  family = "cumulative",
+  link = "logitlink",
+  parallel = FALSE,
   Thresh = NULL,
   ...
 )
@@ -21,10 +20,9 @@ VGAM_vglm_wrapper(
 VGAM_vgam_wrapper(
   formula,
   data,
-  family = "cumulative_link",
-  link = "logistic",
-  parallel = TRUE,
-  parallel_reg = NULL,
+  family = "cumulative",
+  link = "logitlink",
+  parallel = FALSE,
   Thresh = NULL,
   ...
 )
@@ -38,8 +36,18 @@ values_threshold_structure_VGAM
 
 \item{data}{The data frame to pass.}
 
-\item{Thresh}{The threshold constraints. See \code{\link[dials:threshold_structure]{dials::threshold_structure()}}
-for details.}
+\item{family}{The \code{VGAM} family function, as a character string (e.g.
+\code{"cumulative"}, \code{"acat"}, \code{"cratio"}, \code{"sratio"}).}
+
+\item{link}{The \code{VGAM} link function (e.g. \code{"logitlink"}).}
+
+\item{parallel}{A logical; whether predictor effects are shared across
+thresholds. It corresponds to the standardized \code{parallel_reg} argument (see
+\code{\link[dials:parallel_reg]{dials::parallel_reg()}}).}
+
+\item{Thresh}{A character; the threshold constraint pattern. It corresponds
+to the standardized \code{threshold_structure} argument (see
+\code{\link[dials:threshold_structure]{dials::threshold_structure()}}).}
 
 \item{...}{Additional arguments to pass.}
 }
@@ -48,9 +56,11 @@ An object of S3 parent class \code{VGAM} and primary classes \code{vglm} or
 \code{vgam} as returned by \code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
 }
 \description{
-These wrappers convert the standardized \code{odds_link} options encoded in
-\code{\link[dials:values_odds_link]{dials::values_odds_link}} to \code{\link[VGAM:vglmff-class]{VGAM::vglmff}} objects passed to the
-\code{family} argument of \code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
+These wrappers reorganize arguments into proper calls to \code{\link[VGAM:vglm]{VGAM::vglm()}} and
+\code{\link[VGAM:vgam]{VGAM::vgam()}}, which specialize to several families of ordinal regression
+models. The standardized argument values used by \code{parsnip::ordinal_reg()} and
+\code{parsnip::gen_additive_mod()} are matched and converted to the values native
+to \code{VGAM} at translation time.
 }
 \details{
 The vector \code{values_ordinal_link_VGAM} extends the default \code{ordinal_link}
@@ -89,7 +99,8 @@ house_data <-
 ) )
 ( fit_wrap <- VGAM_vglm_wrapper(
   Sat ~ Type + Infl + Cont,
-  family = "stopping_ratio", link = "probit", Thresh = "symmetric_zero",
+  family = "sratio",
+  link = "probitlink", parallel = TRUE, Thresh = "symm0",
   data = house_data
 ) )
 # fit wrapper for additive model
@@ -100,7 +111,7 @@ house_data <-
 ) )
 ( fit_wrap <- VGAM_vgam_wrapper(
   Sat ~ Type + Infl + Cont,
-  family = "continuation_ratio", link = "cloglog",
+  family = "cratio", link = "clogloglink", parallel = TRUE,
   data = house_data
 ) )
 \dontshow{\}) # examplesIf}

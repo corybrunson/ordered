@@ -8,8 +8,7 @@
       Computational engine: clm 
       
       Model fit template:
-      ordered::clm_wrapper(formula = missing_arg(), data = missing_arg(), 
-          weights = missing_arg())
+      ordinal::clm(formula = missing_arg(), data = missing_arg(), weights = missing_arg())
 
 ---
 
@@ -66,15 +65,6 @@
       Computational engine: clm 
       
       Model fit template:
-      ordered::clm_wrapper(formula = missing_arg(), data = missing_arg(), 
-          weights = missing_arg(), link = "probit")
-
-# parallel regression argument handles lists
-
-    Code
-      fit(ordinal_reg(parallel_reg = list(FALSE ~ Infl, TRUE ~ Infl + Cont), engine = "clm"),
-      Sat ~ Infl + Cont, data = house_sub)
-    Condition
-      Error in `list_to_clm_nominal()`:
-      ! Variable "Infl" appears in both parallel and non-parallel specifications. The "clm" engine must treat each predictor as either parallel regression or category-specific (not both).
+      ordinal::clm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(), 
+          link = "probit")
 

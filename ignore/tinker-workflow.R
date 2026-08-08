@@ -25,11 +25,14 @@ polr_spec <-
   set_engine("polr") |>
   set_args(ordinal_link = tune())
 
-# clm: ordinal_link + threshold_structure
+# clm: ordinal_link + threshold_structure + parallel_reg
 clm_spec <-
   ordinal_reg() |>
   set_engine("clm") |>
-  set_args(ordinal_link = tune(), threshold_structure = tune())
+  set_args(
+    ordinal_link = tune(),
+    threshold_structure = tune(), parallel_reg = tune()
+  )
 
 # lrm: penalty
 lrm_spec <-
@@ -43,23 +46,23 @@ orm_spec <-
   set_engine("orm") |>
   set_args(ordinal_link = tune(), penalty = tune())
 
-# vglm: ordinal_link + odds_link + threshold_structure
+# vglm: ordinal_link + odds_link + threshold_structure + parallel_reg
 vglm_spec <-
   ordinal_reg() |>
   set_engine("vglm") |>
   set_args(
     ordinal_link = tune(), odds_link = tune(),
-    threshold_structure = tune()
+    threshold_structure = tune(), parallel_reg = tune()
   )
 
 # ordinalNet: penalty (submodel via multi_predict) + mixture +
-#   parallel_penalty_factor
+#   parallel_penalty_factor + parallel_reg
 ordinalNet_spec <-
   ordinal_reg() |>
   set_engine("ordinalNet") |>
   set_args(
     penalty = tune(), mixture = tune(),
-    parallelPenaltyFactor = tune()
+    parallelPenaltyFactor = tune(), parallel_reg = tune()
   )
 
 # glmnetcr: penalty (submodel via multi_predict) + mixture
@@ -70,12 +73,16 @@ glmnetcr_spec <-
 
 # --- gen_additive_mod engines ---
 
-# vgam: link + family (named differently from ordinal_reg parameter)
+# vgam: link + family (named differently from ordinal_reg parameter) +
+#   Thresh + parallel (engine parameters)
 vgam_spec <-
   gen_additive_mod() |>
   set_engine("vgam") |>
   set_mode("classification") |>
-  set_args(link = tune(), family = tune())
+  set_args(
+    link = tune(), family = tune(),
+    Thresh = tune(), parallel = tune()
+  )
 
 # --- decision_tree engines ---
 

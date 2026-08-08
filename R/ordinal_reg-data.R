@@ -147,7 +147,7 @@ make_ordinal_reg_vglm <- function() {
     model = "ordinal_reg",
     eng = "vglm",
     parsnip = "parallel_reg",
-    original = "parallel_reg",
+    original = "parallel",
     func = list(pkg = "dials", fun = "parallel_reg"),
     has_submodel = FALSE
   )
@@ -160,9 +160,7 @@ make_ordinal_reg_vglm <- function() {
       interface = "formula",
       protect = c("formula", "data", "weights"),
       func = c(pkg = "ordered", fun = "VGAM_vglm_wrapper"),
-      defaults = list(
-        parallel = TRUE
-      )
+      defaults = list()
     )
   )
 
@@ -817,7 +815,7 @@ make_ordinal_reg_clm <- function() {
     value = list(
       interface = "formula",
       protect = c("formula", "data", "weights"),
-      func = c(pkg = "ordered", fun = "clm_wrapper"),
+      func = c(pkg = "ordinal", fun = "clm"),
       defaults = list()
     )
   )

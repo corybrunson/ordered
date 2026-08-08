@@ -138,7 +138,7 @@
       data = house_sub)
     Condition
       Error in `fit()`:
-      ! `parallel_reg` must be a single logical value, a formula with a logical LHS, or a list of at most two such elements.
+      ! `parallel_reg` must be a single logical value.
 
 ---
 
@@ -147,7 +147,7 @@
       Cont, data = house_sub)
     Condition
       Error in `fit()`:
-      ! The LHS of `parallel_reg` formula must be TRUE or FALSE.
+      ! `parallel_reg` must be a single logical value.
 
 ---
 
@@ -156,5 +156,5 @@
       "clm"), Sat ~ Infl + Cont, data = house_sub)
     Condition
       Error in `fit()`:
-      ! `parallel_reg` list can have at most 2 elements.
+      ! `parallel_reg` must be a single logical value.
 

@@ -11,11 +11,11 @@ test_that("model object", {
   # no extra arguments
 
   set.seed(seed)
-  orig_fit <- VGAM::vgam(
+  orig_fit <- suppressWarnings(VGAM::vgam(
     class ~ mol_weight + volume + ClogP,
-    family = VGAM::cumulative(parallel = TRUE),
+    family = VGAM::cumulative(),
     data = caco_train
-  )
+  ))
 
   tidy_spec <- gen_additive_mod() |>
     set_engine("vgam") |>
@@ -40,12 +40,11 @@ test_that("model object", {
   # extra arguments
 
   set.seed(seed)
-  orig_fit <- VGAM::vgam(
+  orig_fit <- suppressWarnings(VGAM::vgam(
     class ~ s(mol_weight) + volume + ClogP,
-    # NB: Unused model parameters are ignored without comment.
-    family = VGAM::cratio(link = "probitlink", parallel = TRUE),
+    family = VGAM::cratio(link = "probitlink"),
     data = caco_train
-  )
+  ))
 
   tidy_spec <- gen_additive_mod() |>
     set_engine("vgam") |>
@@ -95,7 +94,7 @@ test_that("case weights", {
   )
 
   tidy_spec <- gen_additive_mod() |>
-    set_engine("vgam") |>
+    set_engine("vgam", parallel = TRUE) |>
     set_mode("classification")
   set.seed(seed)
   tidy_fit <- fit(
@@ -194,7 +193,7 @@ test_that("interfaces agree", {
   onet_spec <-
     gen_additive_mod() |>
     set_mode("classification") |>
-    set_engine("vgam")
+    set_engine("vgam", parallel = TRUE)
   expect_snapshot(onet_spec |> translate())
 
   expect_no_error({
@@ -226,7 +225,7 @@ test_that("arguments agree", {
   onet_arg_spec <-
     gen_additive_mod() |>
     set_mode("classification") |>
-    set_engine("vgam") |>
+    set_engine("vgam", parallel = TRUE) |>
     set_args(link = "cloglog", family = "stopping")
   expect_snapshot(onet_arg_spec |> translate())
 

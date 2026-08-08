@@ -3,6 +3,7 @@
 test_that("model object", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
+
   house_sub <- get_house()$sub
 
   # no extra arguments
@@ -14,7 +15,7 @@ test_that("model object", {
     data = house_sub
   )
 
-  tidy_spec <- ordinal_reg() |>
+  tidy_spec <- ordinal_reg(parallel_reg = TRUE) |>
     set_engine("vglm") |>
     set_mode("classification")
   set.seed(seed)
@@ -34,14 +35,13 @@ test_that("model object", {
   set.seed(seed)
   orig_fit <- VGAM::vglm(
     Sat ~ Type + Infl + Cont,
-    # NB: Unused model parameters are ignored without comment.
     family = VGAM::cratio(
       link = "probitlink", parallel = TRUE, Thresh = "symm1"
     ),
     data = house_sub
   )
 
-  tidy_spec <- ordinal_reg() |>
+  tidy_spec <- ordinal_reg(parallel_reg = TRUE) |>
     set_engine("vglm") |>
     set_mode("classification") |>
     set_args(
@@ -70,6 +70,7 @@ test_that("model object", {
 test_that("case weights", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
+
   house_sub <- get_house()$sub
 
   set.seed(seed)
@@ -83,7 +84,7 @@ test_that("case weights", {
     weights = house_wts
   )
 
-  tidy_spec <- ordinal_reg() |>
+  tidy_spec <- ordinal_reg(parallel_reg = TRUE) |>
     set_engine("vglm") |>
     set_mode("classification")
   set.seed(seed)
@@ -112,7 +113,7 @@ test_that("class prediction", {
 
   house_sub <- get_house()$sub
 
-  tidy_fit <- ordinal_reg(engine = "vglm") |>
+  tidy_fit <- ordinal_reg(engine = "vglm", parallel_reg = TRUE) |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
   # as in `parsnip::set_pred()`, use `VGAM::predictvglm()` to avoid mis-dispatch
@@ -139,7 +140,7 @@ test_that("probability prediction", {
 
   house_sub <- get_house()$sub
 
-  tidy_fit <- ordinal_reg(engine = "vglm") |>
+  tidy_fit <- ordinal_reg(engine = "vglm", parallel_reg = TRUE) |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
   # as in `parsnip::set_pred()`, use `VGAM::predictvglm()` to avoid mis-dispatch
@@ -165,7 +166,7 @@ test_that("linear_pred prediction", {
 
   house_sub <- get_house()$sub
 
-  tidy_fit <- ordinal_reg(engine = "vglm") |>
+  tidy_fit <- ordinal_reg(engine = "vglm", parallel_reg = TRUE) |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
   orig_link <- VGAM::predictvglm(
@@ -186,7 +187,7 @@ test_that("interfaces agree", {
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
-    ordinal_reg() |>
+    ordinal_reg(parallel_reg = TRUE) |>
     set_mode("classification") |>
     set_engine("vglm")
   expect_snapshot(onet_spec |> translate())
@@ -219,6 +220,7 @@ test_that("arguments agree", {
 
   onet_arg_spec <-
     ordinal_reg(
+      parallel_reg = TRUE,
       ordinal_link = "cloglog", odds_link = "stopping"
     ) |>
     set_mode("classification") |>
@@ -239,6 +241,7 @@ test_that("arguments agree", {
 test_that("parallel regression argument handles logicals", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("VGAM")
+
   house_sub <- get_house()$sub
 
   # all parallel regression
@@ -286,86 +289,4 @@ test_that("parallel regression argument handles logicals", {
   }
 })
 
-test_that("parallel regression argument handles formulae", {
-  skip_if_not_installed("MASS")
-  skip_if_not_installed("VGAM")
-  house_sub <- get_house()$sub
 
-  set.seed(seed)
-  tidy_fit <- ordinal_reg(parallel_reg = TRUE ~ Cont, engine = "vglm") |>
-    fit(Sat ~ Infl + Cont, data = house_sub)
-
-  set.seed(seed)
-  orig_fit <- VGAM::vglm(
-    Sat ~ Infl + Cont,
-    family = VGAM::cumulative(parallel = TRUE ~ -1 + Cont),
-    data = house_sub
-  )
-
-  skip_slots <- c("call", "misc")
-  for (s in setdiff(slotNames(tidy_fit$fit), skip_slots)) {
-    expect_equal(
-      slot(tidy_fit$fit, s),
-      slot(orig_fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
-    )
-  }
-
-  set.seed(seed)
-  tidy_fit <- ordinal_reg(parallel_reg = FALSE ~ Cont, engine = "vglm") |>
-    fit(Sat ~ Infl + Cont, data = house_sub)
-
-  set.seed(seed)
-  orig_fit <- suppressWarnings(VGAM::vglm(
-    Sat ~ Infl + Cont,
-    family = VGAM::cumulative(parallel = FALSE ~ -1 + Cont),
-    data = house_sub
-  ))
-
-  skip_slots <- c("call", "misc")
-  for (s in setdiff(slotNames(tidy_fit$fit), skip_slots)) {
-    expect_equal(
-      slot(tidy_fit$fit, s),
-      slot(orig_fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
-    )
-  }
-})
-
-test_that("parallel regression argument handles lists", {
-  skip_if_not_installed("MASS")
-  skip_if_not_installed("VGAM")
-  house_sub <- get_house()$sub
-
-  set.seed(seed)
-  tidy_fit <- ordinal_reg(
-    parallel_reg = list(TRUE ~ Infl, FALSE ~ Type + Cont),
-    engine = "vglm"
-  ) |>
-    fit(Sat ~ Type + Infl + Cont, data = house_sub)
-
-  set.seed(seed)
-  orig_fit <- VGAM::vglm(
-    Sat ~ Type + Infl + Cont,
-    family = VGAM::cumulative(parallel = TRUE ~ -1 + Infl),
-    data = house_sub
-  )
-
-  skip_slots <- c("call", "misc")
-  for (s in setdiff(slotNames(tidy_fit$fit), skip_slots)) {
-    expect_equal(
-      slot(tidy_fit$fit, s),
-      slot(orig_fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
-    )
-  }
-
-  expect_snapshot(
-    ordinal_reg(
-      parallel_reg = list(TRUE ~ Infl, FALSE ~ Infl + Cont),
-      engine = "vglm"
-    ) |>
-      fit(Sat ~ Infl + Cont, data = house_sub),
-    error = TRUE
-  )
-})

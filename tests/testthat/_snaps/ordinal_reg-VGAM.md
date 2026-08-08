@@ -5,6 +5,9 @@
     Output
       Ordinal Regression Model Specification (classification)
       
+      Main Arguments:
+        parallel_reg = TRUE
+      
       Computational engine: vglm 
       
       Model fit template:
@@ -63,12 +66,13 @@
       Main Arguments:
         ordinal_link = cloglog
         odds_link = stopping
+        parallel_reg = TRUE
       
       Computational engine: vglm 
       
       Model fit template:
       ordered::VGAM_vglm_wrapper(formula = missing_arg(), data = missing_arg(), 
-          weights = missing_arg(), link = "cloglog", family = "stopping", 
+          weights = missing_arg(), link = "clogloglink", family = "sratio", 
           parallel = TRUE)
 
 ---
@@ -76,13 +80,4 @@
     Code
       set.seed(13)
       onet_arg_fit <- fit(onet_arg_spec, class ~ ., data = caco_train)
-
-# parallel regression argument handles lists
-
-    Code
-      fit(ordinal_reg(parallel_reg = list(TRUE ~ Infl, FALSE ~ Infl + Cont), engine = "vglm"),
-      Sat ~ Infl + Cont, data = house_sub)
-    Condition
-      Error in `list_to_vglm_parallel()`:
-      ! Variable "Infl" appears in both parallel and non-parallel specifications.
 

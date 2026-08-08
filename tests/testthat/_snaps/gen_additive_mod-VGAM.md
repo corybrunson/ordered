@@ -5,6 +5,9 @@
     Output
       GAM Model Specification (classification)
       
+      Engine-Specific Arguments:
+        parallel = TRUE
+      
       Computational engine: vgam 
       
       Model fit template:
@@ -53,6 +56,7 @@
       GAM Model Specification (classification)
       
       Engine-Specific Arguments:
+        parallel = TRUE
         link = cloglog
         family = stopping
       
@@ -60,8 +64,8 @@
       
       Model fit template:
       ordered::VGAM_vgam_wrapper(formula = missing_arg(), data = missing_arg(), 
-          weights = missing_arg(), link = "cloglog", family = "stopping", 
-          parallel = TRUE)
+          weights = missing_arg(), parallel = TRUE, link = "clogloglink", 
+          family = "sratio")
 
 ---
 

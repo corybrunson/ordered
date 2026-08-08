@@ -12,7 +12,6 @@ This version introduces source code and unit tests for new engines:
 * `clm` from the **ordinal** package
   - cumulative link ordinal regression
   - additional `ordinal_link` dial values
-  - dial for `threshold` argument
 * `lrm` and `orm` from the **rms** package
   - regularized cumulative probability ordinal regression
   - shared prediction wrapper
@@ -36,14 +35,17 @@ Coordinated with [parsnip PR #1391](https://github.com/tidymodels/parsnip/pull/1
 
 ## threshold structure and parallel regression model arguments
 
-The `threshold_structure` model argument for `ordinal_reg()` controls what constraints, if any, are imposed on the ordered thresholds. It can be used by the `clm` and `vglm` engines.
+The `threshold_structure` model argument for `ordinal_reg()` controls what constraints, if any, are imposed on the ordered thresholds.
+It can be used by the `clm` and `vglm` engines.
 
-The `parallel_reg` model argument for `ordinal_reg()` provides a unified interface for controlling the parallel regression assumption. It accepts a logical value (applied to all terms), a formula with a logical LHS naming parallel or non-parallel terms, or a list combining both; the engines `clm`, `vglm`, and `ordinalNet` are compatible with different subsets of specifications:
-* `clm_wrapper()` (new) translates the `parallel_reg` specification to a formula accepted by `ordinal::clm(nominal)`
-* `VGAM_vglm_wrapper()` and `VGAM_vgam_wrapper()` accept a `parallel_reg` argument and translate it for the VGAM `parallel` argument
-* `ordinalNet_wrapper()` accepts a `parallel_reg` argument and translates it for the `parallelTerms` and `nonparallelTerms` arguments
+The `parallel_reg` model argument for `ordinal_reg()` controls the parallel regression assumption with a logical value applied to all predictors.
+It can be used by the `clm`, `vglm`, and `ordinalNet` engines.
+Note that the default is to defer to the engine, and the `vglm` engine defaults to non-parallel terms.
 
-Coordinated with forthcoming PRs to parsnip and to dials.
+The `gen_additive_mod()` `vgam` engine additionally registers the `Thresh` and `parallel` engine arguments.
+These may be tuned using the `threshold_structure` and `parallel_reg` dials.
+
+Coordinated with [parsnip PR #1393](https://github.com/tidymodels/parsnip/pull/1393) and [dials PR #462](https://github.com/tidymodels/dials/pull/462).
 
 # ordered 0.1.0
 
