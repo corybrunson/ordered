@@ -1,0 +1,1467 @@
+---
+title: "Controlling the Parallel Regression Assumption across Ordinal Engines"
+output: html_document
+---
+
+The parallel regression assumption states that the effect of each
+predictor is the same across all cumulative thresholds. Four engines
+allow users to relax this assumption in different ways:
+
+1. **`ordinalNet::ordinalNet()`**: `parallelTerms`, `nonparallelTerms`, `parallelPenaltyFactor` arguments
+2. **`ordinal::clm()`**: `nominal` formula
+3. **`VGAM::vglm()`**: `parallel` argument in the family function
+4. **`brms::brm()`**: `cs()` function in the model formula
+
+This document explores each engine's parameterization directly (without
+using the ordered package), compares results where they should agree,
+describes their idiosyncrasies, and proposes harmonizations.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  comment = "#>"
+)
+```
+
+# Setup
+
+```{r install-ordered}
+devtools::install_local("..", force = TRUE, quiet = TRUE)
+```
+
+```{r load-packages}
+library(MASS)
+library(VGAM)
+library(ordinalNet)
+library(ordinal)
+```
+
+# Data
+
+A survey of housing conditions in Copenhagen, with an ordered factor
+response `Sat` (satisfaction: Low < Medium < High) and three categorical
+predictors: `Infl` (influence on management), `Type` (type of housing),
+`Cont` (contact with neighbors). The `Freq` column gives cell counts.
+
+We use only `Infl` and `Cont` as predictors to keep models tractable.
+`Type` (4 levels) is omitted to avoid saturation in fully non-parallel
+models.
+
+```{r housing-data}
+data("housing")
+
+housing <- housing[housing$Type == "Tower", ]
+housing$Type <- NULL
+housing_long <- housing[rep(seq_len(nrow(housing)), housing$Freq), ]
+housing_long$Freq <- NULL
+rownames(housing_long) <- NULL
+
+nrow(housing_long)
+table(housing_long$Sat)
+
+f <- Sat ~ Infl + Cont
+```
+
+# Models across engines
+
+Each engine expresses parallelism through its own interface, but all four
+can fit the same models. The table summarizes the syntax; the subsections
+below fit each model in every engine and compare the results.
+
+| Engine | Interface | Fully parallel | Fully non-parallel | Partial |
+|---|---|---|---|---|
+| `vglm` | formula + family argument | <code>parallel&nbsp;=&nbsp;TRUE</code> | <code>parallel&nbsp;=&nbsp;FALSE</code> | <code>parallel&nbsp;=&nbsp;TRUE&nbsp;~&nbsp;&lt;parallel&nbsp;terms&gt;</code> |
+| `clm` | formula + `nominal` | no `nominal` | <code>nominal&nbsp;=&nbsp;~&nbsp;&lt;all&nbsp;terms&gt;</code> | <code>nominal&nbsp;=&nbsp;~&nbsp;&lt;non-parallel&nbsp;terms&gt;</code> |
+| `ordinalNet` | matrix + term flags | <code>parallelTerms&nbsp;=&nbsp;TRUE</code>, <code>nonparallelTerms&nbsp;=&nbsp;FALSE</code> | <code>parallelTerms&nbsp;=&nbsp;FALSE</code>, <code>nonparallelTerms&nbsp;=&nbsp;TRUE</code> | semi-parallel (both `TRUE`) |
+| `brm` | formula + `cs()` | no `cs()` | all terms in `cs()` | `cs(<non-parallel terms>)` |
+
+The conventions differ in three ways:
+
+- **What the formula names**: `vglm`'s `parallel` formula names the
+  **parallel** terms; `clm`'s `nominal` and `brm`'s `cs()` name the
+  **non-parallel** terms; `ordinalNet` names both with separate flags.
+- **Sign convention**: `clm` uses the opposite sign of `vglm` and `ordinalNet`
+  (latent-variable formulation); `brm` matches `vglm`. This matters only when
+  comparing coefficient estimates.
+- **Estimator**: `ordinalNet` is penalized, so we use `lambdaVals = 0` (no
+  penalty) to compare with unpenalized `vglm` and `clm`; `brm` fits via MCMC,
+  so we compare posterior means (not MLEs) and log-likelihoods (which are
+  comparable).
+
+`vglm` formula details: the `parallel` argument lives inside the family
+function (`cumulative()`, `cratio()`, `sratio()`, `acat()`), and the
+intercept is always category-specific (never parallel), regardless of the
+formula specification. `TRUE ~ -1 + x1` (x1 parallel) is equivalent to
+`FALSE ~ 1 + (all other terms)`, verified in the "`vglm`: equivalent
+formula formulations" subsection below.
+
+```{r ordinalNet-setup}
+x_mat <- model.matrix(f, data = housing_long)[, -1]
+y_fac <- housing_long$Sat
+```
+
+## Fully parallel model
+
+In the fully parallel model, each predictor has a single coefficient,
+shared across all thresholds. With 2 predictors and 2 thresholds, the
+model has 2 intercepts + 2 = 4 free parameters. For the logit link, this
+is the proportional odds model. The engines specify it as:
+
+- `vglm`: `parallel = TRUE`
+- `clm`: no `nominal` argument
+- `ordinalNet`: `parallelTerms = TRUE, nonparallelTerms = FALSE`
+- `brm`: no `cs()`
+
+<details>
+<summary>`vglm`: coefficient matrix and log-likelihood</summary>
+
+```{r vglm-par}
+vglm_par <- vglm(
+  f, data = housing_long,
+  family = VGAM::cumulative(link = "logitlink", parallel = TRUE)
+)
+
+coef(vglm_par, matrix = TRUE)
+logLik(vglm_par)
+```
+
+</details>
+
+
+<details>
+<summary>`clm`: coefficients and log-likelihood</summary>
+
+```{r clm-par}
+clm_par <- clm(f, data = housing_long, link = "logit")
+
+coef(clm_par)
+logLik(clm_par)
+```
+
+</details>
+
+
+<details>
+<summary>`ordinalNet`: coefficients and log-likelihood</summary>
+
+```{r ordinalNet-par}
+set.seed(42)
+on_par <- ordinalNet(
+  x = x_mat, y = y_fac,
+  family = "cumulative", link = "logit",
+  parallelTerms = TRUE, nonparallelTerms = FALSE,
+  lambdaVals = 0, nLambda = 1
+)
+
+coef(on_par)
+on_par$loglik
+```
+
+</details>
+
+
+<details>
+<summary>`brm`: posterior means</summary>
+
+```{r brm-par, cache=TRUE}
+library(brms)
+
+set.seed(42)
+brms_par <- brm(
+  Sat ~ Infl + Cont, data = housing_long,
+  family = brms::cumulative("logit"),
+  chains = 4, iter = 2000, warmup = 1000,
+  silent = 2, refresh = 0
+)
+
+# Posterior means for non-intercept coefficients
+brms::fixef(brms_par)
+```
+
+</details>
+
+
+<details>
+<summary>`brm`: log-likelihood</summary>
+
+```{r brm-par-ll}
+# Pointwise log-likelihood, then sum across observations
+ll_mat <- brms::log_lik(brms_par)
+brms_par_LL <- sum(colMeans(ll_mat))
+brms_par_LL
+```
+
+</details>
+
+
+All four engines should agree:
+
+<details>
+<summary>Cross-engine comparison of coefficients and log-likelihoods</summary>
+
+```{r cross-par}
+params <- c("InflMedium", "InflHigh", "ContHigh")
+
+cf_vglm_mat <- coef(vglm_par, matrix = TRUE)
+cf_clm_vec <- coef(clm_par)
+cf_on_vec <- coef(on_par)
+cf_brms_vec <- brms::fixef(brms_par)[params, "Estimate"]
+
+data.frame(
+  parameter = params,
+  vglm = as.numeric(cf_vglm_mat[params, 1]),
+  clm = as.numeric(cf_clm_vec[params]),
+  ordinalNet = as.numeric(cf_on_vec[params]),
+  brm = cf_brms_vec,
+  check.names = FALSE
+)
+
+# Log-likelihoods
+data.frame(
+  engine = c("vglm", "clm", "ordinalNet", "brm"),
+  LL = signif(c(
+    as.numeric(logLik(vglm_par)),
+    as.numeric(logLik(clm_par)),
+    on_par$loglik,
+    brms_par_LL
+  ), 7)
+)
+```
+
+</details>
+
+
+`vglm` and `ordinalNet` share the same sign convention; `clm` uses the opposite
+sign (latent-variable formulation). `brm` uses the same sign convention as
+`vglm`. The three MLE log-likelihoods (`vglm`, `clm`, `ordinalNet`) should be
+identical. `brm` reports the posterior-mean log-likelihood, which
+approximates but does not exactly equal the MLE (the gap widens for
+more-parameter models like the fully non-parallel model, where MCMC
+mixing is harder).
+
+## Fully non-parallel model
+
+In the fully non-parallel model, every predictor has category-specific
+coefficients. With 2 predictors and 2 thresholds, the model has
+2 intercepts + 2×2 = 6 free parameters, versus 4 for the fully parallel
+model. For the logit link, this model is known as the generalized ordered
+logit. The engines specify it as:
+
+- `vglm`: `parallel = FALSE`
+- `clm`: `nominal = ~ Infl + Cont`
+- `ordinalNet`: `parallelTerms = FALSE, nonparallelTerms = TRUE`
+- `brm`: `cs(Infl) + cs(Cont)`
+
+<details>
+<summary>`vglm`: coefficient matrix and log-likelihood</summary>
+
+```{r vglm-npar}
+vglm_npar <- vglm(
+  f, data = housing_long,
+  family = VGAM::cumulative(link = "logitlink", parallel = FALSE)
+)
+
+coef(vglm_npar, matrix = TRUE)
+logLik(vglm_npar)
+```
+
+</details>
+
+
+<details>
+<summary>`clm`: coefficients and log-likelihood</summary>
+
+```{r clm-npar}
+clm_npar <- clm(f, data = housing_long, link = "logit",
+               nominal = ~ Infl + Cont)
+
+coef(clm_npar)
+logLik(clm_npar)
+```
+
+</details>
+
+
+<details>
+<summary>`ordinalNet`: coefficients and log-likelihood</summary>
+
+```{r ordinalNet-npar}
+set.seed(42)
+on_npar <- ordinalNet(
+  x = x_mat, y = y_fac,
+  family = "cumulative", link = "logit",
+  parallelTerms = FALSE, nonparallelTerms = TRUE,
+  lambdaVals = 0, nLambda = 1
+)
+
+coef(on_npar)
+on_npar$loglik
+```
+
+</details>
+
+
+<details>
+<summary>`brm`: posterior means</summary>
+
+```{r brm-npar, cache=TRUE}
+set.seed(42)
+brms_npar <- brm(
+  Sat ~ cs(Infl) + cs(Cont), data = housing_long,
+  family = brms::cumulative("logit"),
+  chains = 4, iter = 2000, warmup = 1000,
+  silent = 2, refresh = 0
+)
+
+brms::fixef(brms_npar)
+```
+
+</details>
+
+
+<details>
+<summary>`brm`: log-likelihood</summary>
+
+```{r brm-npar-ll}
+brms_npar_LL <- sum(colMeans(brms::log_lik(brms_npar)))
+brms_npar_LL
+```
+
+</details>
+
+
+<details>
+<summary>Coefficient structures across engines</summary>
+
+```{r cross-npar}
+# vglm fully non-parallel coefficient matrix (rows = predictors, cols = thresholds)
+cf_vglm_npar_mat <- coef(vglm_npar, matrix = TRUE)
+cf_vglm_npar_mat
+
+# ordinalNet non-parallel coefficients (vector with "predictor:threshold" names)
+cf_on_npar_vec <- coef(on_npar)
+cf_on_npar_vec
+
+# clm non-parallel coefficients (vector with "threshold.predictor" names, opposite sign)
+cf_clm_npar_vec <- coef(clm_npar)
+cf_clm_npar_vec
+```
+
+</details>
+
+
+<details>
+<summary>Log-likelihoods across engines</summary>
+
+```{r cross-ll-npar}
+data.frame(
+  engine = c("vglm", "clm", "ordinalNet", "brm"),
+  LL = signif(c(
+    as.numeric(logLik(vglm_npar)),
+    as.numeric(logLik(clm_npar)),
+    on_npar$loglik,
+    brms_npar_LL
+  ), 7)
+)
+```
+
+</details>
+
+
+To compare `vglm` and `ordinalNet` directly (same sign convention), extract
+the category-specific coefficients into a common structure:
+
+<details>
+<summary>Aligned category-specific coefficients</summary>
+
+```{r cross-npar-aligned}
+params <- c("InflMedium", "InflHigh", "ContHigh")
+thr_names <- c("1", "2")
+
+# brm fully non-parallel posterior means (category-specific)
+cf_brms_npar <- brms::fixef(brms_npar)
+
+npar_aligned <- expand.grid(
+  parameter = params,
+  threshold = thr_names,
+  stringsAsFactors = FALSE
+)
+
+for (i in seq_len(nrow(npar_aligned))) {
+  p <- npar_aligned$parameter[i]
+  t <- npar_aligned$threshold[i]
+  npar_aligned$vglm[i] <- cf_vglm_npar_mat[p, as.integer(t)]
+  npar_aligned$ordinalNet[i] <- cf_on_npar_vec[paste0(p, ":", t)]
+  npar_aligned$brm[i] <- cf_brms_npar[paste0(p, "[", t, "]"), "Estimate"]
+}
+npar_aligned
+```
+
+</details>
+
+
+## Partial: Infl parallel, Cont non-parallel
+
+Here Infl is parallel and Cont is non-parallel. The engines specify it
+as:
+
+- `vglm`: `parallel = TRUE ~ -1 + Infl`
+- `clm`: `nominal = ~ Cont`
+- `brm`: `Sat ~ Infl + cs(Cont)`
+- `ordinalNet`: cannot express this directly (its flags are all-or-nothing;
+  see "`ordinalNet`: semi-parallel model" below)
+
+<details>
+<summary>`vglm`: coefficient matrix and log-likelihood</summary>
+
+```{r vglm-partial-infl}
+vglm_partial_infl <- vglm(
+  f, data = housing_long,
+  family = VGAM::cumulative(link = "logitlink", parallel = TRUE ~ -1 + Infl)
+)
+
+coef(vglm_partial_infl, matrix = TRUE)
+logLik(vglm_partial_infl)
+```
+
+</details>
+
+
+<details>
+<summary>`clm`: coefficients and log-likelihood</summary>
+
+```{r clm-partial-cont}
+clm_partial_cont <- clm(f, data = housing_long, link = "logit",
+                        nominal = ~ Cont)
+
+coef(clm_partial_cont)
+logLik(clm_partial_cont)
+```
+
+</details>
+
+
+<details>
+<summary>`brm`: posterior means</summary>
+
+```{r brm-partial-infl, cache=TRUE}
+set.seed(42)
+brms_partial_infl <- brm(
+  Sat ~ Infl + cs(Cont), data = housing_long,
+  family = brms::cumulative("logit"),
+  chains = 4, iter = 2000, warmup = 1000,
+  silent = 2, refresh = 0
+)
+
+brms::fixef(brms_partial_infl)
+```
+
+</details>
+
+
+<details>
+<summary>`brm`: log-likelihood</summary>
+
+```{r brm-partial-infl-ll}
+brms_partial_infl_LL <- sum(colMeans(brms::log_lik(brms_partial_infl)))
+brms_partial_infl_LL
+```
+
+</details>
+
+
+<details>
+<summary>Cross-engine comparison of coefficients and log-likelihoods</summary>
+
+```{r cross-partial-infl}
+# vglm: Infl parallel, Cont non-parallel
+cf_vglm_part_infl <- coef(vglm_partial_infl, matrix = TRUE)
+
+# clm: Cont nominal (non-parallel), Infl parallel --- same model
+cf_clm_part_cont <- coef(clm_partial_cont)
+
+# brm: Infl parallel, Cont non-parallel
+cf_brms_part_infl <- brms::fixef(brms_partial_infl)
+
+# Align by parameter name
+# vglm has ContHigh (non-parallel, category-specific)
+# and InflMedium, InflHigh (parallel, shared across thresholds)
+params_np <- c("ContHigh")
+params_p <- c("InflMedium", "InflHigh")
+
+data.frame(
+  parameter = c(params_np, params_p),
+  vglm_thr1 = c(
+    as.numeric(cf_vglm_part_infl[params_np, 1]),
+    as.numeric(cf_vglm_part_infl[params_p, 1])
+  ),
+  vglm_thr2 = c(
+    as.numeric(cf_vglm_part_infl[params_np, 2]),
+    as.numeric(cf_vglm_part_infl[params_p, 2])
+  ),
+  clm = c(
+    as.numeric(cf_clm_part_cont[paste0("Low|Medium.", params_np)]),
+    as.numeric(cf_clm_part_cont[params_p])
+  ),
+  brm_thr1 = c(
+    cf_brms_part_infl[paste0(params_np, "[1]"), "Estimate"],
+    cf_brms_part_infl[params_p, "Estimate"]
+  ),
+  brm_thr2 = c(
+    cf_brms_part_infl[paste0(params_np, "[2]"), "Estimate"],
+    cf_brms_part_infl[params_p, "Estimate"]
+  ),
+  check.names = FALSE
+)
+
+data.frame(
+  engine = c("vglm", "clm", "brm"),
+  LL = signif(c(
+    as.numeric(logLik(vglm_partial_infl)),
+    as.numeric(logLik(clm_partial_cont)),
+    brms_partial_infl_LL
+  ), 7)
+)
+```
+
+</details>
+
+
+These should be identical (same model, different parameterization).
+
+## Partial: Cont parallel, Infl non-parallel
+
+Here Cont is parallel and Infl is non-parallel. The engines specify it
+as:
+
+- `vglm`: `parallel = TRUE ~ -1 + Cont`
+- `clm`: `nominal = ~ Infl`
+- `brm`: `Sat ~ cs(Infl) + Cont`
+- `ordinalNet`: cannot express this directly (its flags are all-or-nothing;
+  see "`ordinalNet`: semi-parallel model" below)
+
+<details>
+<summary>`vglm`: coefficient matrix and log-likelihood</summary>
+
+```{r vglm-partial-cont}
+vglm_partial_cont <- vglm(
+  f, data = housing_long,
+  family = VGAM::cumulative(link = "logitlink", parallel = TRUE ~ -1 + Cont)
+)
+
+coef(vglm_partial_cont, matrix = TRUE)
+logLik(vglm_partial_cont)
+```
+
+</details>
+
+
+<details>
+<summary>`clm`: coefficients and log-likelihood</summary>
+
+```{r clm-partial-infl}
+clm_partial_infl <- clm(f, data = housing_long, link = "logit",
+                        nominal = ~ Infl)
+
+coef(clm_partial_infl)
+logLik(clm_partial_infl)
+```
+
+</details>
+
+
+<details>
+<summary>`brm`: posterior means</summary>
+
+```{r brm-partial-cont, cache=TRUE}
+set.seed(42)
+brms_partial_cont <- brm(
+  Sat ~ cs(Infl) + Cont, data = housing_long,
+  family = brms::cumulative("logit"),
+  chains = 4, iter = 2000, warmup = 1000,
+  silent = 2, refresh = 0
+)
+
+brms::fixef(brms_partial_cont)
+```
+
+</details>
+
+
+<details>
+<summary>`brm`: log-likelihood</summary>
+
+```{r brm-partial-cont-ll}
+brms_partial_cont_LL <- sum(colMeans(brms::log_lik(brms_partial_cont)))
+brms_partial_cont_LL
+```
+
+</details>
+
+
+<details>
+<summary>Cross-engine comparison of coefficients and log-likelihoods</summary>
+
+```{r cross-partial-cont}
+# vglm: Cont parallel, Infl non-parallel
+cf_vglm_part_cont <- coef(vglm_partial_cont, matrix = TRUE)
+
+# clm: Infl nominal (non-parallel), Cont parallel --- same model
+cf_clm_part_infl <- coef(clm_partial_infl)
+
+# brm: Cont parallel, Infl non-parallel
+cf_brms_part_cont <- brms::fixef(brms_partial_cont)
+
+# Align by parameter name (non-intercept only)
+# vglm has InflMedium, InflHigh (non-parallel, category-specific)
+# and ContHigh (parallel, shared across thresholds)
+params_np <- c("InflMedium", "InflHigh")
+params_p <- c("ContHigh")
+
+data.frame(
+  parameter = c(params_np, params_p),
+  vglm_thr1 = c(
+    as.numeric(cf_vglm_part_cont[params_np, 1]),
+    as.numeric(cf_vglm_part_cont[params_p, 1])
+  ),
+  vglm_thr2 = c(
+    as.numeric(cf_vglm_part_cont[params_np, 2]),
+    as.numeric(cf_vglm_part_cont[params_p, 2])
+  ),
+  clm = c(
+    as.numeric(cf_clm_part_infl[paste0("Low|Medium.", params_np)]),
+    as.numeric(cf_clm_part_infl[params_p])
+  ),
+  brm_thr1 = c(
+    cf_brms_part_cont[paste0(params_np, "[1]"), "Estimate"],
+    cf_brms_part_cont[params_p, "Estimate"]
+  ),
+  brm_thr2 = c(
+    cf_brms_part_cont[paste0(params_np, "[2]"), "Estimate"],
+    cf_brms_part_cont[params_p, "Estimate"]
+  ),
+  check.names = FALSE
+)
+
+data.frame(
+  engine = c("vglm", "clm", "brm"),
+  LL = signif(c(
+    as.numeric(logLik(vglm_partial_cont)),
+    as.numeric(logLik(clm_partial_infl)),
+    brms_partial_cont_LL
+  ), 7)
+)
+```
+
+</details>
+
+
+These should be identical (same model, different parameterization).
+
+# Engine-specific parameterizations
+
+## `vglm`: equivalent formula formulations
+
+`TRUE ~ -1 + Infl` (Infl parallel) should equal `FALSE ~ 1 + Cont`
+(Cont non-parallel; everything else parallel).
+
+<details>
+<summary>Equivalent formula formulations: coefficients and equality checks</summary>
+
+```{r vglm-equivalence}
+vglm_partial_infl_check <- vglm(
+  f, data = housing_long,
+  family = VGAM::cumulative(link = "logitlink", parallel = FALSE ~ 1 + Cont)
+)
+
+vglm_partial_cont_check <- vglm(
+  f, data = housing_long,
+  family = VGAM::cumulative(link = "logitlink", parallel = FALSE ~ 1 + Infl)
+)
+
+# TRUE ~ -1 + Infl should equal FALSE ~ 1 + Cont
+cf_a <- coef(vglm_partial_infl, matrix = TRUE)
+cf_b <- coef(vglm_partial_infl_check, matrix = TRUE)
+
+data.frame(
+  parameter = rownames(cf_a),
+  `TRUE~-1+Infl` = as.numeric(cf_a[, 1]),
+  `FALSE~1+Cont` = as.numeric(cf_b[, 1]),
+  check.names = FALSE
+)
+
+all.equal(cf_a, cf_b)
+
+# TRUE ~ -1 + Cont should equal FALSE ~ 1 + Infl
+cf_c <- coef(vglm_partial_cont, matrix = TRUE)
+cf_d <- coef(vglm_partial_cont_check, matrix = TRUE)
+
+data.frame(
+  parameter = rownames(cf_c),
+  `TRUE~-1+Cont` = as.numeric(cf_c[, 1]),
+  `FALSE~1+Infl` = as.numeric(cf_d[, 1]),
+  check.names = FALSE
+)
+
+all.equal(cf_c, cf_d)
+```
+
+</details>
+
+
+## `brm`: same variable parallel and non-parallel
+
+`brm` also lets the same variable appear both with and without `cs()`:
+
+```r
+Sat ~ Infl + cs(Infl) + Cont
+```
+
+The variable's effect decomposes into a shared (parallel) coefficient
+`b` plus a category-specific deviation `bcs_j` --- a reparameterization
+of the fully non-parallel model. The other engines cannot do this: `vglm`'s
+`parallel` formula, `clm`'s `nominal` formula, and `ordinalNet`'s
+`parallelTerms`/`nonparallelTerms` flags each assign a variable to
+exactly one side of the partition.
+
+## `ordinalNet`: semi-parallel model
+
+`parallelTerms` and `nonparallelTerms` cannot both be `FALSE`. The
+"semi-parallel" model has both `TRUE`: the elastic net penalty (scaled by
+`parallelPenaltyFactor`) shrinks the nonparallel terms toward the
+parallel model. At `lambda = 0`, the semi-parallel model spans the same
+space as the fully non-parallel model; the parallel terms are redundant
+(absorbed into nonparallel).
+
+<details>
+<summary>`ordinalNet`: semi-parallel coefficients and log-likelihood</summary>
+
+```{r ordinalNet-semi}
+set.seed(42)
+on_semi <- ordinalNet(
+  x = x_mat, y = y_fac,
+  family = "cumulative", link = "logit",
+  parallelTerms = TRUE, nonparallelTerms = TRUE,
+  lambdaVals = 0, nLambda = 1
+)
+
+coef(on_semi)
+on_semi$loglik
+```
+
+</details>
+
+
+With higher `parallelPenaltyFactor`, parallel terms are penalized more,
+so nonparallel terms should be larger (less shrunk toward zero). This
+effectively biases the model **away** from the fully parallel model.
+
+<details>
+<summary>`ordinalNet`: effect of parallelPenaltyFactor on coefficients</summary>
+
+```{r ordinalNet-pf}
+set.seed(42)
+on_pf1 <- ordinalNet(
+  x = x_mat, y = y_fac,
+  family = "cumulative", link = "logit",
+  parallelTerms = TRUE, nonparallelTerms = TRUE,
+  parallelPenaltyFactor = 1,
+  lambdaVals = c(0.05), nLambda = 1
+)
+
+writeLines("pf=1, lambda=0.05:")
+print(coef(on_pf1))
+
+set.seed(42)
+on_pf5 <- ordinalNet(
+  x = x_mat, y = y_fac,
+  family = "cumulative", link = "logit",
+  parallelTerms = TRUE, nonparallelTerms = TRUE,
+  parallelPenaltyFactor = 5,
+  lambdaVals = c(0.05), nLambda = 1
+)
+
+writeLines(c("", "pf=5, lambda=0.05:"))
+print(coef(on_pf5))
+```
+
+</details>
+
+
+## `parallelPenaltyFactor` mechanics
+
+### How it works
+
+The semi-parallel model has both `parallelTerms` and `nonparallelTerms`
+`TRUE`. Its elastic net penalty is constructed (from the `ordinalNet`
+source) as:
+
+```
+penaltyFactorsIntercept   <- rep(0, nLev - 1)           # unpenalized
+penaltyFactorsParallel    <- penaltyFactors * parallelPenaltyFactor
+penaltyFactorsNonparallel <- rep(penaltyFactors, nLev - 1)
+penaltyFactors <- c(penaltyFactorsIntercept,
+                     penaltyFactorsParallel,
+                     penaltyFactorsNonparallel)
+```
+
+For 3 levels, 3 predictors, the per-parameter penalty is:
+
+| Parameter | Penalty |
+|---|---|
+| `(Intercept):1` | 0 (always unpenalized) |
+| `(Intercept):2` | 0 (always unpenalized) |
+| `InflMedium` (parallel) | `penaltyFactors[1] * parallelPenaltyFactor` |
+| `InflHigh` (parallel) | `penaltyFactors[2] * parallelPenaltyFactor` |
+| `ContHigh` (parallel) | `penaltyFactors[3] * parallelPenaltyFactor` |
+| `InflMedium:1` (nonpar) | `penaltyFactors[1]` |
+| `InflHigh:1` (nonpar) | `penaltyFactors[2]` |
+| `ContHigh:1` (nonpar) | `penaltyFactors[3]` |
+| `InflMedium:2` (nonpar) | `penaltyFactors[1]` |
+| `InflHigh:2` (nonpar) | `penaltyFactors[2]` |
+| `ContHigh:2` (nonpar) | `penaltyFactors[3]` |
+
+`parallelPenaltyFactor` scales the parallel terms relative to the
+nonparallel terms: higher values penalize parallel terms more (pushing
+toward the fully non-parallel model), lower values penalize them less
+(pushing toward the fully parallel model).
+
+The critical constraint is that `penaltyFactors[j]` is the **same** for
+both the parallel and nonparallel terms of variable `j`, so there is no
+way to independently control the penalty on Cont's parallel versus its
+nonparallel terms.
+
+### Sweep: `parallelPenaltyFactor` from `0` to `Inf`
+
+<details>
+<summary>Sweep results across parallelPenaltyFactor values</summary>
+
+```{r pf-sweep, cache=TRUE}
+pf_sweep <- c(0, 0.01, 0.1, 0.5, 1, 2, 5, 10, 50, Inf)
+results_pf <- data.frame()
+
+for (pf in pf_sweep) {
+  set.seed(42)
+  pf_use <- ifelse(is.infinite(pf), 1e10, pf)
+  fit <- tryCatch(
+    ordinalNet(
+      x = x_mat, y = y_fac,
+      family = "cumulative", link = "logit",
+      parallelTerms = TRUE, nonparallelTerms = TRUE,
+      parallelPenaltyFactor = pf_use,
+      lambdaVals = c(0.05), nLambda = 1,
+      warn = FALSE
+    ),
+    error = function(e) NULL
+  )
+  if (!is.null(fit)) {
+    cf <- coef(fit)
+    results_pf <- rbind(results_pf, data.frame(
+      pf = pf,
+      LL = fit$loglik,
+      Infl_par = abs(cf["InflMedium"]) + abs(cf["InflHigh"]),
+      Infl_np = abs(cf["InflMedium:1"]) + abs(cf["InflHigh:1"]) +
+        abs(cf["InflMedium:2"]) + abs(cf["InflHigh:2"]),
+      Cont_par = abs(cf["ContHigh"]),
+      Cont_np = abs(cf["ContHigh:1"]) + abs(cf["ContHigh:2"]),
+      npar = sum(cf != 0),
+      stringsAsFactors = FALSE
+    ))
+  }
+}
+
+results_pf$pf_label <- ifelse(
+  is.infinite(results_pf$pf), "Inf",
+  sprintf("%.2f", results_pf$pf)
+)
+print(results_pf[, c("pf_label", "LL", "Infl_par", "Infl_np",
+                      "Cont_par", "Cont_np", "npar")])
+```
+
+</details>
+
+
+- `pf = 0`: parallel terms unpenalized, nonparallel penalized => fully
+  parallel model
+- `pf = 1`: equal penalty => intermediate model
+- `pf = Inf`: parallel terms zeroed out => fully non-parallel model
+
+(Values in between interpolate: `pf = 0.01` is nearly fully parallel,
+`pf >= 2` already approaches fully non-parallel.)
+
+### Partial parallelism is impossible
+
+Because `penaltyFactors[j]` is shared between the parallel and nonparallel
+terms of each variable, `parallelPenaltyFactor` is a "global knob" for
+the parallel regression assumption, not a per-variable switch: it cannot
+make one variable non-parallel while another stays parallel.
+
+Target: Infl parallel, Cont non-parallel (`clm` reference:
+`LL = -404.4711` via `nominal = ~ Cont`). Attempt: set `penaltyFactors`
+to penalize Cont more than Infl:
+
+<details>
+<summary>Attempted partial parallelism: coefficients and log-likelihood</summary>
+
+```{r partial-try}
+pf_partial <- c(1, 1, 10)
+set.seed(42)
+fit_partial_try <- ordinalNet(
+  x = x_mat, y = y_fac,
+  family = "cumulative", link = "logit",
+  parallelTerms = TRUE, nonparallelTerms = TRUE,
+  parallelPenaltyFactor = 1,
+  penaltyFactors = pf_partial,
+  lambdaVals = c(0.05), nLambda = 1,
+  warn = FALSE
+)
+
+print(coef(fit_partial_try))
+fit_partial_try$loglik
+```
+
+</details>
+
+
+**Problem**: this penalizes both Cont's parallel **and** nonparallel
+terms more than Infl's --- the opposite of what we want, since Cont's
+nonparallel terms are the very terms we want to keep.
+
+**Contrast with `clm`/`vglm`/`brm`**: these engines use maximum likelihood
+with a design matrix that includes category-specific terms **only** for
+non-parallel variables. This is a hard structural constraint in the model
+itself, not a soft penalization, so per-variable partial parallelism is
+native.
+
+**Implication for ordered**: `ordinalNet` cannot express the same model
+as `clm`/`vglm` when some variables are parallel and others are not. The
+harmonized interface must either:
+
+(a) Error when partial parallelism is requested for `ordinalNet`,
+(b) Approximate it (poorly) via penalty tuning, or
+(c) Advise users to switch to `clm` or `vglm` for partial parallelism.
+
+### What `parallelPenaltyFactor` _is_ good for
+
+Despite this, `parallelPenaltyFactor` serves valuable purposes:
+
+1. **Model selection and regularized estimation**: sweeping it (or using
+   cross-validation) data-adaptively estimates the overall degree of
+   parallel regression assumption violation, and the semi-parallel model
+   can predict better than either extreme by borrowing strength across
+   categories.
+2. **Variable selection**: combined with the elastic net (`alpha < 1`),
+   it selects predictors while the parallelism structure determines how
+   their effects are modeled.
+
+**Practical recommendation**: for per-variable partial parallelism, use
+`clm`, `vglm`, or `brm`. Use `ordinalNet` when the entire model should be
+regularized, when variable selection matters, or when the degree of
+parallel regression assumption violation is uncertain and should be
+estimated.
+
+### Design matrix approach for partial parallelism
+
+A wrapper around `ordinalNet` *could* achieve per-variable partial
+parallelism by constructing the design matrix by hand: shared dummy terms
+for the parallel variables, and interactions with threshold indicators
+for the nonparallel variables.
+
+<details>
+<summary>Constructed design matrix dimensions</summary>
+
+```{r design-matrix-demo}
+# Demonstrate the design-matrix construction (not fitted)
+# Target: Infl parallel, Cont non-parallel
+
+# Step 1: Identify groups
+parallel_vars <- c("InflMedium", "InflHigh")
+nonparallel_vars <- c("ContHigh")
+
+# Step 2: Parallel design matrix (standard dummies, shared across thresholds)
+X_par <- x_mat[, parallel_vars, drop = FALSE]
+
+# Step 3: Nonparallel design matrix (interactions with threshold indicators)
+K <- nlevels(y_fac)
+n_thr <- K - 1
+X_np_list <- list()
+for (j in seq_along(nonparallel_vars)) {
+  for (t in seq_len(n_thr)) {
+    thr_indicator <- as.integer(as.integer(y_fac) > t)
+    X_np_list[[length(X_np_list) + 1]] <- x_mat[, nonparallel_vars[j]] * thr_indicator
+  }
+}
+X_np <- do.call(cbind, X_np_list)
+colnames(X_np) <- paste0(rep(nonparallel_vars, each = n_thr), ":", seq_len(n_thr))
+
+# Step 4: Combine
+X_partial <- cbind(X_par, X_np)
+
+data.frame(
+  full_columns = ncol(x_mat),
+  partial_columns = ncol(X_partial),
+  parallel = paste(parallel_vars, collapse = ", "),
+  nonparallel = paste(colnames(X_np), collapse = ", ")
+)
+```
+
+</details>
+
+
+In practice this is not native to `ordinalNet`: the wrapper would need to
+bypass the internal design-matrix construction (setting both flags
+`FALSE`) and pass the intercepts and the full penalty vector to the
+internal optimizer or to `glmnet` directly, and the resulting fit would
+forfeit elastic net regularization for the parallel terms. The approach
+is mainly of theoretical interest --- it shows that `ordinalNet`'s *model
+space* can express partial parallelism, but its *interface* does not
+expose it.
+
+### Parallel-to-non-parallel spectrum
+
+<details>
+<summary>`ordinalNet` spectrum: log-likelihood and information criteria</summary>
+
+```{r spectrum, cache=TRUE}
+models_spectrum <- list(
+  list(name = "Parallel", pt = TRUE, nt = FALSE, pf = 1),
+  list(name = "Semi (pf=0.1)", pt = TRUE, nt = TRUE, pf = 0.1),
+  list(name = "Semi (pf=0.5)", pt = TRUE, nt = TRUE, pf = 0.5),
+  list(name = "Semi (pf=1)", pt = TRUE, nt = TRUE, pf = 1),
+  list(name = "Semi (pf=5)", pt = TRUE, nt = TRUE, pf = 5),
+  list(name = "Semi (pf=10)", pt = TRUE, nt = TRUE, pf = 10),
+  list(name = "Non-parallel", pt = FALSE, nt = TRUE, pf = 1)
+)
+
+spectrum_df <- data.frame(
+  model = character(7), LL = NA_real_, AIC = NA_real_,
+  BIC = NA_real_, npar = NA_integer_,
+  stringsAsFactors = FALSE
+)
+for (i in seq_along(models_spectrum)) {
+  m <- models_spectrum[[i]]
+  set.seed(42)
+  fit <- ordinalNet(
+    x = x_mat, y = y_fac,
+    family = "cumulative", link = "logit",
+    parallelTerms = m$pt, nonparallelTerms = m$nt,
+    parallelPenaltyFactor = m$pf,
+    lambdaVals = c(0.05), nLambda = 1,
+    warn = FALSE
+  )
+  npar <- sum(coef(fit) != 0)
+  spectrum_df$model[i] <- m$name
+  spectrum_df$LL[i] <- fit$loglik
+  spectrum_df$AIC[i] <- -2 * fit$loglik + 2 * npar
+  spectrum_df$BIC[i] <- -2 * fit$loglik + log(nrow(x_mat)) * npar
+  spectrum_df$npar[i] <- npar
+}
+print(spectrum_df)
+```
+
+</details>
+
+
+`clm` reference (unpenalized MLE):
+
+<details>
+<summary>`clm` reference: log-likelihoods and information criteria</summary>
+
+```{r spectrum-clm-ref}
+n <- nrow(x_mat)
+data.frame(
+  model = c("Parallel (clm)", "Non-parallel (clm)", "Partial Cont (clm)", "Partial Infl (clm)"),
+  LL = c(
+    as.numeric(logLik(clm_par)),
+    as.numeric(logLik(clm_npar)),
+    as.numeric(logLik(clm_partial_cont)),
+    as.numeric(logLik(clm_partial_infl))
+  ),
+  AIC = c(
+    -2 * as.numeric(logLik(clm_par)) + 2 * 5,
+    -2 * as.numeric(logLik(clm_npar)) + 2 * 8,
+    -2 * as.numeric(logLik(clm_partial_cont)) + 2 * 6,
+    -2 * as.numeric(logLik(clm_partial_infl)) + 2 * 7
+  ),
+  BIC = c(
+    -2 * as.numeric(logLik(clm_par)) + log(n) * 5,
+    -2 * as.numeric(logLik(clm_npar)) + log(n) * 8,
+    -2 * as.numeric(logLik(clm_partial_cont)) + log(n) * 6,
+    -2 * as.numeric(logLik(clm_partial_infl)) + log(n) * 7
+  ),
+  npar = c(5, 8, 6, 7)
+)
+```
+
+</details>
+
+
+Note: `ordinalNet` fits use `lambda = 0.05` (regularized), so LLs are lower
+than the unpenalized MLE. The semi-parallel model with `pf = 0` recovers
+the fully parallel model; with `pf >= 2` it recovers the fully non-parallel
+model (all parallel terms zeroed). The "sweet spot" depends on the data
+and tuning.
+
+# Threshold constraints with parallel regression
+
+Threshold constraints and parallel regression constraints are orthogonal:
+thresholds control the intercept structure, while parallelism controls
+the regression coefficients. They can be combined freely. Which engines
+support threshold constraints, and how?
+
+## Available constraints
+
+`flexible` (the default in all engines) estimates K-1 independent
+thresholds. The constrained options reduce the number of free threshold
+parameters:
+
+- **equidistant / equid**: equal spacing between thresholds (2 free
+  parameters: intercept + spacing, regardless of K).
+- **symmetric / symm1**: thresholds symmetric around the central
+  threshold (floor(K/2) + 1 free parameters).
+- **symmetric2 / symm0**: symmetric about zero; central threshold is
+  zero (even K) or two central thresholds are equal and opposite
+  (odd K).
+- **qnorm** (`vglm` only): thresholds placed at normal-distribution
+  quantiles (1 free parameter: the scale).
+- **sum_to_zero** (`brm` only): thresholds constrained to sum to zero
+  (K-1 free parameters, but centered).
+
+`vglm`'s threshold syntax changed at version 1.1-10: up to 1.1-9 the
+argument was `thresholds` with values `"equidistant"`, `"symmetric1"`,
+and `"symmetric0"`; from 1.1-10 it is `Thresh` with the abbreviated
+values `"equid"`, `"symm1"`, `"symm0"`, `"free"`, and `"qnorm"`.
+
+| Engine | Threshold argument | Options | Exposed in ordered? |
+|---|---|---|---|
+| `clm` | `threshold` | `flexible`, `symmetric`, `symmetric2`, `equidistant` | Yes (`threshold_structure` dial) |
+| `vglm` (≤ 1.1-9) | `thresholds` (in family) | `"equidistant"`, `"symmetric1"`, `"symmetric0"` | No (wrapper uses `...`) |
+| `vglm` (≥ 1.1-10) | `Thresh` (in family) | `NULL`, `"equid"`, `"symm1"`, `"symm0"`, `"free"`, `"qnorm"` | No (wrapper uses `...`) |
+| `brm` | `threshold` (in family) | `"flexible"`, `"equidistant"`, `"sum_to_zero"` | No (not registered) |
+| `ordinalNet` | --- | None | --- |
+
+## Interaction with parallelism
+
+Because thresholds and parallelism constrain different parts of the
+model, they compose without conflict:
+
+```r
+# clm: equidistant thresholds + partial non-parallel effects
+clm(Sat ~ Infl + Cont, data = data,
+    nominal = ~ Cont, threshold = "equidistant")
+
+# vglm: equidistant thresholds + non-parallel effects
+vglm(Sat ~ Infl + Cont, data = data,
+     family = VGAM::cumulative(link = "logitlink",
+                         parallel = FALSE, Thresh = "equid"))
+
+# brm: equidistant thresholds + category-specific effects
+brm(Sat ~ Infl + cs(Cont), data = data,
+    family = brms::cumulative("logit", threshold = "equidistant"))
+```
+
+The parallel regression specification determines how many coefficient
+vectors are estimated (one for a fully parallel model, K-1 for a fully
+non-parallel model, variable for partial parallelism).
+The threshold constraint determines how many intercepts are estimated.
+Together, they set the total number of free parameters.
+
+## Comparison on housing data
+
+<details>
+<summary>`clm`: threshold sweep log-likelihoods and degrees of freedom</summary>
+
+```{r threshold-comparison, cache=TRUE}
+# clm: threshold sweep with fully parallel model
+clm_thr_par <- data.frame(
+  threshold = c("flexible", "symmetric", "equidistant"),
+  LL = NA_real_, df = NA_integer_,
+  stringsAsFactors = FALSE
+)
+for (i in seq_along(clm_thr_par$threshold)) {
+  fit <- clm(f, data = housing_long, link = "logit",
+             threshold = clm_thr_par$threshold[i])
+  clm_thr_par$LL[i] <- as.numeric(logLik(fit))
+  clm_thr_par$df[i] <- attr(logLik(fit), "df")
+}
+print(clm_thr_par)
+
+# clm: threshold sweep with fully non-parallel model (all nominal)
+clm_thr_npar <- clm_thr_par
+for (i in seq_along(clm_thr_npar$threshold)) {
+  fit <- clm(f, data = housing_long, link = "logit",
+             nominal = ~ Infl + Cont,
+             threshold = clm_thr_npar$threshold[i])
+  clm_thr_npar$LL[i] <- as.numeric(logLik(fit))
+  clm_thr_npar$df[i] <- attr(logLik(fit), "df")
+}
+print(clm_thr_npar)
+```
+
+</details>
+
+
+With 3 satisfaction levels (2 thresholds) and 2 categorical predictors,
+the equidistant constraint saves at most 1 degree of freedom (2
+thresholds down to 1 spacing parameter). The gain grows with the number
+of ordinal levels. Threshold constraints are most useful when the
+spacing between categories is plausibly uniform, and they interact
+naturally with the parallel regression specification: a user can
+simultaneously request equidistant thresholds and partial non-parallel
+effects, getting a parsimonious model on both dimensions.
+
+# Harmonization proposals
+
+## Proposal 1: Unified parallelism specification
+
+A single engine argument called `parallelism` that accepts:
+
+- `parallelism = "parallel"` (or `TRUE`): all terms parallel.
+  Equivalent to `vglm: parallel = TRUE`, `clm: nominal = NULL`,
+  `brm: Sat ~ x1 + x2` (no `cs()` terms),
+  `ordinalNet: parallelTerms=TRUE, nonparallelTerms=FALSE`.
+
+- `parallelism = "nonparallel"` (or `FALSE`): no terms parallel.
+  Equivalent to `vglm: parallel = FALSE`, `clm: nominal = ~ .`,
+  `brm: Sat ~ cs(x1) + cs(x2)`,
+  `ordinalNet: parallelTerms=FALSE, nonparallelTerms=TRUE`.
+
+- `parallelism = ~ x1 + x2` (formula naming non-parallel terms):
+  partial specification. Equivalent to `vglm: parallel = TRUE ~ -1 +
+  (complement of formula)`, `clm: nominal = ~ x1 + x2`,
+  `brm: Sat ~ Infl + cs(Cont)`,
+  NOT SUPPORTED natively by `ordinalNet`.
+
+- `parallelism = "semi"` (`ordinalNet`-specific): semi-parallel model with
+  penalized nonparallel terms.
+
+## Proposal 2: `clm`-style formula
+
+Adopt `clm`'s convention (shared by `brm`): a formula naming the
+**non-parallel** terms.
+
+```
+nominal = ~ x3
+=> x3 is non-parallel; everything else is parallel.
+```
+
+Advantages:
+
+- More intuitive for users who want to "break" the parallel regression
+  assumption for specific variables.
+- Maps to `ordinalNet`'s all-or-nothing flags: if all variables are in
+  the formula, set `parallelTerms=FALSE, nonparallelTerms=TRUE`; if no
+  variables are in the formula, set `parallelTerms=TRUE,
+  nonparallelTerms=FALSE`. Partial parallelism is not supported natively
+  (see Challenges below).
+- `clm`, `brm`, and `ordinalNet` use the same direction (non-parallel terms).
+
+### Implementation
+
+Given the constraints, the most practical harmonization for ordered
+would be to:
+
+1. Register `nominal` (or a renamed `parallelism`) as a model argument
+   for each engine, accepting a right-hand-side formula.
+
+2. Document the translation:
+   - For `clm`: pass directly as `nominal = ~ ...`.
+   - For `vglm`: convert to `parallel = TRUE ~ -1 + (complement)`.
+   - For `brm`: wrap non-parallel terms in `cs()` in the formula.
+   - For `ordinalNet`: convert to `parallelTerms`/`nonparallelTerms`
+     booleans, with an error if partial parallelism is requested.
+
+3. Keep `parallelPenaltyFactor` as a separate engine-specific argument
+   (`ordinalNet` only).
+
+4. Document that `vglm`/`brm` and `clm` use opposite sign conventions for
+   coefficients (cumulative probability vs. latent variable).
+
+5. Note that `brm` is Bayesian; posterior means approximate MLEs with
+   large samples but require MCMC computation time.
+
+This approach respects each engine's native interface while giving users
+clear guidance on how to express the same model across engines.
+
+## Proposal 3: `cs()`-style formula syntax
+
+The `gen_additive_mod()` model with the `vgam` engine demonstrates how
+formula specials control model structure: the `s()` function marks
+predictors for smooth treatment, and the formula is passed through to
+`VGAM::vgam()` which interprets it natively. This precedent motivates a
+similar approach for parallelism: a `cs()` ("category-specific") formula
+special that marks predictors for non-parallel treatment.
+
+Adopt `brm`'s `cs()` convention directly in the model formula (as
+demonstrated in the `brm` section above): variables wrapped in `cs()` are
+category-specific (non-parallel); unwrapped variables are parallel.
+Unlike Proposal 2, this needs no separate argument --- the formula
+itself carries the parallelism information.
+
+```
+Sat ~ Infl + cs(Cont)         # Infl parallel, Cont non-parallel
+Sat ~ cs(Infl) + cs(Cont)     # All non-parallel
+Sat ~ Infl + Cont             # All parallel
+```
+
+### Translation to `vglm`
+
+The wrapper parses the formula to identify `cs()` terms, strips the
+wrappers, and constructs the `parallel` argument for the family function.
+`vglm` names the **parallel** terms, so the wrapper computes the complement
+of the `cs()` variables:
+
+```r
+# User formula: Sat ~ Infl + cs(Cont)
+# cs() vars: Cont  =>  parallel vars: Infl
+# Translation:
+vglm(
+  Sat ~ Infl + Cont, data = data,
+  family = VGAM::cumulative(link = "logitlink", parallel = TRUE ~ -1 + Infl)
+)
+```
+
+When all terms are non-parallel (`cs(Infl) + cs(Cont)`), the wrapper
+sets `parallel = FALSE`. When no terms are `cs()`, it sets
+`parallel = TRUE`. The intercept is always category-specific regardless
+of the specification.
+
+### Translation to `clm`
+
+The wrapper extracts `cs()` terms and passes them as the `nominal`
+formula. This maps directly: `cs()` terms become nominal terms.
+
+```r
+# User formula: Sat ~ Infl + cs(Cont)
+# cs() vars: Cont
+# Translation:
+clm(Sat ~ Infl + Cont, data = data, nominal = ~ Cont)
+```
+
+### Translation to `ordinalNet`
+
+`ordinalNet` cannot express partial parallelism natively (see the
+structural limitation discussed above). The wrapper checks whether the
+`cs()` specification is all-or-nothing:
+
+```r
+# Sat ~ Infl + Cont (no cs()): fully parallel model
+ordinalNet(x, y, ..., parallelTerms = TRUE, nonparallelTerms = FALSE)
+
+# Sat ~ cs(Infl) + cs(Cont) (all cs()): fully non-parallel model
+ordinalNet(x, y, ..., parallelTerms = FALSE, nonparallelTerms = TRUE)
+
+# Sat ~ Infl + cs(Cont) (partial): ERROR
+stop("ordinalNet does not support partial parallelism. ",
+     "Use engine 'clm' or 'vglm' for partial parallelism.")
+```
+
+### Interaction with `s()` terms
+
+`brm` allows `s()` and `cs()` in the same formula, but only on
+**different** predictors:
+
+```r
+bf(rating ~ period + cs(treat) + s(x), family = sratio())
+```
+
+Here `period` and `x` have parallel effects and `treat` has a
+non-parallel effect; `cs()` controls parallelism, `s()` controls
+functional form. Nesting is not allowed --- `cs(s(x))` raises an error ---
+and `cs()` works only with `sratio()`, `cratio()`, and `acat()`
+families, not `cumulative()`.
+
+`vglm` is richer here: smooth terms and non-parallel effects coexist
+naturally, and a smooth term can itself be non-parallel, a capability
+`brm` lacks. The catch is that `vglm`'s `parallel` formula matches terms by
+**exact string label**, so a raw variable name like `x1` does not match
+the smooth term label `s(x1, df = 2)`:
+
+```r
+vgam(y ~ s(x1, df = 2) + x2,
+     family = VGAM::cumulative(link = "logitlink",
+                         parallel = FALSE ~ 1 + s(x1, df = 2)))
+```
+
+A `cs()` implementation in ordered's vgam wrapper would therefore need
+to map `cs()` variable names to their exact smooth term labels when
+constructing the `parallel` formula.
+
+### Implementation sketch
+
+The wrapper would parse the formula to identify `cs()` specials,
+analogous to how `VGAM::vgam()` handles `s()` specials:
+
+```r
+parse_cs_terms <- function(formula) {
+  terms_obj <- terms(formula, specials = "cs")
+  cs_idx <- attr(terms_obj, "specials")$cs
+  all_vars <- rownames(attr(terms_obj, "factors"))
+  if (is.null(cs_idx)) {
+    return(list(formula = formula, cs_vars = character(0)))
+  }
+  cs_vars <- all_vars[cs_idx]
+  clean_formula <- remove_cs_wrappers(formula)
+  list(formula = clean_formula, cs_vars = cs_vars)
+}
+```
+
+This approach is formula-native, matches the user's mental model ("wrap
+in cs() to make that variable non-parallel"), and parallels the existing
+`gen_additive_mod` + `s()` precedent in the tidymodels ecosystem.
+
+## Challenges with harmonization
+
+1. **Formula semantics differ**: In `vglm`, the formula names PARALLEL
+   terms (`TRUE ~ -1 + x1` => x1 is parallel). In `clm` and `brm`, the
+   formula names NON-PARALLEL terms (`nominal = ~ x1` or `cs(x1)`).
+   These are logical inverses. A unified interface should pick ONE
+   convention and translate for each engine.
+
+2. **Family vs. model argument**: In `vglm`, the parallelism is specified
+   inside the family function (`cumulative(parallel=...)`), not as a model
+   argument. In `clm` and `ordinalNet`, it is a model argument. In `brm`, it
+   is part of the formula (`cs()`). For a unified interface, it should be
+   a model argument (consistent with `clm` and `ordinalNet`), and the wrapper
+   should inject it into the `vglm` family constructor and the `brm`
+   formula.
+
+3. **Intercept handling**: `vglm` explicitly excludes the intercept from
+   the parallelism constraint (intercepts are always category-specific).
+   `clm` does the same by design. `ordinalNet` has no explicit intercept in
+   the design matrix. A unified interface should document that intercepts
+   are always category-specific regardless of the parallelism setting.
+
+4. **Penalty interactions**: `ordinalNet`'s `parallelPenaltyFactor` has no
+   analog in `vglm` or `clm`. If we harmonize the parallelism specification,
+   we still need a separate mechanism for differential penalization. This
+   could be a separate `parallel_penalty_factor` engine argument.
+
+5. **`ordinalNet`'s all-or-nothing design**: `ordinalNet` cannot express
+   partial parallelism natively. A formula-based interface would require
+   `ordinalNet` to either accept the formula and zero out non-selected
+   nonparallel terms, or raise an error when partial parallelism is
+   requested. The first option is feasible but requires a wrapper that
+   constructs the design matrix with interaction terms only for
+   non-parallel variables.
+
+6. **Threshold structure**: `clm` supports threshold constraints
+   (equidistant, symmetric, etc.) that interact with nominal effects.
+   `vglm` supports similar constraints via the `Thresh` argument. `brm`
+   supports threshold constraints via the `threshold` argument in the
+   family. `ordinalNet` has no threshold structure. A unified interface
+   would need to decide whether threshold constraints are part of the
+   parallelism specification or separate. See the "Threshold constraints
+   with parallel regression" section above.
+
+7. **Scale model**: `clm` supports a scale formula for heteroscedastic
+   models. `vglm` supports this via `s()` in `vgam`. `brm` supports this
+   via distributional regression (`bf(..., sigma ~ ...)`). `ordinalNet`
+   does not. This is orthogonal to parallelism but adds complexity to the
+   unified interface.
+
+8. **Link function interactions**: `clm` supports Aranda-Ordaz and log-gamma
+   links that `vglm`, `ordinalNet`, and `brm` do not. The parallelism
+   specification is orthogonal to the link, but some links may have
+   convergence issues with non-parallel models.
