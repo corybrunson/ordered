@@ -14,10 +14,9 @@ test_that("specification handles model parameters", {
 
   # an unavailable odds link function
   acat_spec <- ordinal_reg(engine = "clm", odds_link = "adjacent_categories")
-  expect_warning(
-    fit(acat_spec, Sat ~ Type + Infl + Cont, data = house_sub),
-    "clm.*cumulative[ \\_]link"
-  )
+  expect_snapshot(error = TRUE, {
+    fit(acat_spec, Sat ~ Type + Infl + Cont, data = house_sub)
+  })
 })
 
 # model: basic -----------------------------------------------------------------
@@ -241,6 +240,22 @@ test_that("parallel regression argument handles logicals", {
   orig_fit <- ordinal::clm(
     Sat ~ Infl + Cont, data = house_sub,
     nominal = ~ Infl + Cont
+  )
+
+  tidy_fit$fit$call <- orig_fit$call <- NULL
+  tidy_fit$fit$formulas <- orig_fit$formulas <- NULL
+  expect_equal(tidy_fit$fit, orig_fit, ignore_formula_env = TRUE)
+
+  # all category-specific with interactions
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(parallel_reg = FALSE, engine = "clm") |>
+    fit(Sat ~ Infl * Cont, data = house_sub)
+
+  set.seed(seed)
+  orig_fit <- ordinal::clm(
+    Sat ~ Infl * Cont, data = house_sub,
+    nominal = ~ Infl * Cont
   )
 
   tidy_fit$fit$call <- orig_fit$call <- NULL
