@@ -659,6 +659,119 @@ data.frame(
 
 These should be identical (same model, different parameterization).
 
+## Intercept-only model: relaxing parallelism with no variable predictors
+
+When the model contains only an intercept and no variable predictors, the
+parallel regression assumption has nothing to differentiate: there are no
+slope coefficients to make category-specific. Relaxing parallelism "for all
+terms" therefore reduces to asking each engine what it does with its
+intercepts when instructed to estimate non-parallel terms, which the engines
+handle very differently.
+
+The four engines, fit to the intercept-only model `Sat ~ 1`:
+
+- `vglm`: `parallel = FALSE`
+- `clm`: `nominal = ~ 1`
+- `ordinalNet`: `parallelTerms = FALSE, nonparallelTerms = TRUE`
+- `brm`: `Sat ~ cs(1)` (a degenerate request, since `cs()` has no term to wrap)
+
+<details>
+<summary>`vglm`: `parallel = FALSE` on an intercept-only model</summary>
+
+```{r vglm-int-only}
+vglm_int_par <- vglm(
+  Sat ~ 1, data = housing_long,
+  family = VGAM::cumulative(link = "logitlink", parallel = TRUE)
+)
+vglm_int_npar <- vglm(
+  Sat ~ 1, data = housing_long,
+  family = VGAM::cumulative(link = "logitlink", parallel = FALSE)
+)
+
+coef(vglm_int_par, matrix = TRUE)
+coef(vglm_int_npar, matrix = TRUE)
+all.equal(coef(vglm_int_par, matrix = TRUE), coef(vglm_int_npar, matrix = TRUE))
+```
+
+</details>
+
+`vglm` treats the intercept as category-specific regardless of the
+`parallel` setting, so `parallel = FALSE` changes nothing: the two fits have
+identical thresholds and identical log-likelihoods. Relaxing parallelism is a
+no-op when there are no variable predictors.
+
+<details>
+<summary>`clm`: `nominal = ~ 1` on an intercept-only model</summary>
+
+```{r clm-int-only}
+clm_int_par <- clm(Sat ~ 1, data = housing_long, link = "logit")
+clm_int_npar <- clm(Sat ~ 1, data = housing_long, link = "logit",
+                    nominal = ~ 1)
+
+coef(clm_int_par)
+coef(clm_int_npar)
+all.equal(unname(coef(clm_int_par)), unname(coef(clm_int_npar)))
+```
+
+</details>
+
+`clm` accepts `nominal = ~ 1` and simply re-labels the threshold intercepts
+as `Threshold.(Intercept)` terms, but their estimates are numerically
+identical to the plain parallel fit. As with `vglm`, there are no variable
+effects to relax, so relaxing parallelism does not change the model. The
+`nominal = ~ .` form, which names "all" terms, is degenerate here: with no
+full-rank predictor, the resulting fit is near-singular and fails to
+converge.
+
+<details>
+<summary>`ordinalNet`: intercept-only model (zero predictor columns)</summary>
+
+```{r ordinalNet-int-only, error=TRUE}
+x_mat_int <- model.matrix(~ 1, data = housing_long)[, -1]
+on_int <- ordinalNet(
+  x = x_mat_int, y = housing_long$Sat,
+  family = "cumulative", link = "logit",
+  parallelTerms = FALSE, nonparallelTerms = TRUE,
+  lambdaVals = 0, nLambda = 1
+)
+```
+
+</details>
+
+`ordinalNet` fits from a predictor matrix rather than a formula, and it
+requires at least one predictor column. With zero columns (the intercept-only
+case), it throws `"subscript out of bounds"` before fitting, for both the
+parallel and the non-parallel flag settings. So `ordinalNet` cannot express
+even the simplest intercept-only model through its matrix interface, let
+alone relax parallelism in one.
+
+<details>
+<summary>`brm`: intercept-only model and `cs()`</summary>
+
+```{r brm-int-only, cache=TRUE}
+brms_int <- brm(
+  Sat ~ 1, data = housing_long,
+  family = brms::cumulative("logit"),
+  chains = 4, iter = 2000, warmup = 1000,
+  silent = 2, refresh = 0
+)
+
+brms::fixef(brms_int)
+```
+
+</details>
+
+`brm`'s `cs()` special attaches to individual predictor terms, so with an
+intercept-only model there is no term to wrap and `cs()` has no effect. The
+intercepts remain a single set of category-specific thresholds, and the
+posterior means match the `vglm`/`clm` estimates.
+
+In summary, relaxing parallelism for "all terms" of an intercept-only model
+is vacuous for `vglm`, `clm`, and `brm` --- each leaves the intercepts (which
+are always category-specific) unchanged --- while `ordinalNet` cannot fit the
+model at all because its matrix interface demands at least one predictor
+column.
+
 # Engine-specific parameterizations
 
 ## `vglm`: equivalent formula formulations
