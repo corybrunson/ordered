@@ -226,7 +226,7 @@ test_that("arguments agree", {
     gen_additive_mod() |>
     set_mode("classification") |>
     set_engine("vgam", parallel = TRUE) |>
-    set_args(link = "cloglog", family = "stopping")
+    set_args(link = "cloglog", family = "stopping_ratio")
   expect_snapshot(onet_arg_spec |> translate())
 
   expect_snapshot({

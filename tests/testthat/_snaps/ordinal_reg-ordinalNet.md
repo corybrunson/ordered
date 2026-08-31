@@ -24,7 +24,7 @@
       
       Main Arguments:
         ordinal_link = cloglog
-        odds_link = stopping
+        odds_link = stopping_ratio
         penalty = 0.1
         mixture = 0.25
       

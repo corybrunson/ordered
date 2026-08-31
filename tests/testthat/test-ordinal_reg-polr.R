@@ -11,9 +11,9 @@ test_that("specification handles model parameters", {
 
   # an unavailable odds link function
   acat_spec <- ordinal_reg(engine = "polr", odds_link = "adjacent_categories")
-  expect_warning(
+  expect_error(
     fit(acat_spec, Sat ~ Type + Infl + Cont, data = house_sub),
-    "polr.*cumulative[ \\_]link"
+    "polr.*cumulative.*link"
   )
 })
 

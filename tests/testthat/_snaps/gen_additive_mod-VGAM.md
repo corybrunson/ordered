@@ -58,7 +58,7 @@
       Engine-Specific Arguments:
         parallel = TRUE
         link = cloglog
-        family = stopping
+        family = stopping_ratio
       
       Computational engine: vgam 
       

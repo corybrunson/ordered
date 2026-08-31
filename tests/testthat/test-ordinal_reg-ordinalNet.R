@@ -42,7 +42,7 @@ test_that("model object (penalty path from original to tidy)", {
   )
 
   tidy_spec <-
-    ordinal_reg(penalty = 0.01, mixture = .5, odds_link = "stopping") |>
+    ordinal_reg(penalty = 0.01, mixture = .5, odds_link = "stopping_ratio") |>
     set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -90,7 +90,7 @@ test_that("model object (penalty path from tidy to original)", {
   # extra arguments
 
   tidy_spec <-
-    ordinal_reg(penalty = 0.001, mixture = .5, odds_link = "stopping") |>
+    ordinal_reg(penalty = 0.001, mixture = .5, odds_link = "stopping_ratio") |>
     set_engine("ordinalNet")
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -180,7 +180,7 @@ test_that("case weights", {
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
     set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
-    set_args(mixture = .5, odds_link = "stopping")
+    set_args(mixture = .5, odds_link = "stopping_ratio")
   tidy_data <- transform(house_data, Freq = frequency_weights(Freq))
   set.seed(seed)
   tidy_fit <- fit(
@@ -437,7 +437,7 @@ test_that("arguments agree", {
     ordinal_reg(
       penalty = 0.1,
       mixture = .25,
-      ordinal_link = "cloglog", odds_link = "stopping"
+      ordinal_link = "cloglog", odds_link = "stopping_ratio"
     ) |>
     set_mode("classification") |>
     set_engine("ordinalNet", path_values = 10 ^ seq(-6, -1))

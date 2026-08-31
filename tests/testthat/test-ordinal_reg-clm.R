@@ -249,13 +249,17 @@ test_that("parallel regression argument handles logicals", {
   # all category-specific with interactions
 
   set.seed(seed)
-  tidy_fit <- ordinal_reg(parallel_reg = FALSE, engine = "clm") |>
-    fit(Sat ~ Infl * Cont, data = house_sub)
+  suppressWarnings(
+    tidy_fit <- ordinal_reg(parallel_reg = FALSE, engine = "clm") |>
+      fit(Sat ~ Infl * Cont, data = house_sub)
+  )
 
   set.seed(seed)
-  orig_fit <- ordinal::clm(
-    Sat ~ Infl * Cont, data = house_sub,
-    nominal = ~ Infl * Cont
+  suppressWarnings(
+    orig_fit <- ordinal::clm(
+      Sat ~ Infl * Cont, data = house_sub,
+      nominal = ~ Infl * Cont
+    )
   )
 
   tidy_fit$fit$call <- orig_fit$call <- NULL

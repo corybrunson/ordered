@@ -29,7 +29,7 @@
       ordinal_reg(mode = "regression")
     Condition
       Error in `ordinal_reg()`:
-      ! `mode` should be 'classification'
+      ! `mode` should be "classification".
 
 ---
 
@@ -138,7 +138,7 @@
       data = house_sub)
     Condition
       Error in `fit()`:
-      ! `parallel_reg` must be a single logical value.
+      ! `parallel_reg` must be `TRUE`, `FALSE`, or `NULL`, not the string "TRUE".
 
 ---
 
@@ -147,7 +147,7 @@
       Cont, data = house_sub)
     Condition
       Error in `fit()`:
-      ! `parallel_reg` must be a single logical value.
+      ! `parallel_reg` must be `TRUE`, `FALSE`, or `NULL`, not a <formula> object.
 
 ---
 
@@ -156,5 +156,5 @@
       "clm"), Sat ~ Infl + Cont, data = house_sub)
     Condition
       Error in `fit()`:
-      ! `parallel_reg` must be a single logical value.
+      ! `parallel_reg` must be `TRUE`, `FALSE`, or `NULL`, not a list.
 

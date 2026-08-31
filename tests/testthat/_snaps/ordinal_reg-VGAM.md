@@ -65,7 +65,7 @@
       
       Main Arguments:
         ordinal_link = cloglog
-        odds_link = stopping
+        odds_link = stopping_ratio
         parallel_reg = TRUE
       
       Computational engine: vglm 

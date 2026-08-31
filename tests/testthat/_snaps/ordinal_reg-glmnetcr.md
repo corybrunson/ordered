@@ -4,7 +4,7 @@
       translate(gcr_spec)
     Condition
       Warning:
-      x The glmnetcr engine ignores `penalty` in favor of a path that enables prediction at interpolated penalty values.
+      x The "glmnetcr" engine ignores `penalty` in favor of a path that enables prediction at interpolated penalty values.
       ! `penalty` was passed 0 values.
       i Use `path_values` to override the default path.
     Output

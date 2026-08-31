@@ -221,7 +221,7 @@ test_that("arguments agree", {
   onet_arg_spec <-
     ordinal_reg(
       parallel_reg = TRUE,
-      ordinal_link = "cloglog", odds_link = "stopping"
+      ordinal_link = "cloglog", odds_link = "stopping_ratio"
     ) |>
     set_mode("classification") |>
     set_engine("vglm")
