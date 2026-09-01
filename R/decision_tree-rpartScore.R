@@ -1,4 +1,4 @@
-#' A wrapper for `rpartScore`
+#' Fit wrapper for `rpartScore`
 #'
 #' A wrapper is used because the model interface requires the response variable
 #' to be numeric rather than ordered or factor; the wrapper edits the input

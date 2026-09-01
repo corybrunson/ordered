@@ -1,14 +1,14 @@
-#' Prediction wrapper for `glmnetcr`
+#' Predict wrapper for `glmnetcr`
 #'
 #' Selects predictions at a specific penalty value from the regularization path.
-#' When the requested penalty lies between two path values, linearly interpolates
-#' between the probability matrices at the neighboring steps.
+#' When the requested penalty lies between two path values, linearly
+#' interpolates between the probability matrices at the neighboring steps.
 #' @param object A `glmnetcr` object.
 #' @param newx A predictor matrix.
 #' @param type Either `"class"` or `"prob"`.
 #' @param lambda A penalty value at which to predict. If `NULL`, the step
 #'   minimizing `criteria` is used.
-#' @param criteria Criterion by which to select `lambda` within the path
+#' @param criteria The criterion by which to select `lambda` within the path
 #'   sequence. Defaults to `"bic"` for consistency with
 #'   [glmnetcr::predict.glmnetcr()]. (NB: This contrasts with
 #'   [predict_ordinalNet_wrapper()].)
@@ -103,7 +103,7 @@ predict_glmnetcr_wrapper <- function(
     )
   }
 
-  return(res)
+  res
 }
 
 # S3 methods for parsnip's model_fit dispatch ----------------------------------
@@ -117,7 +117,7 @@ predict._glmnetcr <- function(
     object, new_data, type = NULL, opts = list(),
     penalty = NULL, ...
 ) {
-  if (is.null(penalty) && !is.null(object$spec$args$penalty)) {
+  if (is.null(penalty) && ! is.null(object$spec$args$penalty)) {
     penalty <- object$spec$args$penalty
   }
   object$spec$args$penalty <- penalty
@@ -159,7 +159,7 @@ multi_predict._glmnetcr <- function(
   object$spec <- eval_args(object$spec)
 
   if (is.null(penalty)) {
-    if (!is.null(object$spec$args$penalty)) {
+    if (! is.null(object$spec$args$penalty)) {
       penalty <- object$spec$args$penalty
     } else {
       penalty <- object$fit$lambda
@@ -179,7 +179,10 @@ multi_predict._glmnetcr <- function(
       object, new_data = new_data, penalty = penalty
     ),
     "raw" = rlang::abort(
-      "`type = 'raw'` is not yet supported for `multi_predict` with the `glmnetcr` engine."
+      paste0(
+        "`type = 'raw'` is not yet supported for `multi_predict` with the ",
+        "`glmnetcr` engine."
+      )
     )
   )
 

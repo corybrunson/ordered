@@ -1,4 +1,4 @@
-#' Wrappers for `VGAM`
+#' Fit wrappers for `VGAM`
 #'
 #' These wrappers reorganize arguments into proper calls to [VGAM::vglm()] and
 #' [VGAM::vgam()], which specialize to several families of ordinal regression
@@ -19,10 +19,10 @@
 #' @param family The `VGAM` family function, as a character string (e.g.
 #'   `"cumulative"`, `"acat"`, `"cratio"`, `"sratio"`).
 #' @param link The `VGAM` link function (e.g. `"logitlink"`).
-#' @param parallel A logical; whether predictor effects are shared across
+#' @param parallel Logical; whether predictor effects are shared across
 #'   thresholds. It corresponds to the standardized `parallel_reg` argument (see
 #'   [dials::parallel_reg()]).
-#' @param Thresh A character; the threshold constraint pattern. It corresponds
+#' @param Thresh Character; the threshold constraint pattern. It corresponds
 #'   to the standardized `threshold_structure` argument (see
 #'   [dials::threshold_structure()]).
 #' @param ... Additional arguments to pass.
@@ -42,7 +42,6 @@
 #' dials::ordinal_link(values = values_ordinal_link_VGAM)
 #' values_threshold_structure_VGAM
 #' dials::threshold_structure(values = values_threshold_structure_VGAM)
-
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]

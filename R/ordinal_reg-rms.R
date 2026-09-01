@@ -1,4 +1,4 @@
-#' Wrapper for `rms` predictions
+#' Predict wrapper for `rms`
 #'
 #' `rms::lrm()` and `rms::orm()` use [rms::predictrms()] internally, which
 #' does not accept tibble inputs. This wrapper ensures that `newdata` is
@@ -6,10 +6,10 @@
 #' @param object A fitted model object of class `"lrm"` or `"orm"`.
 #' @param newdata A data frame or tibble of predictors.
 #' @param type The prediction type, passed to the underlying method.
-#' @param ... Additional arguments passed to the underlying method.
+#' @param ... Additional arguments to pass.
 #' @keywords internal
 #' @returns The result of [stats::predict()] dispatched on `object`.
-#' @examplesIf rlang::is_installed("rms") && rlang::is_installed("MASS")
+#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("rms")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
 #' ( fit <- rms::lrm(Sat ~ Infl + Type + Cont, data = house_data) )

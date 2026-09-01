@@ -6,7 +6,7 @@
 \alias{predict_class._glmnetcr}
 \alias{predict_classprob._glmnetcr}
 \alias{multi_predict._glmnetcr}
-\title{Prediction wrapper for \code{glmnetcr}}
+\title{Predict wrapper for \code{glmnetcr}}
 \usage{
 predict_glmnetcr_wrapper(
   object,
@@ -41,7 +41,7 @@ predict_glmnetcr_wrapper(
 \item{lambda}{A penalty value at which to predict. If \code{NULL}, the step
 minimizing \code{criteria} is used.}
 
-\item{criteria}{Criterion by which to select \code{lambda} within the path
+\item{criteria}{The criterion by which to select \code{lambda} within the path
 sequence. Defaults to \code{"bic"} for consistency with
 \code{\link[glmnetcr:predict.glmnetcr]{glmnetcr::predict.glmnetcr()}}. (NB: This contrasts with
 \code{\link[=predict_ordinalNet_wrapper]{predict_ordinalNet_wrapper()}}.)}
@@ -56,8 +56,8 @@ probabilities.
 }
 \description{
 Selects predictions at a specific penalty value from the regularization path.
-When the requested penalty lies between two path values, linearly interpolates
-between the probability matrices at the neighboring steps.
+When the requested penalty lies between two path values, linearly
+interpolates between the probability matrices at the neighboring steps.
 }
 \examples{
 \dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("glmnetcr")) withAutoprint(\{ # examplesIf}

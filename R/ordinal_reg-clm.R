@@ -74,7 +74,7 @@ clm_wrapper <- function(
 # formula, so that `clm()` has no aliased coefficients to drop. An offset has no
 # coefficient to vary across thresholds, so it stays in the location formula.
 clm_formulas <- function(formula, data, call = rlang::caller_env()) {
-  term_info <- terms(formula, data = data)
+  term_info <- stats::terms(formula, data = data)
   term_labels <- attr(term_info, "term.labels")
   offset <- attr(term_info, "offset")
 

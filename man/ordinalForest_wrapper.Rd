@@ -2,7 +2,7 @@
 % Please edit documentation in R/rand_forest-ordinalForest.R
 \name{ordinalForest_wrapper}
 \alias{ordinalForest_wrapper}
-\title{A wrapper for \code{ordinalForest}}
+\title{Fit wrapper for \code{ordinalForest}}
 \usage{
 ordinalForest_wrapper(x, y, ...)
 }
@@ -11,7 +11,7 @@ ordinalForest_wrapper(x, y, ...)
 
 \item{y}{The outcome factor.}
 
-\item{...}{Arguments to pass to the underlying model function.}
+\item{...}{Additional arguments to pass.}
 }
 \value{
 An object of S3 class \code{ordfor} as returned by
@@ -19,7 +19,7 @@ An object of S3 class \code{ordfor} as returned by
 }
 \description{
 A wrapper is needed since they have a non-standard model interface that
-required the data set and the column name (character string) for the outcome.
+requires the data set and the column name (character string) for the outcome.
 }
 \examples{
 \dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("ordinalForest")) withAutoprint(\{ # examplesIf}

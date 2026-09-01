@@ -1,4 +1,4 @@
-#' Wrappers for `ordinalNet`
+#' Fit and predict wrappers for `ordinalNet`
 #'
 #' The fit wrapper restructures case weights and reorganizes arguments into a
 #' call to [ordinalNet::ordinalNet()]. The prediction wrapper interpolates
@@ -80,7 +80,9 @@ ordinalNet_wrapper <- function(
 
   # throw error if penalty factor would go unused
   if (! parallelTerms && parallelPenaltyFactor != 1) {
-    abort("{.arg parallelPenaltyFactor} cannot be used without parallel terms.")
+    cli::cli_abort(
+      "{.arg parallelPenaltyFactor} cannot be used without parallel terms."
+    )
   }
 
   # restructure based on weights (requires `y` to be a factor)

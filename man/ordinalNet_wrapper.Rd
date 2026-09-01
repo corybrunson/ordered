@@ -8,7 +8,7 @@
 \alias{predict_raw._ordinalNet}
 \alias{predict_classprob._ordinalNet}
 \alias{predict_class._ordinalNet}
-\title{Wrappers for \code{ordinalNet}}
+\title{Fit and predict wrappers for \code{ordinalNet}}
 \usage{
 ordinalNet_wrapper(
   x,

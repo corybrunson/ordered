@@ -5,7 +5,7 @@
 \alias{VGAM_vgam_wrapper}
 \alias{values_ordinal_link_VGAM}
 \alias{values_threshold_structure_VGAM}
-\title{Wrappers for \code{VGAM}}
+\title{Fit wrappers for \code{VGAM}}
 \usage{
 VGAM_vglm_wrapper(
   formula,
@@ -41,11 +41,11 @@ values_threshold_structure_VGAM
 
 \item{link}{The \code{VGAM} link function (e.g. \code{"logitlink"}).}
 
-\item{parallel}{A logical; whether predictor effects are shared across
+\item{parallel}{Logical; whether predictor effects are shared across
 thresholds. It corresponds to the standardized \code{parallel_reg} argument (see
 \code{\link[dials:parallel_reg]{dials::parallel_reg()}}).}
 
-\item{Thresh}{A character; the threshold constraint pattern. It corresponds
+\item{Thresh}{Character; the threshold constraint pattern. It corresponds
 to the standardized \code{threshold_structure} argument (see
 \code{\link[dials:threshold_structure]{dials::threshold_structure()}}).}
 
