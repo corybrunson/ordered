@@ -9,6 +9,8 @@ clm_wrapper(
   data,
   weights = NULL,
   parallel_reg = NULL,
+  link = NULL,
+  threshold = NULL,
   ...,
   call = rlang::caller_env()
 )
@@ -40,15 +42,23 @@ be split once \code{data} is known, and because the standard translation
 \dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("ordinal")) withAutoprint(\{ # examplesIf}
 house_data <-
   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
-# parallel regression assumption
-( fit_orig <- ordinal::clm(Sat ~ Type + Cont, data = house_data) )
-( fit_wrap <- clm_wrapper(Sat ~ Type + Cont, data = house_data) )
-# non-parallelism
+# arguments are translated
 ( fit_orig <- ordinal::clm(
-  Sat ~ 1, data = house_data, nominal = ~ Infl + Cont
+  Sat ~ Type + Cont, data = house_data,
+  link = "logit", threshold = "symmetric2"
 ) )
 ( fit_wrap <- clm_wrapper(
-  Sat ~ Infl + Cont, data = house_data, parallel_reg = FALSE
+  Sat ~ Type + Cont, data = house_data,
+  link = "logistic", threshold = "symmetric_zero"
+) )
+# relax the parallel regression assumption
+( fit_orig <- ordinal::clm(
+  Sat ~ 1, data = house_data,
+  nominal = ~ Infl + Cont
+) )
+( fit_wrap <- clm_wrapper(
+  Sat ~ Infl + Cont, data = house_data,
+  parallel_reg = FALSE
 ) )
 \dontshow{\}) # examplesIf}
 }

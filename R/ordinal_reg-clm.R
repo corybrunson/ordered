@@ -16,15 +16,23 @@
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("ordinal")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
-#' # parallel regression assumption
-#' ( fit_orig <- ordinal::clm(Sat ~ Type + Cont, data = house_data) )
-#' ( fit_wrap <- clm_wrapper(Sat ~ Type + Cont, data = house_data) )
-#' # non-parallelism
+#' # arguments are translated
 #' ( fit_orig <- ordinal::clm(
-#'   Sat ~ 1, data = house_data, nominal = ~ Infl + Cont
+#'   Sat ~ Type + Cont, data = house_data,
+#'   link = "logit", threshold = "symmetric2"
 #' ) )
 #' ( fit_wrap <- clm_wrapper(
-#'   Sat ~ Infl + Cont, data = house_data, parallel_reg = FALSE
+#'   Sat ~ Type + Cont, data = house_data,
+#'   link = "logistic", threshold = "symmetric_zero"
+#' ) )
+#' # relax the parallel regression assumption
+#' ( fit_orig <- ordinal::clm(
+#'   Sat ~ 1, data = house_data,
+#'   nominal = ~ Infl + Cont
+#' ) )
+#' ( fit_wrap <- clm_wrapper(
+#'   Sat ~ Infl + Cont, data = house_data,
+#'   parallel_reg = FALSE
 #' ) )
 #' @export
 clm_wrapper <- function(
@@ -32,6 +40,8 @@ clm_wrapper <- function(
   data,
   weights = NULL,
   parallel_reg = NULL,
+  link = NULL,
+  threshold = NULL,
   ...,
   call = rlang::caller_env()
 ) {
@@ -39,6 +49,7 @@ clm_wrapper <- function(
 
   # capture before forcing the promises, so that the rebuilt call below records
   # engine arguments as the user wrote them rather than as their values
+  arg_exprs <- rlang::enexprs(link = link, threshold = threshold)
   dot_exprs <- rlang::enexprs(...)
   dots <- list(...)
 
@@ -48,10 +59,26 @@ clm_wrapper <- function(
     list(formula = formula)
   }
 
-  args <- c(formulas, list(data = data), dots)
+  args <- c(formulas, list(data = data))
   if (! is.null(weights)) {
     args$weights <- weights
   }
+  if (! is.null(link)) {
+    if (link == "logistic") link <- "logit"
+    args$link <- link
+  }
+  if (! is.null(threshold)) {
+    threshold <- switch(
+      threshold,
+      flexible = "flexible",
+      symmetric_median = "symmetric",
+      symmetric_zero = "symmetric2",
+      equidistant = "equidistant",
+      threshold
+    )
+    args$threshold <- threshold
+  }
+  args <- c(args, dots)
 
   res <- do.call(ordinal::clm, args)
 
@@ -61,6 +88,7 @@ clm_wrapper <- function(
     "clm",
     !!! formulas,
     data = rlang::sym("data"),
+    !!! arg_exprs,
     !!! dot_exprs,
     .ns = "ordinal"
   )

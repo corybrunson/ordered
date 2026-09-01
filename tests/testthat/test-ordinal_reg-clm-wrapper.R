@@ -112,6 +112,23 @@ test_that("clm_wrapper() passes `nominal` through for partial parallelism", {
   expect_equal(coef(res), coef(exp))
 })
 
+test_that("clm_wrapper() records relays revalued arguments in the call", {
+  skip_if_not_installed("ordinal")
+  soup <- ordinal::soup
+
+  res <- clm_wrapper(
+    SURENESS ~ PROD,
+    data = soup,
+    link = "logistic", threshold = "symmetric_zero"
+  )
+  # unmodified call
+  expect_equal(res$call$link, "logistic")
+  expect_equal(res$call$threshold, "symmetric_zero")
+  # native values
+  expect_equal(res$info$link, "logit")
+  expect_equal(res$info$threshold, "symmetric2")
+})
+
 test_that("clm_wrapper() records arguments passed through `...` in the call", {
   skip_if_not_installed("ordinal")
   soup <- ordinal::soup
@@ -124,6 +141,7 @@ test_that("clm_wrapper() records arguments passed through `...` in the call", {
   )
   expect_equal(res$call$link, "probit")
 
+  # absent `parallel_reg`, `nominal` is accepted
   res <- clm_wrapper(SURENESS ~ PROD, data = soup, nominal = ~DAY)
   expect_equal(res$call$nominal, rlang::expr(~DAY))
 
