@@ -815,7 +815,7 @@ make_ordinal_reg_clm <- function() {
     value = list(
       interface = "formula",
       protect = c("formula", "data", "weights"),
-      func = c(pkg = "ordinal", fun = "clm"),
+      func = c(pkg = "ordered", fun = "clm_wrapper"),
       defaults = list()
     )
   )

@@ -11,6 +11,7 @@ Now `predictvglm()` is used instead.
 This version introduces source code and unit tests for new engines:
 * `clm` from the **ordinal** package
   - cumulative link ordinal regression
+  - fit wrapper to translate formulae
   - additional `ordinal_link` dial values
 * `lrm` and `orm` from the **rms** package
   - regularized cumulative probability ordinal regression

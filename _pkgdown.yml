@@ -13,6 +13,7 @@ reference:
   desc: >
     Wrappers for Ordinal Classification Engines
   contents:
+  - '`clm_wrapper`'
   - '`ordinalNet_wrapper`'
   - '`predict_glmnetcr_wrapper`'
   - '`VGAM_vglm_wrapper`'

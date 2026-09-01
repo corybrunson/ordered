@@ -17,7 +17,8 @@
       Computational engine: clm 
       
       Model fit template:
-      ordinal::clm(formula = missing_arg(), data = missing_arg(), weights = missing_arg())
+      ordered::clm_wrapper(formula = missing_arg(), data = missing_arg(), 
+          weights = missing_arg())
 
 ---
 
@@ -74,6 +75,6 @@
       Computational engine: clm 
       
       Model fit template:
-      ordinal::clm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(), 
-          link = "probit")
+      ordered::clm_wrapper(formula = missing_arg(), data = missing_arg(), 
+          weights = missing_arg(), link = "probit")
 

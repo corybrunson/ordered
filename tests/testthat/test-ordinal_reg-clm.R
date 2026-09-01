@@ -238,7 +238,7 @@ test_that("parallel regression argument handles logicals", {
 
   set.seed(seed)
   orig_fit <- ordinal::clm(
-    Sat ~ Infl + Cont, data = house_sub,
+    Sat ~ 1, data = house_sub,
     nominal = ~ Infl + Cont
   )
 
@@ -257,8 +257,9 @@ test_that("parallel regression argument handles logicals", {
   set.seed(seed)
   suppressWarnings(
     orig_fit <- ordinal::clm(
-      Sat ~ Infl * Cont, data = house_sub,
-      nominal = ~ Infl * Cont
+      Sat ~ 1, data = house_sub,
+      # wrapper expands full interaction expressions into summands
+      nominal = ~ Infl + Cont + Infl:Cont
     )
   )
 
