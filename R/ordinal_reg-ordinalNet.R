@@ -285,7 +285,9 @@ multi_predict._ordinalNet <- function(
   # adapted from `censored::multi_predict._coxnet`
 
   if (type != "raw" && length(opts) > 0L) {
-    rlang::warn("`opts` is only used with `type = 'raw'` and was ignored.")
+    cli::cli_warn(
+      "{.arg opts} is only used with {.arg type} = {.val raw} and was ignored."
+    )
   }
 
   pred <- switch(

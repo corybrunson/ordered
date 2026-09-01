@@ -167,7 +167,9 @@ multi_predict._glmnetcr <- function(
   }
 
   if (type != "raw" && length(opts) > 0L) {
-    rlang::warn("`opts` is only used with `type = 'raw'` and was ignored.")
+    cli::cli_warn(
+      "{.arg opts} is only used with {.arg type} = {.val raw} and was ignored."
+    )
   }
 
   pred <- switch(
@@ -178,11 +180,9 @@ multi_predict._glmnetcr <- function(
     "class" = multi_predict_class_glmnetcr(
       object, new_data = new_data, penalty = penalty
     ),
-    "raw" = rlang::abort(
-      paste0(
-        "`type = 'raw'` is not yet supported for `multi_predict` with the ",
-        "`glmnetcr` engine."
-      )
+    "raw" = cli::cli_abort(
+      "{.arg type} = {.val raw} is not yet supported for `multi_predict`
+      with the {.val glmnetcr} engine."
     )
   )
 
