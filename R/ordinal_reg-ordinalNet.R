@@ -203,7 +203,7 @@ approx_prediction_row <- function(values, adjacent, penalty) {
   approx(adjacent, values, xout = penalty)$y
 }
 
-# ordinalNet call stack using `predict()` when object has
+# `ordinalNet` call stack using `predict()` when object has
 # classes "_ordinalNet" and "model_fit":
 #
 # predict()
@@ -216,12 +216,12 @@ approx_prediction_row <- function(values, adjacent, penalty) {
 #        predict_ordinalNet_wrapper()     <-- interpolates penalty
 #         predict.ordinalNet()            <-- generates predictions
 
-# ordinalNet call stack using `multi_predict()` when object has
+# `ordinalNet` call stack using `multi_predict()` when object has
 # classes "_ordinalNet" and "model_fit":
 #
 # multi_predict()
 #  multi_predict._ordinalNet()            <-- checks and sets penalty
-#   multi_predict_<type>_ordinal_net()    <-- vectorizes prediction over penalty
+#   multi_predict_<type>_ordinal_net()    <-- vectorizes over penalties
 #    predict._ordinalNet(multi = FALSE)   <-- (see above)
 
 #' @importFrom stats approx as.formula coef predict

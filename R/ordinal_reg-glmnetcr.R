@@ -106,6 +106,27 @@ predict_glmnetcr_wrapper <- function(
   res
 }
 
+# `glmnetcr` call stack using `predict()` when object has
+# classes "_glmnetcr" and "model_fit":
+#
+# predict()
+#  predict._glmnetcr(penalty = NULL)     <-- checks and sets penalty
+#   predict.model_fit()                  <-- checks for extra vars in ...
+#    predict_<type>()                    <-- dispatches by type
+#     predict_<type>._glmnetcr()         <-- evaluates spec arguments
+#      predict_<type>.model_fit()        <-- prepares tidy call
+#       eval_tidy()                      <-- evaluates tidy call
+#        predict_glmnetcr_wrapper()      <-- interpolates penalty
+#         predict.glmnetcr()             <-- generates predictions
+
+# `glmnetcr` call stack using `multi_predict()` when object has
+# classes "_glmnetcr" and "model_fit":
+#
+# multi_predict()
+#  multi_predict._glmnetcr()             <-- checks and sets penalty
+#   multi_predict_<type>_glmnetcr()      <-- vectorizes over penalties
+#    predict._glmnetcr(multi = FALSE)    <-- (see above)
+
 # S3 methods for parsnip's model_fit dispatch ----------------------------------
 
 #' @rdname predict_glmnetcr_wrapper
