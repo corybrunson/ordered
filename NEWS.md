@@ -1,12 +1,16 @@
 # next version
 
-## bug fix
+## maintenance
+
+### bug fix
 
 A bug in the prediction of `vglm` models, and associated tests, were patched.
 Previously, `predict()` was used, which triggers S3 dispatch when **VGAM** is not attached but S4 dispatched when it is.
 Now `predictvglm()` is used instead.
 
-## additional ordinal regression and random forest engines
+## new features
+
+### additional ordinal regression and random forest engines
 
 This version introduces source code and unit tests for new engines:
 * `clm` from the **ordinal** package
@@ -27,14 +31,14 @@ This version introduces source code and unit tests for new engines:
 
 Coordinated with [parsnip PR #1384](https://github.com/tidymodels/parsnip/pull/1384).
 
-## linear prediction type
+### linear prediction type
 
 Linear predictions are enabled for the `clm`, `lrm`, `orm`, `vglm`, and `ordinalNet` ordinal regression engines and for the `vgam` generalized additive model engine.
 They consistently return a single column of linear predictors (without threshold contributions).
 
 Coordinated with [parsnip PR #1391](https://github.com/tidymodels/parsnip/pull/1391).
 
-## threshold structure and parallel regression model arguments
+### threshold structure and parallel regression model arguments
 
 The `threshold_structure` model argument for `ordinal_reg()` controls what constraints, if any, are imposed on the ordered thresholds.
 It can be used by the `clm` and `vglm` engines.
