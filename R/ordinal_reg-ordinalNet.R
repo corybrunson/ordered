@@ -210,7 +210,7 @@ approx_prediction_row <- function(values, adjacent, penalty) {
 #  predict._ordinalNet(penalty = NULL)    <-- checks and sets penalty
 #   predict.model_fit()                   <-- checks for extra vars in ...
 #    predict_<type>()                     <-- dispatches by type
-#     predict_<type>._ordinalNet()        <-- post-processes interpolation
+#     predict_<type>._ordinalNet()        <-- evaluates spec arguments
 #      predict_<type>.model_fit()         <-- prepares tidy call
 #       eval_tidy()                       <-- evaluates tidy call
 #        predict_ordinalNet_wrapper()     <-- interpolates penalty
