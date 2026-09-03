@@ -64,8 +64,7 @@ clm_wrapper <- function(
     args$weights <- weights
   }
   if (! is.null(link)) {
-    if (link == "logistic") link <- "logit"
-    args$link <- link
+    args$link <- match_ordinal_link_clm(link, call = call)
   }
   if (! is.null(threshold)) {
     threshold <- switch(
@@ -94,6 +93,24 @@ clm_wrapper <- function(
   )
 
   res
+}
+
+match_ordinal_link_clm <- function(link, call = rlang::caller_env()) {
+  if (! is.character(link)) {
+    return(link)
+  }
+  check_string(link, arg = "ordinal_link", call = call)
+
+  link <- rlang::arg_match0(
+    link,
+    values_ordinal_link_clm,
+    arg_nm = "ordinal_link",
+    error_call = call
+  )
+  if (link == "logistic") {
+    link <- "logit"
+  }
+  link
 }
 
 # Split a model formula into the location and `nominal` formulas that
