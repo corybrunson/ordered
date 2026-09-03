@@ -14,7 +14,8 @@ VGAM_vglm_wrapper(
   link = "logitlink",
   parallel = FALSE,
   Thresh = NULL,
-  ...
+  ...,
+  call = rlang::caller_env()
 )
 
 VGAM_vgam_wrapper(
@@ -24,7 +25,8 @@ VGAM_vgam_wrapper(
   link = "logitlink",
   parallel = FALSE,
   Thresh = NULL,
-  ...
+  ...,
+  call = rlang::caller_env()
 )
 
 values_ordinal_link_VGAM
@@ -36,10 +38,14 @@ values_threshold_structure_VGAM
 
 \item{data}{The data frame to pass.}
 
-\item{family}{The \code{VGAM} family function, as a character string (e.g.
-\code{"cumulative"}, \code{"acat"}, \code{"cratio"}, \code{"sratio"}).}
+\item{family}{The \code{VGAM} family function, given either in the standardized
+form (e.g. \code{"cumulative_link"}, \code{"adjacent_categories"},
+\code{"continuation_ratio"}, \code{"stopping_ratio"}) or natively (e.g. \code{"cumulative"},
+\code{"acat"}, \code{"cratio"}, \code{"sratio"}).}
 
-\item{link}{The \code{VGAM} link function (e.g. \code{"logitlink"}).}
+\item{link}{The \code{VGAM} link function, given either in the standardized form
+(e.g. \code{"logistic"}, \code{"cloglog"}) or natively (e.g. \code{"logitlink"},
+\code{"clogloglink"}).}
 
 \item{parallel}{Logical; whether predictor effects are shared across
 thresholds. It corresponds to the standardized \code{parallel_reg} argument (see
@@ -60,7 +66,7 @@ These wrappers reorganize arguments into proper calls to \code{\link[VGAM:vglm]{
 \code{\link[VGAM:vgam]{VGAM::vgam()}}, which specialize to several families of ordinal regression
 models. The standardized argument values used by \code{parsnip::ordinal_reg()} and
 \code{parsnip::gen_additive_mod()} are matched and converted to the values native
-to \code{VGAM} at translation time.
+to \code{VGAM} within the wrappers themselves.
 }
 \details{
 The vector \code{values_ordinal_link_VGAM} extends the default \code{ordinal_link}

@@ -16,10 +16,12 @@ ordinalNet_wrapper(
   weights = NULL,
   family = "cumulative",
   link = "logit",
+  parallel_reg = NULL,
   parallelTerms = TRUE,
   nonparallelTerms = FALSE,
   parallelPenaltyFactor = 1,
-  ...
+  ...,
+  call = rlang::caller_env()
 )
 
 predict_ordinalNet_wrapper(
@@ -64,11 +66,17 @@ predict_ordinalNet_wrapper(
 the outcome is restructured into a multinomial matrix of weighted
 indicators.}
 
-\item{family}{The \code{ordinalNet} family function, as a character string (e.g.
-\code{"cumulative"}, \code{"sratio"}, \code{"cratio"}, \code{"acat"}).}
+\item{family}{The \code{ordinalNet} family function, given either in the
+standardized form (e.g. \code{"cumulative_link"}, \code{"stopping_ratio"}) or natively
+(e.g. \code{"cumulative"}, \code{"sratio"}, \code{"cratio"}, \code{"acat"}).}
 
-\item{link}{The \code{ordinalNet} link function, as a character string (e.g.
-\code{"logit"}, \code{"probit"}, \code{"cloglog"}, \code{"cauchit"}).}
+\item{link}{The \code{ordinalNet} link function, given either in the standardized
+form (e.g. \code{"logistic"}) or natively (e.g. \code{"logit"}, \code{"probit"},
+\code{"cloglog"}, \code{"cauchit"}).}
+
+\item{parallel_reg}{Logical; whether predictors share effects across
+thresholds. When \code{FALSE}, \code{parallelTerms} is set to \code{FALSE} and
+\code{nonparallelTerms} to \code{TRUE}.}
 
 \item{parallelTerms}{Logical; whether to use parallel terms.}
 

@@ -8,6 +8,10 @@ A bug in the prediction of `vglm` models, and associated tests, were patched.
 Previously, `predict()` was used, which triggers S3 dispatch when **VGAM** is not attached but S4 dispatched when it is.
 Now `predictvglm()` is used instead.
 
+### refactor
+
+`ordinal_reg()` argument value translation has been moved from the `translate()` method in parsnip to engine wrappers in ordered, with the exception of penalty path assembly for `ordinalNet` and `glmnetcr`, in coordination with [parsnip PR #1393](https://github.com/tidymodels/parsnip/pull/1393).
+
 ## new features
 
 ### additional ordinal regression and random forest engines
