@@ -1,11 +1,27 @@
-#' Wrappers for `ordinalNet`
+#' Fit and predict wrappers for `ordinalNet`
 #'
-#' The fit wrapper converts the standardized `odds_link` options encoded in
-#' [`dials::values_odds_link`] to the `family` options of
-#' [ordinalNet::ordinalNet()]. The prediction wrapper interpolates between
-#' fitted penalties to enable submodel prediction at specified penalties.
+#' The fit wrapper restructures case weights and reorganizes arguments into a
+#' call to [ordinalNet::ordinalNet()]. The prediction wrapper interpolates
+#' between fitted penalties to enable submodel prediction at specified
+#' penalties.
 #' @param x The predictor data.
 #' @param y The outcome vector.
+#' @param weights An optional numeric vector of case weights. When provided, the
+#'   outcome is restructured into a multinomial matrix of weighted indicators.
+#' @param family The odds link function; either a standardized dial value
+#'   (`"cumulative_link"`, `"adjacent_categories"`, `"continuation_ratio"`,
+#'   `"stopping_ratio"`) or an `ordinalNet` native value (`"cumulative"`,
+#'   `"acat"`, `"cratio"`, `"sratio"`).
+#' @param link The ordinal link function; either a standardized dial value (e.g.
+#'   `"logistic"`, `"probit"`) or a `ordinalNet` native value (e.g. `"logit"`,
+#'   `"probit"`).
+#' @param parallel_reg Logical; whether predictors share effects across
+#'   thresholds. When `FALSE`, `parallelTerms` is set to `FALSE` and
+#'   `nonparallelTerms` to `TRUE`.
+#' @param parallelTerms Logical; whether to use parallel terms.
+#' @param nonparallelTerms Logical; whether to use non-parallel terms.
+#' @param parallelPenaltyFactor Numeric; scale factor applied to the penalty on
+#'   parallel terms. Errs when used without parallel terms.
 #' @param ... Additional arguments to pass.
 #' @keywords internal
 #' @returns An object of S3 class `ordinalNet` as returned by
@@ -29,7 +45,7 @@
 #' ) )
 #' ( fit_wrap <- ordinalNet_wrapper(
 #'   house_matrix, y = house_data$Sat,
-#'   family = "stopping_ratio", link = "logistic",
+#'   family = "sratio", link = "logit",
 #'   lambdaVals = pen_vec
 #' ) )
 #' fit_tidy <-
@@ -60,33 +76,27 @@
 #' @export
 ordinalNet_wrapper <- function(
     x, y, weights = NULL,
-    # TODO: Test whether defaults can be omitted.
-    family = "cumulative_link", link = "logistic",
-    ...
+    family = "cumulative",
+    link = "logit",
+    parallel_reg = NULL,
+    parallelTerms = TRUE, nonparallelTerms = FALSE, parallelPenaltyFactor = 1,
+    ...,
+    call = rlang::caller_env()
 ) {
   rlang::check_installed("ordinalNet")
 
-  # match and convert odds link options
-  family <- match.arg(family, dials::values_odds_link)
-  family <- switch(
-    family,
-    cumulative_link = "cumulative",
-    adjacent_categories = "acat",
-    continuation_ratio = "cratio",
-    stopping_ratio = "sratio"
-  )
-  # REVIEW: There may be a standard way to do this. In particular, can this be
-  # robust to upgrades in {ordinalNet}? How can errors and duplication be
-  # prevented in tuning routines?
-  link <- match.arg(link, dials::values_ordinal_link)
-  # REVIEW: Change `logistic` to `logit` in {dials}?
-  if (link == "logistic") link <- "logit"
-  if (link == "loglog") {
+  # match standardized argument values to their `ordinalNet` natives
+  family <- match_ordinal_family(family, call = call)
+  link <- match_ordinal_link_ordinalNet(link, call = call)
+  if (isFALSE(parallel_reg)) {
+    parallelTerms <- FALSE
+    nonparallelTerms <- TRUE
+  }
+
+  # throw error if penalty factor would go unused
+  if (! parallelTerms && parallelPenaltyFactor != 1) {
     cli::cli_abort(
-      c(
-        "The `ordinalNet` engine does not support the log-log ordinal link.",
-        "i" = "See `?ordinalNet::ordinalNet` for provided link functions."
-      )
+      "{.arg parallelPenaltyFactor} cannot be used without parallel terms."
     )
   }
 
@@ -103,9 +113,42 @@ ordinalNet_wrapper <- function(
     .fn = "ordinalNet", .ns = "ordinalNet",
     x = rlang::expr(x), y = rlang::expr(y),
     family = rlang::expr(family), link = rlang::expr(link),
+    parallelTerms = parallelTerms,
+    nonparallelTerms = nonparallelTerms,
+    parallelPenaltyFactor = parallelPenaltyFactor,
     ...
   )
   rlang::eval_tidy(cl)
+}
+
+match_ordinal_link_ordinalNet <- function(link, call = rlang::caller_env()) {
+  if (! is.character(link)) {
+    return(link)
+  }
+  check_string(link, arg = "ordinal_link", call = call)
+  # native values pass through unchanged (note `logit`, not `logistic`)
+  if (link %in% c("logit", "probit", "cloglog", "cauchit")) {
+    return(link)
+  }
+  link <- rlang::arg_match0(
+    link,
+    dials::values_ordinal_link,
+    arg_nm = "ordinal_link",
+    error_call = call
+  )
+  if (link == "logistic") {
+    link <- "logit"
+  }
+  if (link == "loglog") {
+    cli::cli_abort(
+      c(
+        "The `ordinalNet` engine does not support the log-log ordinal link.",
+        "i" = "See `?ordinalNet::ordinalNet` for provided link functions."
+      ),
+      call = call
+    )
+  }
+  link
 }
 
 #' @rdname ordinalNet_wrapper
@@ -179,9 +222,11 @@ adjacent_penalties <- function(object, penalty, use_extreme = TRUE) {
   in_rng <- penalty >= min(ref) && penalty <= max(ref)
   have_extr <- is.null(object$args$lambdaVals) && object$args$includeLambda0
   if (! in_rng && ! have_extr) {
-    cli::cli_abort("The penalty value {format(penalty, digits = 3)} is
-                    outside the penalty range contained in the model object.",
-                   call = rlang::call2("predict"))
+    cli::cli_abort(
+      "The penalty value {format(penalty, digits = 3)} is
+      outside the penalty range contained in the model object.",
+      call = rlang::call2("predict")
+    )
   }
 
   above <- which.min(ifelse(ref < penalty,  Inf, ref))
@@ -205,28 +250,28 @@ approx_prediction_row <- function(values, adjacent, penalty) {
   approx(adjacent, values, xout = penalty)$y
 }
 
-# ordinalNet call stack using `predict()` when object has
+# `ordinalNet` call stack using `predict()` when object has
 # classes "_ordinalNet" and "model_fit":
 #
 # predict()
 #  predict._ordinalNet(penalty = NULL)    <-- checks and sets penalty
 #   predict.model_fit()                   <-- checks for extra vars in ...
 #    predict_<type>()                     <-- dispatches by type
-#     predict_<type>._ordinalNet()        <-- post-processes interpolation
+#     predict_<type>._ordinalNet()        <-- evaluates spec arguments
 #      predict_<type>.model_fit()         <-- prepares tidy call
 #       eval_tidy()                       <-- evaluates tidy call
 #        predict_ordinalNet_wrapper()     <-- interpolates penalty
 #         predict.ordinalNet()            <-- generates predictions
 
-# ordinalNet call stack using `multi_predict()` when object has
+# `ordinalNet` call stack using `multi_predict()` when object has
 # classes "_ordinalNet" and "model_fit":
 #
 # multi_predict()
 #  multi_predict._ordinalNet()            <-- checks and sets penalty
-#   multi_predict_<type>_ordinal_net()    <-- vectorizes prediction over penalty
+#   multi_predict_<type>_ordinal_net()    <-- vectorizes over penalties
 #    predict._ordinalNet(multi = FALSE)   <-- (see above)
 
-#' @importFrom stats approx predict
+#' @importFrom stats approx as.formula coef predict
 #' @importFrom parsnip eval_args predict_raw multi_predict
 #' @param penalty A numeric vector of penalty values.
 
@@ -287,7 +332,9 @@ multi_predict._ordinalNet <- function(
   # adapted from `censored::multi_predict._coxnet`
 
   if (type != "raw" && length(opts) > 0L) {
-    rlang::warn("`opts` is only used with `type = 'raw'` and was ignored.")
+    cli::cli_warn(
+      "{.arg opts} is only used with {.arg type} = {.val raw} and was ignored."
+    )
   }
 
   pred <- switch(

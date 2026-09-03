@@ -1,3 +1,12 @@
+# specification handles model parameters
+
+    Code
+      fit(acat_spec, Sat ~ Type + Infl + Cont, data = house_sub)
+    Condition
+      Error in `fit()`:
+      ! The "clm" engine supports only the cumulative odds link.
+      i Use the "vglm" or "ordinalNet" engine for alternative odds links.
+
 # interfaces agree
 
     Code
@@ -8,7 +17,8 @@
       Computational engine: clm 
       
       Model fit template:
-      ordinal::clm(formula = missing_arg(), data = missing_arg(), weights = missing_arg())
+      ordered::clm_wrapper(formula = missing_arg(), data = missing_arg(), 
+          weights = missing_arg())
 
 ---
 
@@ -65,6 +75,6 @@
       Computational engine: clm 
       
       Model fit template:
-      ordinal::clm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(), 
-          link = "probit")
+      ordered::clm_wrapper(formula = missing_arg(), data = missing_arg(), 
+          weights = missing_arg(), link = "probit")
 

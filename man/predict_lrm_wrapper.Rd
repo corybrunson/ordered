@@ -2,7 +2,7 @@
 % Please edit documentation in R/ordinal_reg-rms.R
 \name{predict_lrm_wrapper}
 \alias{predict_lrm_wrapper}
-\title{Wrapper for \code{rms} predictions}
+\title{Predict wrapper for \code{rms}}
 \usage{
 predict_lrm_wrapper(object, newdata, type, ...)
 }
@@ -13,7 +13,7 @@ predict_lrm_wrapper(object, newdata, type, ...)
 
 \item{type}{The prediction type, passed to the underlying method.}
 
-\item{...}{Additional arguments passed to the underlying method.}
+\item{...}{Additional arguments to pass.}
 }
 \value{
 The result of \code{\link[stats:predict]{stats::predict()}} dispatched on \code{object}.
@@ -24,7 +24,7 @@ does not accept tibble inputs. This wrapper ensures that \code{newdata} is
 converted to a plain data frame before the S3 method is dispatched.
 }
 \examples{
-\dontshow{if (rlang::is_installed("rms") && rlang::is_installed("MASS")) withAutoprint(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("rms")) withAutoprint(\{ # examplesIf}
 house_data <-
   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
 ( fit <- rms::lrm(Sat ~ Infl + Type + Cont, data = house_data) )

@@ -1,14 +1,34 @@
-#' Wrappers for `VGAM`
+#' Fit wrappers for `VGAM`
 #'
-#' These wrappers convert the standardized `odds_link` options encoded in
-#' [`dials::values_odds_link`] to [`VGAM::vglmff-class`] objects passed to the
-#' `family` argument of [VGAM::vglm()] and [VGAM::vgam()].
+#' These wrappers reorganize arguments into proper calls to [VGAM::vglm()] and
+#' [VGAM::vgam()], which specialize to several families of ordinal regression
+#' models. The standardized argument values used by `parsnip::ordinal_reg()` and
+#' `parsnip::gen_additive_mod()` are matched and converted to the values native
+#' to `VGAM` within the wrappers.
 #'
 #' The vector `values_ordinal_link_VGAM` extends the default `ordinal_link`
 #' options encoded in [`dials::values_ordinal_link`] to those accepted by
 #' [`VGAM::vglm()`] and [`VGAM::vgam()`].
+#'
+#' The vector `values_threshold_structure_VGAM` extends the default
+#' `threshold_structure` options encoded in
+#' [`dials::values_threshold_structure`] to those accepted by [`VGAM::vglm()`]
+#' and [`VGAM::vgam()`].
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.
+#' @param family The odds link function; either a standardized dial value
+#'   (`"cumulative_link"`, `"adjacent_categories"`, `"continuation_ratio"`,
+#'   `"stopping_ratio"`) or a `VGAM` native value (`"cumulative"`, `"acat"`,
+#'   `"cratio"`, `"sratio"`).
+#' @param link The ordinal link function; either a standardized dial value (e.g.
+#'   `"logistic"`, `"cloglog"`) or a `VGAM` native value (e.g. `"logitlink"`,
+#'   `"clogloglink"`).
+#' @param parallel Logical; whether predictor effects are shared across
+#'   thresholds. It corresponds to the standardized `parallel_reg` argument (see
+#'   [dials::parallel_reg()]).
+#' @param Thresh Character; the threshold constraint pattern. It corresponds to
+#'   the standardized `threshold_structure` argument (see
+#'   [dials::threshold_structure()]).
 #' @param ... Additional arguments to pass.
 #' @details Note that `VGAM::vglm()` and `VGAM::vgam()` treat the rows of `data`
 #'   as the units of observation: Compressed `data` with one row per predictor
@@ -24,6 +44,8 @@
 #' @examples
 #' values_ordinal_link_VGAM
 #' dials::ordinal_link(values = values_ordinal_link_VGAM)
+#' values_threshold_structure_VGAM
+#' dials::threshold_structure(values = values_threshold_structure_VGAM)
 
 #' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM")
 #' house_data <-
@@ -31,48 +53,56 @@
 #' # fit wrapper for linear model
 #' ( fit_orig <- VGAM::vglm(
 #'   Sat ~ Type + Infl + Cont,
-#'   family = VGAM::sratio(link = "probitlink", parallel = TRUE),
+#'   family = VGAM::sratio(
+#'     link = "probitlink", parallel = TRUE, Thresh = "symm0"
+#'   ),
 #'   data = house_data
 #' ) )
 #' ( fit_wrap <- VGAM_vglm_wrapper(
 #'   Sat ~ Type + Infl + Cont,
-#'   family = "stopping_ratio", link = "probit",
+#'   family = "sratio",
+#'   link = "probitlink", parallel = TRUE, Thresh = "symmetric_zero",
 #'   data = house_data
 #' ) )
 #' # fit wrapper for additive model
 #' ( fit_orig <- VGAM::vgam(
 #'   Sat ~ Type + Infl + Cont,
-#'   family = VGAM::cratio(link = "clogloglink", parallel = TRUE),
+#'   family = VGAM::cratio(
+#'     link = "clogloglink", parallel = TRUE, Thresh = "symm0",
+#'   ),
 #'   data = house_data
 #' ) )
 #' ( fit_wrap <- VGAM_vgam_wrapper(
 #'   Sat ~ Type + Infl + Cont,
-#'   family = "continuation_ratio", link = "cloglog",
+#'   family = "cratio",
+#'   link = "cloglog", parallel = TRUE, Thresh = "symm0",
 #'   data = house_data
 #' ) )
 #' @export
 VGAM_vglm_wrapper <- function(
     formula, data,
-    family = "cumulative_link", link = "logistic",
-    parallel = TRUE,
-    ...
+    family = "cumulative",
+    link = "logitlink",
+    parallel = FALSE,
+    Thresh = NULL,
+    ...,
+    call = rlang::caller_env()
 ) {
   rlang::check_installed("VGAM")
-
-  # for now, require `parallel` to be logical
-  check_logical(parallel)
 
   # TODO: Ensure that `formula = cbind(...) ~ ...` is disallowed, for this and
   # for other `ordinal_reg()` engines.
 
-  # match and convert odds link options
-  family <- match_VGAM_family(family)
-  link <- match_VGAM_link(link)
+  # match standardized argument values to their `VGAM` natives
+  link <- match_ordinal_link_VGAM(link, call = call)
+  family <- match_ordinal_family(family, call = call)
+  Thresh <- match_threshold_structure_VGAM(Thresh, call = call)
+  check_ordinal_link_family_VGAM(family = family, link = link, call = call)
 
   # execute nested call on modified inputs
   family_call <- rlang::call2(
     .fn = family, .ns = "VGAM",
-    link = link, parallel = parallel
+    link = link, parallel = parallel, Thresh = Thresh
   )
   cl <- rlang::call2(
     .fn = "vglm", .ns = "VGAM",
@@ -80,30 +110,32 @@ VGAM_vglm_wrapper <- function(
     family = family_call,
     ...
   )
-  rlang::eval_tidy(cl)
+  suppressWarnings(rlang::eval_tidy(cl))
 }
 
 #' @rdname VGAM_vglm_wrapper
 #' @export
 VGAM_vgam_wrapper <- function(
     formula, data,
-    family = "cumulative_link", link = "logistic",
-    parallel = TRUE,
-    ...
+    family = "cumulative",
+    link = "logitlink",
+    parallel = FALSE,
+    Thresh = NULL,
+    ...,
+    call = rlang::caller_env()
 ) {
   rlang::check_installed("VGAM")
 
-  # for now, require `parallel` to be logical
-  check_logical(parallel)
-
-  # match and convert odds link options
-  family <- match_VGAM_family(family)
-  link <- match_VGAM_link(link)
+  # match standardized argument values to their `VGAM` natives
+  link <- match_ordinal_link_VGAM(link, call = call)
+  family <- match_ordinal_family(family, call = call)
+  Thresh <- match_threshold_structure_VGAM(Thresh, call = call)
+  check_ordinal_link_family_VGAM(family = family, link = link, call = call)
 
   # execute nested call on modified inputs
   family_call <- rlang::call2(
     .fn = family, .ns = "VGAM",
-    link = link, parallel = parallel
+    link = link, parallel = parallel, Thresh = Thresh
   )
   cl <- rlang::call2(
     .fn = "vgam", .ns = "VGAM",
@@ -111,19 +143,43 @@ VGAM_vgam_wrapper <- function(
     family = family_call,
     ...
   )
-  rlang::eval_tidy(cl)
+  suppressWarnings(rlang::eval_tidy(cl))
 }
+
+# The extended dial values are built directly from `dials::values_*` so
+# synchronize automatically.
 
 #' @rdname VGAM_vglm_wrapper
 #' @export
 values_ordinal_link_VGAM <- c(
   dials::values_ordinal_link,
-  # TODO: Expand to include link functions to other domains than [0,1].
+  # TODO: Expand to include link functions to other domains than [0,1]?
   c("foldsqrt", "logc", "gord", "pord", "nbord")
 )
 
-match_VGAM_family <- function(family) {
-  family <- match.arg(family, dials::values_odds_link)
+#' @rdname VGAM_vglm_wrapper
+#' @export
+values_threshold_structure_VGAM <- c(
+  dials::values_threshold_structure,
+  "qnorm"
+)
+
+# match standardized `odds_link` value to a `VGAM`/`ordinalNet` family name;
+# used by wrappers
+match_ordinal_family <- function(family, call = rlang::caller_env()) {
+  if (!is.character(family)) {
+    return(family)
+  }
+  check_string(family, arg = "odds_link", call = call)
+  if (family %in% c("cumulative", "acat", "cratio", "sratio")) {
+    return(family)
+  }
+  family <- rlang::arg_match0(
+    family,
+    dials::values_odds_link,
+    arg_nm = "odds_link",
+    error_call = call
+  )
   switch(
     family,
     cumulative_link = "cumulative",
@@ -133,19 +189,98 @@ match_VGAM_family <- function(family) {
   )
 }
 
-match_VGAM_link <- function(link) {
-  link <- match.arg(link, values_ordinal_link_VGAM)
-  # REVIEW: Change `logistic` to `logit` in {dials}?
-  if (link == "logistic") link <- "logit"
-  if (link == "loglog") {
+match_ordinal_link_VGAM <- function(link, call = rlang::caller_env()) {
+  if (! is.character(link)) {
+    return(link)
+  }
+  check_string(link, arg = "ordinal_link", call = call)
+
+  if (
+    # keep native values
+    ! link %in% c(
+      "logitlink", "probitlink", "logloglink", "clogloglink", "cauchitlink",
+      "foldsqrtlink", "logclink", "gordlink", "pordlink", "nbordlink"
+    )
+  ) {
+    # modify standardized values
+    link <- rlang::arg_match0(
+      link,
+      values_ordinal_link_VGAM,
+      arg_nm = "ordinal_link",
+      error_call = call
+    )
+    if (link == "logistic") {
+      link <- "logit"
+    }
+    link <- paste0(link, "link")
+  }
+
+  if (link == "logloglink") {
     cli::cli_abort(
       c(
-        "The `vglm` engine does not support the log-log ordinal link.",
+        "The {.pkg VGAM} engines do not support the log-log ordinal link.",
         "i" = "See `?VGAM::Links` for provided link functions."
-      )
+      ),
+      call = call
     )
   }
-  paste0(link, "link")
+  link
+}
+
+match_threshold_structure_VGAM <- function(
+  Thresh,
+  call = rlang::caller_env()
+) {
+  if (! is.character(Thresh)) {
+    return(Thresh)
+  }
+  check_string(Thresh, arg = "threshold_structure", call = call)
+
+  if (
+    # keep native values
+    ! Thresh %in% c("free", "symm1", "symm0", "equid", "qnorm")
+  ) {
+    # modify standardized values
+    Thresh <- rlang::arg_match0(
+      Thresh,
+      values_threshold_structure_VGAM,
+      arg_nm = "threshold_structure",
+      error_call = call
+    )
+    Thresh <- switch(
+      Thresh,
+      flexible = "free",
+      symmetric_median = "symm1",
+      symmetric_zero = "symm0",
+      equidistant = "equid",
+      qnorm = "qnorm"
+    )
+  }
+
+  Thresh
+}
+
+check_ordinal_link_family_VGAM <- function(
+  family,
+  link,
+  call = rlang::caller_env()
+) {
+  if (
+    is.character(family) &&
+      is.character(link) &&
+      family == "acat" &&
+      link %in% c("logitlink", "probitlink", "clogloglink")
+  ) {
+    cli::cli_abort(
+      c(
+        "The {.val adjacent_categories} family is not compatible with
+         the {.val {link}} link function.",
+        "i" = "Use {.val cauchitlink} or {.val identitylink} instead."
+      ),
+      call = call
+    )
+  }
+  invisible(NULL)
 }
 
 predict_VGAM_class_post <- function(x, object) {

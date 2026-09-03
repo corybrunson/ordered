@@ -8,15 +8,20 @@
 \alias{predict_raw._ordinalNet}
 \alias{predict_classprob._ordinalNet}
 \alias{predict_class._ordinalNet}
-\title{Wrappers for \code{ordinalNet}}
+\title{Fit and predict wrappers for \code{ordinalNet}}
 \usage{
 ordinalNet_wrapper(
   x,
   y,
   weights = NULL,
-  family = "cumulative_link",
-  link = "logistic",
-  ...
+  family = "cumulative",
+  link = "logit",
+  parallel_reg = NULL,
+  parallelTerms = TRUE,
+  nonparallelTerms = FALSE,
+  parallelPenaltyFactor = 1,
+  ...,
+  call = rlang::caller_env()
 )
 
 predict_ordinalNet_wrapper(
@@ -57,6 +62,29 @@ predict_ordinalNet_wrapper(
 
 \item{y}{The outcome vector.}
 
+\item{weights}{An optional numeric vector of case weights. When provided,
+the outcome is restructured into a multinomial matrix of weighted
+indicators.}
+
+\item{family}{The \code{ordinalNet} family function, given either in the
+standardized form (e.g. \code{"cumulative_link"}, \code{"stopping_ratio"}) or natively
+(e.g. \code{"cumulative"}, \code{"sratio"}, \code{"cratio"}, \code{"acat"}).}
+
+\item{link}{The \code{ordinalNet} link function, given either in the standardized
+form (e.g. \code{"logistic"}) or natively (e.g. \code{"logit"}, \code{"probit"},
+\code{"cloglog"}, \code{"cauchit"}).}
+
+\item{parallel_reg}{Logical; whether predictors share effects across
+thresholds. When \code{FALSE}, \code{parallelTerms} is set to \code{FALSE} and
+\code{nonparallelTerms} to \code{TRUE}.}
+
+\item{parallelTerms}{Logical; whether to use parallel terms.}
+
+\item{nonparallelTerms}{Logical; whether to use non-parallel terms.}
+
+\item{parallelPenaltyFactor}{Numeric; scale factor applied to the penalty on
+parallel terms. Errs when used without parallel terms.}
+
 \item{...}{Additional arguments to pass.}
 
 \item{penalty}{A numeric vector of penalty values.}
@@ -67,10 +95,10 @@ An object of S3 class \code{ordinalNet} as returned by
 returned by \code{\link[ordinalNet:predict.ordinalNet]{ordinalNet::predict.ordinalNet}}\verb{()}.
 }
 \description{
-The fit wrapper converts the standardized \code{odds_link} options encoded in
-\code{\link[dials:values_odds_link]{dials::values_odds_link}} to the \code{family} options of
-\code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}}. The prediction wrapper interpolates between
-fitted penalties to enable submodel prediction at specified penalties.
+The fit wrapper restructures case weights and reorganizes arguments into a
+call to \code{\link[ordinalNet:ordinalNet]{ordinalNet::ordinalNet()}}. The prediction wrapper interpolates
+between fitted penalties to enable submodel prediction at specified
+penalties.
 }
 \examples{
 \dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("ordinalNet")) withAutoprint(\{ # examplesIf}
@@ -90,7 +118,7 @@ pen_vec <- 10 ^ seq(-2.5, -.5, 1)
 ) )
 ( fit_wrap <- ordinalNet_wrapper(
   house_matrix, y = house_data$Sat,
-  family = "stopping_ratio", link = "logistic",
+  family = "sratio", link = "logit",
   lambdaVals = pen_vec
 ) )
 fit_tidy <-
