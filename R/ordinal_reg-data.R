@@ -858,13 +858,7 @@ make_ordinal_reg_clm <- function() {
     mode = "classification",
     type = "prob",
     value = list(
-      pre = function(new_data, object) {
-        resp <- all.vars(object$fit$terms[[2L]])
-        if (resp %in% names(new_data)) {
-          new_data <- new_data[, !names(new_data) %in% resp, drop = FALSE]
-        }
-        new_data
-      },
+      pre = predict_clm_pre,
       post = function(x, object) {
         x <- tibble::as_tibble(x$fit)
         x <- set_names(x, paste0(".pred_", colnames(x)))
@@ -886,13 +880,7 @@ make_ordinal_reg_clm <- function() {
     mode = "classification",
     type = "linear_pred",
     value = list(
-      pre = function(new_data, object) {
-        resp <- all.vars(object$fit$terms[[2L]])
-        if (resp %in% names(new_data)) {
-          new_data <- new_data[, !names(new_data) %in% resp, drop = FALSE]
-        }
-        new_data
-      },
+      pre = predict_clm_pre,
       post = function(x, object) {
         # x$eta1 = alpha_j - X*beta for each j; engine uses P(Y >= j)
         beta_x <- object$fit$alpha[1] - x$eta1[, 1]

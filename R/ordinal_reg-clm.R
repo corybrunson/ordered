@@ -142,3 +142,11 @@ clm_formulas <- function(formula, data, call = rlang::caller_env()) {
 
   list(formula = loc, nominal = nominal)
 }
+
+predict_clm_pre <- function(new_data, object) {
+  resp <- all.vars(object$fit$terms[[2L]])
+  if (resp %in% names(new_data)) {
+    new_data <- new_data[, !names(new_data) %in% resp, drop = FALSE]
+  }
+  new_data
+}
