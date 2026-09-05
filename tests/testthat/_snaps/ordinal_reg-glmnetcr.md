@@ -3,18 +3,12 @@
     Code
       translate(gcr_spec)
     Condition
-      Warning:
-      x The "glmnetcr" engine ignores `penalty` in favor of a path that enables prediction at interpolated penalty values.
-      ! `penalty` was passed 0 values.
-      i Use `path_values` to override the default path.
-    Output
-      Ordinal Regression Model Specification (classification)
-      
-      Computational engine: glmnetcr 
-      
-      Model fit template:
-      glmnetcr::glmnetcr(x = missing_arg(), y = missing_arg(), weights = missing_arg(), 
-          nlambda = 120L, lambda.min.ratio = 1e-08)
+      Error:
+      x For the "glmnetcr" engine, `penalty` must be a single number (or a value of `tune()`).
+      ! There are 0 values for `penalty`.
+      i To try multiple values for total regularization, use the tune package.
+      i To predict multiple penalties, use `multi_predict()`.
+      i To override the default path, use `path_values`.
 
 ---
 
@@ -29,8 +23,7 @@
       Computational engine: glmnetcr 
       
       Model fit template:
-      glmnetcr::glmnetcr(x = missing_arg(), y = missing_arg(), weights = missing_arg(), 
-          nlambda = 120L, lambda.min.ratio = 1e-08)
+      glmnetcr::glmnetcr(x = missing_arg(), y = missing_arg(), weights = missing_arg())
 
 # arguments agree
 
