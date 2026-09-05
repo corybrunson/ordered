@@ -207,31 +207,21 @@ predict_ordinalNet_wrapper <- function(
   )
 }
 
-# `use_extreme` is a placeholder for a policy that we need to set; do we error
-# when predicting outside of the observed penalty range or do something else
-# (such as predicting at the closest value in the path) --topepo
+# return 1 or 2 (adjacent) penalty path indices:
+# if 1, it is used; if 2, predictions are interpolated
+adjacent_penalties <- function(object, penalty) {
 
-# See `translate.ordinal_reg()` in {parsnip}. by using `nLambda` and
-# `lambdaMinRatio` together with `includeLambda0`, we ensure that any penalty
-# value can be "interpolated" (those above the maximum are equivalent to the
-# maximum). The `have_extr` variable determines whether this was done based on
-# the arguments retained in the `ordinalNet` object. --corybrunson
-
-adjacent_penalties <- function(object, penalty, use_extreme = TRUE) {
-  ref <- object$lambdaVals
-  in_rng <- penalty >= min(ref) && penalty <= max(ref)
-  have_extr <- is.null(object$args$lambdaVals) && object$args$includeLambda0
-  if (! in_rng && ! have_extr) {
-    cli::cli_abort(
-      "The penalty value {format(penalty, digits = 3)} is
-      outside the penalty range contained in the model object.",
-      call = rlang::call2("predict")
-    )
+  # NB: `$lambdaVals` must be unique and decreasing.
+  len <- length(object$lambdaVals)
+  if (penalty < object$lambdaVals[len]) {
+    return(len)
+  } else if (penalty > object$lambdaVals[1L]) {
+    return(1L)
+  } else if (penalty %in% object$lambdaVals) {
+    return(match(penalty, object$lambdaVals))
+  } else {
+    return(which(object$lambdaVals < penalty)[1L] + c(-1L, 0L))
   }
-
-  above <- which.min(ifelse(ref < penalty,  Inf, ref))
-  below <- which.max(ifelse(ref > penalty, -Inf, ref))
-  unique(sort(c(below, above)))
 }
 
 approx_prediction <- function(low, high, adjacent, penalty) {
@@ -271,6 +261,9 @@ approx_prediction_row <- function(values, adjacent, penalty) {
 #   multi_predict_<type>_ordinal_net()    <-- vectorizes over penalties
 #    predict._ordinalNet(multi = FALSE)   <-- (see above)
 
+# NB: `ordinalNet::predict.ordinalNet()` does not support multiple prediction,
+# so `multi_predict()` merely vectorizes `predict(multi = FALSE)`.
+
 #' @importFrom stats approx as.formula coef predict
 #' @importFrom parsnip eval_args predict_raw multi_predict
 #' @param penalty A numeric vector of penalty values.
@@ -290,9 +283,8 @@ predict._ordinalNet <- function(
     penalty <- object$spec$args$penalty
   }
 
-  # TODO: Write unit test using `predict(multi = TRUE)`.
   object$spec$args$penalty <-
-    .check_ordinalNet_penalty_predict(penalty, object, multi)
+    check_penalty_predict(penalty, object, multi)
 
   object$spec <- eval_args(object$spec)
 
@@ -327,7 +319,7 @@ multi_predict._ordinalNet <- function(
   }
 
   object$spec$args$penalty <-
-    .check_ordinalNet_penalty_predict(penalty, object, multi = TRUE)
+    check_penalty_predict(penalty, object, multi = TRUE)
 
   # adapted from `censored::multi_predict._coxnet`
 
@@ -378,43 +370,46 @@ predict_class._ordinalNet <- function(object, new_data, ...) {
   predict_class.model_fit(object, new_data = new_data, ...)
 }
 
-.check_ordinalNet_penalty_predict <- function(
-    penalty = NULL, object, multi = FALSE, call = rlang::caller_env()
+# adapted from `parsnip:::.check_glmnet_penalty_predict()`
+check_penalty_predict <- function(
+    penalty = NULL,
+    object,
+    multi = FALSE,
+    call = rlang::caller_env()
 ) {
+  engine <- object$spec$engine
+  penalty_path_arg <- switch(
+    engine,
+    "ordinalNet" = "lambdaVals",
+    "glmnetcr" = "lambda"
+  )
 
-  if (multi) {
-    # ensure that there is a penalty path
-    if (is.null(penalty)) {
-      penalty <- object$fit$lambdaVals
-    }
-    penalty <- sort(unique(penalty))
-    # REVIEW: This code prevents `tune_grid()` from working.
-    # if (length(penalty) < 2L) {
-    #   cli::cli_abort("There should be at least 2 penalty values for
-    #                {.fn multi_predict}; please use {.fn predict}) instead.",
-    #                  call = call)
-    # }
-  } else {
-    # FIXME: Allow `NULL` penalty so that ordinalNet method uses criterion.
-    if (! is.null(penalty) && length(penalty) != 1L) {
+  if (is.null(penalty)) {
+    penalty <- object$fit[[penalty_path_arg]]
+  }
+
+  # when using `predict()`, allow for a single lambda
+  if (! multi) {
+    if (length(penalty) != 1) {
       cli::cli_abort(
         c(
           "{.arg penalty} should be a single numeric value.",
-          "i" = "{.fn multi_predict} can be used to get
-          multiple predictions per row of data."
+          "i" = "{.fn multi_predict} can be used to get multiple predictions
+          per row of data."
         ),
         call = call
       )
     }
   }
 
-  # REVIEW: This might be unecessary because it lies outside the logic flow.
-  if (length(object$fit$lambdaVals) == 1L && penalty != object$fit$lambdaVals) {
+  if (length(object$fit[[penalty_path_arg]]) == 1L &&
+      penalty != object$fit[[penalty_path_arg]]) {
     cli::cli_abort(
       c(
-        "The ordinalNet model was fit with a single penalty value of
-      {.arg object$fit$lambdaVals}. Predicting with a value of {.arg penalty}
-      will give incorrect results from `ordinalNet()`."
+        "The {.val {engine}} model was fit with a single penalty value of
+        {.arg object$fit[[penalty_path_arg]]}. Predicting with a value of
+        {.arg penalty} will give incorrect results from
+        {.fn {paste0(engine, '()')}}."
       ),
       call = call
     )
@@ -429,7 +424,8 @@ multi_predict_classprob_ordinal_net <- function(object, new_data, penalty) {
     ~ predict(object, new_data, type = "prob", penalty = .x) %>%
       tibble::as_tibble() %>%
       parsnip::add_rowindex() %>%
-      dplyr::mutate(penalty = .x) %>% dplyr::relocate(penalty)
+      dplyr::mutate(penalty = .x) %>%
+      dplyr::relocate(penalty)
   ) %>%
     tidyr::nest(.by = .row, .key = ".pred") %>%
     dplyr::select(-.row)
@@ -440,7 +436,8 @@ multi_predict_class_ordinal_net <- function(object, new_data, penalty) {
     penalty,
     ~ predict(object, new_data, type = "class", penalty = .x) %>%
       parsnip::add_rowindex() %>%
-      dplyr::mutate(penalty = .x) %>% dplyr::relocate(penalty)
+      dplyr::mutate(penalty = .x) %>%
+      dplyr::relocate(penalty)
   ) %>%
     tidyr::nest(.by = .row, .key = ".pred") %>%
     dplyr::select(-.row)
