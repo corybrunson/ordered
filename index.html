@@ -99,7 +99,7 @@
 <div class="section level2">
 <h2 id="available-models-engines-and-prediction-types">Available models, engines, and prediction types<a class="anchor" aria-label="anchor" href="#available-models-engines-and-prediction-types"></a>
 </h2>
-<p>ordered provides new engines for several models, including all engines for <code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code>, as summarized in the table. Currently only predictions of <code>type = "class"</code> and <code>type = "prob"</code> are supported.</p>
+<p>ordered provides new engines for several models, including all engines for <code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code>:</p>
 <table class="table">
 <thead><tr>
 <th align="left">model</th>
@@ -185,6 +185,96 @@
 <td align="left">✔</td>
 <td align="left">✔</td>
 <td align="left">✖</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="tunable-model-arguments">Tunable model arguments<a class="anchor" aria-label="anchor" href="#tunable-model-arguments"></a>
+</h2>
+<p><code>ordinal_reg</code> recognizes several tunable arguments shared by at least two engines in ordered:</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+</colgroup>
+<thead><tr>
+<th align="left">engine</th>
+<th align="left">ordinal_link</th>
+<th align="left">odds_link</th>
+<th align="left">threshold_structure</th>
+<th align="left">parallel_reg</th>
+<th align="left">penalty</th>
+<th align="left">mixture</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left"><code>polr</code></td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>clm</code></td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>lrm</code></td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>orm</code></td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>vglm</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>ordinalNet</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+</tr>
+<tr>
+<td align="left"><code>glmnetcr</code></td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
 </tr>
 </tbody>
 </table>
