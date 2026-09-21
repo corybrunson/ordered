@@ -66,71 +66,6 @@
       Computational engine: polr 
       
 
-# parallel_reg accepts formula input
-
-    Code
-      ordinal_reg(parallel_reg = TRUE ~ x)
-    Output
-      Ordinal Regression Model Specification (classification)
-      
-      Main Arguments:
-        parallel_reg = TRUE ~ x
-      
-      Computational engine: polr 
-      
-
----
-
-    Code
-      ordinal_reg(parallel_reg = FALSE ~ y + z)
-    Output
-      Ordinal Regression Model Specification (classification)
-      
-      Main Arguments:
-        parallel_reg = FALSE ~ y + z
-      
-      Computational engine: polr 
-      
-
-# parallel_reg accepts list input
-
-    Code
-      ordinal_reg(parallel_reg = list(TRUE ~ x))
-    Output
-      Ordinal Regression Model Specification (classification)
-      
-      Main Arguments:
-        parallel_reg = list(TRUE ~ x)
-      
-      Computational engine: polr 
-      
-
----
-
-    Code
-      ordinal_reg(parallel_reg = list(FALSE ~ x, TRUE ~ y))
-    Output
-      Ordinal Regression Model Specification (classification)
-      
-      Main Arguments:
-        parallel_reg = list(FALSE ~ x, TRUE ~ y)
-      
-      Computational engine: polr 
-      
-
----
-
-    Code
-      ordinal_reg(parallel_reg = list(FALSE, TRUE ~ y))
-    Output
-      Ordinal Regression Model Specification (classification)
-      
-      Main Arguments:
-        parallel_reg = list(FALSE, TRUE ~ y)
-      
-      Computational engine: polr 
-      
-
 # parallel_reg rejects invalid inputs
 
     Code
@@ -148,13 +83,4 @@
     Condition
       Error in `fit()`:
       ! `parallel_reg` must be `TRUE`, `FALSE`, or `NULL`, not a <formula> object.
-
----
-
-    Code
-      fit(set_engine(ordinal_reg(parallel_reg = list(TRUE ~ Infl, FALSE ~ Cont, TRUE)),
-      "clm"), Sat ~ Infl + Cont, data = house_sub)
-    Condition
-      Error in `fit()`:
-      ! `parallel_reg` must be `TRUE`, `FALSE`, or `NULL`, not a list.
 
