@@ -35,9 +35,15 @@ test_that("model object", {
   set.seed(seed)
   orig_fit <- VGAM::vglm(
     Sat ~ Type + Infl + Cont,
-    family = VGAM::cratio(
-      link = "probitlink", parallel = TRUE, Thresh = "symm1"
-    ),
+    family = if (utils::packageVersion("VGAM") == package_version("1.1.9")) {
+      VGAM::cratio(
+        link = "probitlink", parallel = TRUE, threshold = "symmetric1"
+      )
+    } else {
+      VGAM::cratio(
+        link = "probitlink", parallel = TRUE, Thresh = "symm1"
+      )
+    },
     data = house_sub
   )
 
@@ -184,6 +190,7 @@ test_that("linear_pred prediction", {
 
 test_that("interfaces agree", {
   skip_if_not_installed("VGAM")
+  skip_if_not(utils::packageVersion("VGAM") > package_version("1.1.9"))
   skip_if_not_installed("QSARdata")
 
   onet_spec <-
@@ -302,6 +309,14 @@ test_that("standardized link, family, and threshold values are matched", {
   expect_equal(match_threshold_structure_VGAM("equidistant"), "equid")
   expect_equal(match_threshold_structure_VGAM("symmetric_zero"), "symm0")
   expect_equal(match_threshold_structure_VGAM("qnorm"), "qnorm")
+  expect_equal(
+    match_threshold_structure_VGAM("equidistant", v_1_1_9 = TRUE),
+    "equidistant"
+  )
+  expect_equal(
+    match_threshold_structure_VGAM("symmetric_zero", v_1_1_9 = TRUE),
+    "symmetric0"
+  )
 
   expect_snapshot(error = TRUE, {
     match_ordinal_link_VGAM("loglog")
@@ -334,10 +349,19 @@ test_that("VGAM wrappers translate standardized argument values", {
     MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
 
   # native values pass through unchanged
-  native <- VGAM_vglm_wrapper(
-    Sat ~ Infl + Type, data = house_data,
-    family = "sratio", link = "probitlink", Thresh = "symm1", parallel = TRUE
-  )
+  native <- if (utils::packageVersion("VGAM") == package_version("1.1.9")) {
+    VGAM_vglm_wrapper(
+      Sat ~ Infl + Type, data = house_data,
+      family = "sratio", link = "probitlink",
+      threshold = "symmetric1", parallel = TRUE
+    )
+  } else {
+    VGAM_vglm_wrapper(
+      Sat ~ Infl + Type, data = house_data,
+      family = "sratio", link = "probitlink",
+      Thresh = "symm1", parallel = TRUE
+    )
+  }
   expect_equal(native@family@infos()$link, "probitlink")
   expect_equal(native@family@vfamily[1L], "sratio")
 

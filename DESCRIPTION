@@ -57,3 +57,4 @@ URL: https://corybrunson.github.io/ordered/
 BugReports: https://github.com/corybrunson/ordered/issues
 Config/Needs/website: rmarkdown
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3

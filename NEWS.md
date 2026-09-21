@@ -14,7 +14,7 @@ Now `predictvglm()` is used instead.
 
 ### penalty paths (breaking change)
 
-Penalty path arguments in `ordinalNet` are no longer silently internally modified; for example, the user must specify `includeLambda0 = TRUE` if they want the path to inclue zero.
+Penalty path arguments in `ordinalNet` are no longer silently internally modified; for example, the user must specify `includeLambda0 = TRUE` if they want the path to include zero.
 Extrapolative predictions, which err in `ordinalNet`, are overridden to use path endpoint values for consistency with `glmnet` and `glmnetcr`.
 
 ## new features
