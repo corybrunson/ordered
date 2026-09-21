@@ -50,7 +50,7 @@ Coordinated with [parsnip PR #1391](https://github.com/tidymodels/parsnip/pull/1
 ### threshold structure and parallel regression model arguments
 
 The `threshold_structure` model argument for `ordinal_reg()` controls what constraints, if any, are imposed on the ordered thresholds.
-It can be used by the `clm` and `vglm` engines.
+It can be used by the `clm` and `vglm` engines, including with VGAM version 1.1-9.
 
 The `parallel_reg` model argument for `ordinal_reg()` controls the parallel regression assumption with a logical value applied to all predictors.
 It can be used by the `clm`, `vglm`, and `ordinalNet` engines.
