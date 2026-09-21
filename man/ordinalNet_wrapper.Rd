@@ -62,17 +62,17 @@ predict_ordinalNet_wrapper(
 
 \item{y}{The outcome vector.}
 
-\item{weights}{An optional numeric vector of case weights. When provided,
-the outcome is restructured into a multinomial matrix of weighted
-indicators.}
+\item{weights}{An optional numeric vector of case weights. When provided, the
+outcome is restructured into a multinomial matrix of weighted indicators.}
 
-\item{family}{The \code{ordinalNet} family function, given either in the
-standardized form (e.g. \code{"cumulative_link"}, \code{"stopping_ratio"}) or natively
-(e.g. \code{"cumulative"}, \code{"sratio"}, \code{"cratio"}, \code{"acat"}).}
+\item{family}{The odds link function; either a standardized dial value
+(\code{"cumulative_link"}, \code{"adjacent_categories"}, \code{"continuation_ratio"},
+\code{"stopping_ratio"}) or an \code{ordinalNet} native value (\code{"cumulative"},
+\code{"acat"}, \code{"cratio"}, \code{"sratio"}).}
 
-\item{link}{The \code{ordinalNet} link function, given either in the standardized
-form (e.g. \code{"logistic"}) or natively (e.g. \code{"logit"}, \code{"probit"},
-\code{"cloglog"}, \code{"cauchit"}).}
+\item{link}{The ordinal link function; either a standardized dial value (e.g.
+\code{"logistic"}, \code{"probit"}) or a \code{ordinalNet} native value (e.g. \code{"logit"},
+\code{"probit"}).}
 
 \item{parallel_reg}{Logical; whether predictors share effects across
 thresholds. When \code{FALSE}, \code{parallelTerms} is set to \code{FALSE} and

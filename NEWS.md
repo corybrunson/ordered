@@ -12,6 +12,11 @@ Now `predictvglm()` is used instead.
 
 `ordinal_reg()` argument value translation has been moved from the `translate()` method in parsnip to engine wrappers in ordered, with the exception of penalty path assembly for `ordinalNet` and `glmnetcr`, in coordination with [parsnip PR #1393](https://github.com/tidymodels/parsnip/pull/1393).
 
+### penalty paths (breaking change)
+
+Penalty path arguments in `ordinalNet` are no longer silently internally modified; for example, the user must specify `includeLambda0 = TRUE` if they want the path to include zero.
+Extrapolative predictions, which err in `ordinalNet`, are overridden to use path endpoint values for consistency with `glmnet` and `glmnetcr`.
+
 ## new features
 
 ### additional ordinal regression and random forest engines
@@ -45,7 +50,7 @@ Coordinated with [parsnip PR #1391](https://github.com/tidymodels/parsnip/pull/1
 ### threshold structure and parallel regression model arguments
 
 The `threshold_structure` model argument for `ordinal_reg()` controls what constraints, if any, are imposed on the ordered thresholds.
-It can be used by the `clm` and `vglm` engines.
+It can be used by the `clm` and `vglm` engines, including with VGAM version 1.1-9.
 
 The `parallel_reg` model argument for `ordinal_reg()` controls the parallel regression assumption with a logical value applied to all predictors.
 It can be used by the `clm`, `vglm`, and `ordinalNet` engines.

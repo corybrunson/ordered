@@ -12,8 +12,7 @@
       
       Model fit template:
       ordered::ordinalNet_wrapper(x = missing_arg(), y = missing_arg(), 
-          weights = missing_arg(), nLambda = 120L, lambdaMinRatio = 1e-08, 
-          includeLambda0 = TRUE)
+          weights = missing_arg())
 
 # arguments agree
 

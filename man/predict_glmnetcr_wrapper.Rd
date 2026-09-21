@@ -2,11 +2,12 @@
 % Please edit documentation in R/ordinal_reg-glmnetcr.R
 \name{predict_glmnetcr_wrapper}
 \alias{predict_glmnetcr_wrapper}
+\alias{multi_predict_glmnetcr_wrapper}
 \alias{predict._glmnetcr}
 \alias{predict_class._glmnetcr}
 \alias{predict_classprob._glmnetcr}
 \alias{multi_predict._glmnetcr}
-\title{Predict wrapper for \code{glmnetcr}}
+\title{Predict wrappers for \code{glmnetcr}}
 \usage{
 predict_glmnetcr_wrapper(
   object,
@@ -16,7 +17,17 @@ predict_glmnetcr_wrapper(
   criteria = c("bic", "aic")
 )
 
-\method{predict}{`_glmnetcr`}(object, new_data, type = NULL, opts = list(), penalty = NULL, ...)
+multi_predict_glmnetcr_wrapper(object, newx, type, lambda)
+
+\method{predict}{`_glmnetcr`}(
+  object,
+  new_data,
+  type = NULL,
+  opts = list(),
+  penalty = NULL,
+  multi = FALSE,
+  ...
+)
 
 \method{predict_class}{`_glmnetcr`}(object, new_data, ...)
 
@@ -38,8 +49,8 @@ predict_glmnetcr_wrapper(
 
 \item{type}{Either \code{"class"} or \code{"prob"}.}
 
-\item{lambda}{A penalty value at which to predict. If \code{NULL}, the step
-minimizing \code{criteria} is used.}
+\item{lambda}{A penalty value or vector at which to predict. If \code{NULL}, the
+step minimizing \code{criteria} is used (single penalty only).}
 
 \item{criteria}{The criterion by which to select \code{lambda} within the path
 sequence. Defaults to \code{"bic"} for consistency with
@@ -51,13 +62,18 @@ penalty. If \code{NULL}, the regularization path stored in the model fit is
 used.}
 }
 \value{
-A character vector of class predictions or a matrix of class
-probabilities.
+\code{predict_glmnetcr_wrapper()} returns a character vector of class
+predictions or a matrix of class probabilities.
+\code{multi_predict_glmnetcr_wrapper()} returns a numeric array with one slice
+per penalty value for class probabilities, or a character matrix with one
+column per penalty value for class predictions.
+Both outputs mimic those of \code{\link[glmnetcr:predict.glmnetcr]{glmnetcr::predict.glmnetcr()}}.
 }
 \description{
-Selects predictions at a specific penalty value from the regularization path.
-When the requested penalty lies between two path values, linearly
-interpolates between the probability matrices at the neighboring steps.
+Select predictions at a specific penalty value or a vector of penalty values.
+For penalties between path values, linearly interpolate between the
+probability matrices at the neighboring steps. For penalties outside the path
+range, use the path endpoints.
 }
 \examples{
 \dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("glmnetcr")) withAutoprint(\{ # examplesIf}
@@ -68,33 +84,57 @@ house_matrix <- model.matrix(
   data = house_data,
   contrasts.arg = lapply(house_data[, 2:4], contrasts, contrasts = FALSE)
 )
-pen_vec <- 10 ^ seq(-1, -3, -.5)
+pen_vec <- 10 ^ seq(-1, -2, -.25)
 fit <- glmnetcr::glmnetcr(
   house_matrix, y = house_data$Sat,
   lambda = pen_vec
 )
 # predictions (may disagree if `lambda` is not on the path `fit$lambda`)
-# probability
+set.seed(34091)
+house_submatrix <- house_matrix[sample(nrow(house_matrix), 6), ]
+# single, probability
 predict(
   fit,
-  newx = head(house_matrix)
-)$probs[, , which.min(abs(fit$lambda - 0.02))]
+  newx = house_submatrix
+)$probs[, , which.min(abs(fit$lambda - .02))]
 predict_glmnetcr_wrapper(
   fit,
-  newx = head(house_matrix),
+  newx = house_submatrix,
   type = "prob",
-  lambda = 0.02
+  lambda = .02
 )
-# class
+# single, class
 predict(
   fit,
-  newx = head(house_matrix)
-)$class[, which.min(abs(fit$lambda - 0.02))]
+  newx = house_submatrix
+)$class[, which.min(abs(fit$lambda - .02))]
 predict_glmnetcr_wrapper(
   fit,
-  newx = head(house_matrix),
+  newx = house_submatrix,
   type = "class",
-  lambda = 0.02
+  lambda = .02
+)
+# multiple, probabilities
+predict(
+  fit,
+  newx = house_submatrix
+)$probs
+multi_predict_glmnetcr_wrapper(
+  fit,
+  newx = house_submatrix,
+  type = "prob",
+  lambda = c(.2, .02, .002)
+)
+# multiple, class
+predict(
+  fit,
+  newx = house_submatrix
+)$class
+multi_predict_glmnetcr_wrapper(
+  fit,
+  newx = house_submatrix,
+  type = "class",
+  lambda = c(.2, .02, .002)
 )
 \dontshow{\}) # examplesIf}
 }

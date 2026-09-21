@@ -14,6 +14,9 @@
 #' `threshold_structure` options encoded in
 #' [`dials::values_threshold_structure`] to those accepted by [`VGAM::vglm()`]
 #' and [`VGAM::vgam()`].
+#'
+#' NB: Prediction with `vgam` models under {VGAM} version 1.1-9 does not yet
+#' support the use of smoothers `s()`.
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.
 #' @param family The odds link function; either a standardized dial value
@@ -46,10 +49,45 @@
 #' dials::ordinal_link(values = values_ordinal_link_VGAM)
 #' values_threshold_structure_VGAM
 #' dials::threshold_structure(values = values_threshold_structure_VGAM)
-
-#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM")
+#'
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+
+#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM") && utils::packageVersion("VGAM") == package_version("1.1.9")
+#' # {VGAM} version 1.1-9
+#'
+#' # fit wrapper for linear model
+#' ( fit_orig <- VGAM::vglm(
+#'   Sat ~ Type + Infl + Cont,
+#'   family = VGAM::sratio(
+#'     link = "probitlink", parallel = TRUE, threshold = "symmetric0"
+#'   ),
+#'   data = house_data
+#' ) )
+#' ( fit_wrap <- VGAM_vglm_wrapper(
+#'   Sat ~ Type + Infl + Cont,
+#'   family = "sratio",
+#'   link = "probitlink", parallel = TRUE, Thresh = "symmetric_zero",
+#'   data = house_data
+#' ) )
+#' # fit wrapper for additive model
+#' ( fit_orig <- VGAM::vgam(
+#'   Sat ~ Type + Infl + Cont,
+#'   family = VGAM::cratio(
+#'     link = "clogloglink", parallel = TRUE, threshold = "symmetric0",
+#'   ),
+#'   data = house_data
+#' ) )
+#' ( fit_wrap <- VGAM_vgam_wrapper(
+#'   Sat ~ Type + Infl + Cont,
+#'   family = "cratio",
+#'   link = "cloglog", parallel = TRUE, Thresh = "symmetric0",
+#'   data = house_data
+#' ) )
+
+#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM") && utils::packageVersion("VGAM") > package_version("1.1.9")
+#' # {VGAM} version >= 1.1-10
+#'
 #' # fit wrapper for linear model
 #' ( fit_orig <- VGAM::vglm(
 #'   Sat ~ Type + Infl + Cont,
@@ -89,6 +127,7 @@ VGAM_vglm_wrapper <- function(
     call = rlang::caller_env()
 ) {
   rlang::check_installed("VGAM")
+  VGAM_1_1_9 <- utils::packageVersion("VGAM") == package_version("1.1.9")
 
   # TODO: Ensure that `formula = cbind(...) ~ ...` is disallowed, for this and
   # for other `ordinal_reg()` engines.
@@ -96,14 +135,25 @@ VGAM_vglm_wrapper <- function(
   # match standardized argument values to their `VGAM` natives
   link <- match_ordinal_link_VGAM(link, call = call)
   family <- match_ordinal_family(family, call = call)
-  Thresh <- match_threshold_structure_VGAM(Thresh, call = call)
+  Thresh <- match_threshold_structure_VGAM(
+    Thresh,
+    v_1_1_9 = VGAM_1_1_9,
+    call = call
+  )
   check_ordinal_link_family_VGAM(family = family, link = link, call = call)
 
   # execute nested call on modified inputs
-  family_call <- rlang::call2(
-    .fn = family, .ns = "VGAM",
-    link = link, parallel = parallel, Thresh = Thresh
-  )
+  family_call <- if (VGAM_1_1_9) {
+    rlang::call2(
+      .fn = family, .ns = "VGAM",
+      link = link, parallel = parallel, threshold = Thresh
+    )
+  } else {
+    rlang::call2(
+      .fn = family, .ns = "VGAM",
+      link = link, parallel = parallel, Thresh = Thresh
+    )
+  }
   cl <- rlang::call2(
     .fn = "vglm", .ns = "VGAM",
     formula = rlang::expr(formula), data = rlang::expr(data),
@@ -125,18 +175,30 @@ VGAM_vgam_wrapper <- function(
     call = rlang::caller_env()
 ) {
   rlang::check_installed("VGAM")
+  VGAM_1_1_9 <- utils::packageVersion("VGAM") == package_version("1.1.9")
 
   # match standardized argument values to their `VGAM` natives
   link <- match_ordinal_link_VGAM(link, call = call)
   family <- match_ordinal_family(family, call = call)
-  Thresh <- match_threshold_structure_VGAM(Thresh, call = call)
+  Thresh <- match_threshold_structure_VGAM(
+    Thresh,
+    v_1_1_9 = VGAM_1_1_9,
+    call = call
+  )
   check_ordinal_link_family_VGAM(family = family, link = link, call = call)
 
   # execute nested call on modified inputs
-  family_call <- rlang::call2(
-    .fn = family, .ns = "VGAM",
-    link = link, parallel = parallel, Thresh = Thresh
-  )
+  family_call <- if (VGAM_1_1_9) {
+    rlang::call2(
+      .fn = family, .ns = "VGAM",
+      link = link, parallel = parallel, threshold = Thresh
+    )
+  } else {
+    rlang::call2(
+      .fn = family, .ns = "VGAM",
+      link = link, parallel = parallel, Thresh = Thresh
+    )
+  }
   cl <- rlang::call2(
     .fn = "vgam", .ns = "VGAM",
     formula = rlang::expr(formula), data = rlang::expr(data),
@@ -228,7 +290,7 @@ match_ordinal_link_VGAM <- function(link, call = rlang::caller_env()) {
 }
 
 match_threshold_structure_VGAM <- function(
-  Thresh,
+  Thresh, v_1_1_9 = FALSE,
   call = rlang::caller_env()
 ) {
   if (! is.character(Thresh)) {
@@ -236,9 +298,15 @@ match_threshold_structure_VGAM <- function(
   }
   check_string(Thresh, arg = "threshold_structure", call = call)
 
+  native_vals <- if (v_1_1_9) {
+    c("unconstrained", "equidistant", "symmetric1", "symmetric0")
+  } else {
+    c("free", "symm1", "symm0", "equid", "qnorm")
+  }
+
   if (
     # keep native values
-    ! Thresh %in% c("free", "symm1", "symm0", "equid", "qnorm")
+    ! Thresh %in% native_vals
   ) {
     # modify standardized values
     Thresh <- rlang::arg_match0(
@@ -247,14 +315,25 @@ match_threshold_structure_VGAM <- function(
       arg_nm = "threshold_structure",
       error_call = call
     )
-    Thresh <- switch(
-      Thresh,
-      flexible = "free",
-      symmetric_median = "symm1",
-      symmetric_zero = "symm0",
-      equidistant = "equid",
-      qnorm = "qnorm"
-    )
+    # match to native values
+    if (v_1_1_9) {
+      Thresh <- switch(
+        Thresh,
+        flexible = "unconstrained",
+        symmetric_median = "symmetric1",
+        symmetric_zero = "symmetric0",
+        equidistant = "equidistant"
+      )
+    } else {
+      Thresh <- switch(
+        Thresh,
+        flexible = "free",
+        symmetric_median = "symm1",
+        symmetric_zero = "symm0",
+        equidistant = "equid",
+        qnorm = "qnorm"
+      )
+    }
   }
 
   Thresh

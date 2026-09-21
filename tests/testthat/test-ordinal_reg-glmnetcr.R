@@ -218,6 +218,102 @@ test_that("prob prediction", {
 
 # multiple prediction ----------------------------------------------------------
 
+test_that("multi-penalty wrapper output structure", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("glmnetcr")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- suppressWarnings(
+    ordinal_reg(engine = "glmnetcr", penalty = 1) |>
+      fit(Sat ~ Type + Cont, data = house_sub)
+  )
+  fit <- tidy_fit$fit
+  n <- nrow(house_sub)
+  pen_vals <- fit$lambda[length(fit$lambda) * seq(4) / 5]
+
+  house_vars <- model.matrix(
+    Sat ~ Type + Cont + 0, data = house_sub,
+    contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
+  )
+
+  # probability: array [nrow, nclass, npenalty]
+  prob_res <- multi_predict_glmnetcr_wrapper(
+    fit, house_vars, type = "prob", lambda = pen_vals
+  )
+  expect_equal(dim(prob_res), c(n, length(tidy_fit$lvl), length(pen_vals)))
+
+  # class: matrix [nrow, npenalty]
+  class_res <- multi_predict_glmnetcr_wrapper(
+    fit, house_vars, type = "class", lambda = pen_vals
+  )
+  expect_equal(dim(class_res), c(n, length(pen_vals)))
+})
+
+test_that("multi-penalty wrapper endpoint use", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("glmnetcr")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- suppressWarnings(
+    ordinal_reg(engine = "glmnetcr", penalty = 1) |>
+      fit(Sat ~ Type + Cont, data = house_sub)
+  )
+  fit <- tidy_fit$fit
+  house_vars <- model.matrix(
+    Sat ~ Type + Cont + 0, data = house_sub,
+    contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
+  )
+
+  prob_lo <- multi_predict_glmnetcr_wrapper(
+    fit, house_vars, "prob", lambda = min(fit$lambda) / 10
+  )
+  prob_at <- multi_predict_glmnetcr_wrapper(
+    fit, house_vars, "prob", lambda = min(fit$lambda)
+  )
+  expect_equal(prob_lo, prob_at)
+
+  prob_hi <- multi_predict_glmnetcr_wrapper(
+    fit, house_vars, "prob", lambda = max(fit$lambda) * 10
+  )
+  prob_at <- multi_predict_glmnetcr_wrapper(
+    fit, house_vars, "prob", lambda = max(fit$lambda)
+  )
+  expect_equal(prob_hi, prob_at)
+})
+
+test_that("single- and multi-penalty wrappers agree", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("glmnetcr")
+  house_sub <- get_house()$sub
+
+  tidy_fit <- suppressWarnings(
+    ordinal_reg(engine = "glmnetcr", penalty = 1) |>
+      fit(Sat ~ Type + Cont, data = house_sub)
+  )
+  fit <- tidy_fit$fit
+  house_vars <- model.matrix(
+    Sat ~ Type + Cont + 0, data = house_sub,
+    contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
+  )
+  pen_vals <- fit$lambda[length(fit$lambda) * seq(4) / 5]
+
+  for (type in c("class", "prob")) {
+    multi_res <- multi_predict_glmnetcr_wrapper(
+      fit, house_vars, type = type, lambda = pen_vals
+    )
+    for (i in seq_along(pen_vals)) {
+      single_res <- predict_glmnetcr_wrapper(
+        fit, house_vars, type = type, lambda = pen_vals[i]
+      )
+      if (type == "prob") {
+        expect_equal(multi_res[, , i], single_res)
+      } else {
+        expect_equal(multi_res[, i], single_res)
+      }
+    }
+  }
+})
+
 test_that("multiple prediction structure", {
   skip_if_not_installed("MASS")
   skip_if_not_installed("glmnetcr")
@@ -334,14 +430,7 @@ test_that("interfaces agree", {
     ordinal_reg() |>
     set_mode("classification") |>
     set_engine("glmnetcr")
-  expect_snapshot(gcr_spec |> translate())
-
-  suppressWarnings(
-    expect_warning(
-      fit(gcr_spec, class ~ ., data = caco_train),
-      regexp = "penalty.*path_values"
-    )
-  )
+  expect_snapshot(gcr_spec |> translate(), error = TRUE)
 
   gcr_spec <-
     ordinal_reg(penalty = 1) |>

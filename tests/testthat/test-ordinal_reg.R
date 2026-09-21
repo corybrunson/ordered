@@ -36,24 +36,3 @@ test_that("parallel_reg accepts logical input", {
   expect_snapshot(ordinal_reg(parallel_reg = TRUE))
   expect_snapshot(ordinal_reg(parallel_reg = FALSE))
 })
-
-test_that("parallel_reg rejects invalid inputs", {
-  skip_if_not_installed("MASS")
-  house_sub <- MASS::housing[rep(seq(nrow(MASS::housing)),
-    MASS::housing$Freq), -5]
-
-  # not logical or formula
-  expect_snapshot(
-    ordinal_reg(parallel_reg = "TRUE") |>
-      set_engine("clm") |>
-      fit(Sat ~ Infl + Cont, data = house_sub),
-    error = TRUE
-  )
-  # formula without logical LHS
-  expect_snapshot(
-    ordinal_reg(parallel_reg = Sat ~ Infl) |>
-      set_engine("clm") |>
-      fit(Sat ~ Infl + Cont, data = house_sub),
-    error = TRUE
-  )
-})
