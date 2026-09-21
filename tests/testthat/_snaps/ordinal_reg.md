@@ -66,21 +66,3 @@
       Computational engine: polr 
       
 
-# parallel_reg rejects invalid inputs
-
-    Code
-      fit(set_engine(ordinal_reg(parallel_reg = "TRUE"), "clm"), Sat ~ Infl + Cont,
-      data = house_sub)
-    Condition
-      Error in `fit()`:
-      ! `parallel_reg` must be `TRUE`, `FALSE`, or `NULL`, not the string "TRUE".
-
----
-
-    Code
-      fit(set_engine(ordinal_reg(parallel_reg = Sat ~ Infl), "clm"), Sat ~ Infl +
-      Cont, data = house_sub)
-    Condition
-      Error in `fit()`:
-      ! `parallel_reg` must be `TRUE`, `FALSE`, or `NULL`, not a <formula> object.
-
