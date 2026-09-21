@@ -188,7 +188,7 @@ We can define the model with specific parameters:
 ```{r}
 or_spec <-
   ordinal_reg(penalty = .001, mixture = .5) |>
-  set_engine("ordinalNet") |>
+  set_engine("ordinalNet", includeLambda0 = TRUE) |>
   set_mode("classification")
 or_spec
 ```
