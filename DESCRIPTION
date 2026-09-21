@@ -39,7 +39,7 @@ Suggests:
     ordinalNet,
     rms (>= 7.0.0),
     glmnetcr,
-    VGAM,
+    VGAM (>= 1.1-9),
     rpartScore,
     ordinalForest,
     orf,
