@@ -15,7 +15,7 @@ prune_func(values = c("mr", "mc"))
 }
 \value{
 An object of S3 parent class \code{param} and primary class \code{qual_param};
-see \code{\link[dials:new-param]{dials::new_qual_param()}}.
+see \code{\link[dials:new_qual_param]{dials::new_qual_param()}}.
 }
 \description{
 These parameters are auxiliary to decision tree models that use the

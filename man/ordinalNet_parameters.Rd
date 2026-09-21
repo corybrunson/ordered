@@ -22,7 +22,7 @@ no transformation, \code{NULL}.}
 }
 \value{
 An object of S3 parent class \code{param} and primary class
-\code{quant_param}; see \code{\link[dials:new-param]{dials::new_quant_param()}}.
+\code{quant_param}; see \code{\link[dials:new_quant_param]{dials::new_quant_param()}}.
 }
 \description{
 These parameters are auxiliary to ordinal regression models that use the

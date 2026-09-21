@@ -38,10 +38,14 @@ export(values_ordinal_link_clm)
 export(values_threshold_structure_VGAM)
 import(parsnip)
 import(rlang)
-importFrom(parsnip,eval_args)
-importFrom(parsnip,multi_predict)
-importFrom(parsnip,predict_raw)
-importFrom(stats,approx)
-importFrom(stats,as.formula)
-importFrom(stats,coef)
-importFrom(stats,predict)
+importFrom(parsnip,
+  eval_args,
+  multi_predict,
+  predict_raw
+)
+importFrom(stats,
+  approx,
+  as.formula,
+  coef,
+  predict
+)

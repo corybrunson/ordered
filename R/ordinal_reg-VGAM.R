@@ -15,7 +15,7 @@
 #' [`dials::values_threshold_structure`] to those accepted by [`VGAM::vglm()`]
 #' and [`VGAM::vgam()`].
 #'
-#' NB: Prediction with `vgam` models under {VGAM} version 1.1-9 does not yet
+#' NB: Prediction with `vgam` models under VGAM version 1.1-9 does not yet
 #' support the use of smoothers `s()`.
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.

@@ -27,8 +27,8 @@ no transformation, \code{NULL}.}
 }
 \value{
 An object of S3 parent class \code{param} and primary class \code{qual_param}
-or \code{quant_param}; see \code{\link[dials:new-param]{dials::new_qual_param()}} and
-\code{\link[dials:new-param]{dials::new_quant_param()}}.
+or \code{quant_param}; see \code{\link[dials:new_qual_param]{dials::new_qual_param()}} and
+\code{\link[dials:new_quant_param]{dials::new_quant_param()}}.
 }
 \description{
 These parameters are auxiliary to random forest models that use the
