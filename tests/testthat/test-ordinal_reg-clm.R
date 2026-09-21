@@ -4,6 +4,7 @@ seed <- 144688L
 
 test_that("specification handles model parameters", {
   skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinal")
   house_sub <- get_house()$sub
 
   # a legitimate ordinal link function not recognized by {dials}
