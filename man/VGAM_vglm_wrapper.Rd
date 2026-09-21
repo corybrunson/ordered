@@ -84,6 +84,9 @@ The vector \code{values_threshold_structure_VGAM} extends the default
 \code{\link[dials:threshold_structure]{dials::values_threshold_structure}} to those accepted by \code{\link[VGAM:vglm]{VGAM::vglm()}}
 and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
 
+NB: Prediction with \code{vgam} models under {VGAM} version 1.1-9 does not yet
+support the use of smoothers \code{s()}.
+
 Note that \code{VGAM::vglm()} and \code{VGAM::vgam()} treat the rows of \code{data}
 as the units of observation: Compressed \code{data} with one row per predictor
 set will be understood as having a multinomial-valued outcome; only
