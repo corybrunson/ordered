@@ -2,7 +2,7 @@
 % Please edit documentation in R/decision_tree-rpartScore.R
 \name{rpartScore_wrapper}
 \alias{rpartScore_wrapper}
-\title{A wrapper for \code{rpartScore}}
+\title{Fit wrapper for \code{rpartScore}}
 \usage{
 rpartScore_wrapper(formula, data, ...)
 }

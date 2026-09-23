@@ -2,7 +2,7 @@
 % Please edit documentation in R/rand_forest-orf.R
 \name{orf_wrapper}
 \alias{orf_wrapper}
-\title{A wrapper for \code{orf}}
+\title{Fit wrapper for \code{orf}}
 \usage{
 orf_wrapper(X, Y, ...)
 }
@@ -11,7 +11,7 @@ orf_wrapper(X, Y, ...)
 
 \item{Y}{The outcome factor.}
 
-\item{...}{Arguments to pass to \code{\link[orf:orf]{orf::orf()}}.}
+\item{...}{Additional arguments to pass.}
 }
 \value{
 An object of S3 class \code{orf} as returned by \code{\link[orf:orf]{orf::orf()}}.
@@ -23,18 +23,18 @@ numeric vector. This wrapper converts the parsnip-standard data.frame (\code{X})
 and factor (\code{Y}) to the required formats before calling \code{\link[orf:orf]{orf::orf()}}.
 }
 \examples{
-\dontshow{if (rlang::is_installed("orf") && rlang::is_installed("MASS")) withAutoprint(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("orf")) withAutoprint(\{ # examplesIf}
 house_data <-
   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
 house_data <- house_data[sample(nrow(house_data), 50), ]
 # encode factors as dummy variables before passing to wrapper
 X_mat <- model.matrix(~ Infl + Type + Cont - 1, data = house_data)
 # fit wrapper
-(fit_wrap <- orf_wrapper(
+( fit_wrap <- orf_wrapper(
   X = X_mat,
   Y = house_data$Sat,
   num.trees = 10
-))
+) )
 \dontshow{\}) # examplesIf}
 }
 \keyword{internal}

@@ -1,4 +1,6 @@
-library(devtools); library(tidymodels); library(bonsai); load_all()
+library(devtools); library(tidymodels)
+load_all("../parsnip/"); load_all("../dials/")
+library(bonsai); load_all()
 
 # reference example:
 # https://workflowsets.tidymodels.org/articles/tuning-and-comparing-models.html
@@ -23,17 +25,14 @@ polr_spec <-
   set_engine("polr") |>
   set_args(ordinal_link = tune())
 
-# vglm: ordinal_link + odds_link
-vglm_spec <-
+# clm: ordinal_link + threshold_structure + parallel_reg
+clm_spec <-
   ordinal_reg() |>
-  set_engine("vglm") |>
-  set_args(ordinal_link = tune(), odds_link = tune())
-
-# ordinalNet: penalty (submodel via multi_predict) + mixture
-ordinalNet_spec <-
-  ordinal_reg() |>
-  set_engine("ordinalNet") |>
-  set_args(penalty = tune(), mixture = tune())
+  set_engine("clm") |>
+  set_args(
+    ordinal_link = tune(),
+    threshold_structure = tune(), parallel_reg = tune()
+  )
 
 # lrm: penalty
 lrm_spec <-
@@ -47,6 +46,25 @@ orm_spec <-
   set_engine("orm") |>
   set_args(ordinal_link = tune(), penalty = tune())
 
+# vglm: ordinal_link + odds_link + threshold_structure + parallel_reg
+vglm_spec <-
+  ordinal_reg() |>
+  set_engine("vglm") |>
+  set_args(
+    ordinal_link = tune(), odds_link = tune(),
+    threshold_structure = tune(), parallel_reg = tune()
+  )
+
+# ordinalNet: penalty (submodel via multi_predict) + mixture +
+#   parallel_penalty_factor + parallel_reg
+ordinalNet_spec <-
+  ordinal_reg() |>
+  set_engine("ordinalNet") |>
+  set_args(
+    penalty = tune(), mixture = tune(),
+    parallelPenaltyFactor = tune(), parallel_reg = tune()
+  )
+
 # glmnetcr: penalty (submodel via multi_predict) + mixture
 glmnetcr_spec <-
   ordinal_reg() |>
@@ -55,12 +73,16 @@ glmnetcr_spec <-
 
 # --- gen_additive_mod engines ---
 
-# vgam: link + family (named differently from ordinal_reg parameter)
+# vgam: link + family (named differently from ordinal_reg parameter) +
+#   Thresh + parallel (engine parameters)
 vgam_spec <-
   gen_additive_mod() |>
   set_engine("vgam") |>
   set_mode("classification") |>
-  set_args(link = tune(), family = tune())
+  set_args(
+    link = tune(), family = tune(),
+    Thresh = tune(), parallel = tune()
+  )
 
 # --- decision_tree engines ---
 
@@ -106,17 +128,23 @@ cforest_spec <-
 polr_tune <- extract_parameter_set_dials(polr_spec)
 ( polr_grid <- grid_regular(polr_tune, levels = Inf) )
 
+clm_tune <- extract_parameter_set_dials(clm_spec)
+( clm_grid <- grid_regular(clm_tune, levels = 3) )
+
+lrm_tune <- extract_parameter_set_dials(lrm_spec)
+( lrm_grid <- grid_regular(lrm_tune, levels = 3) )
+
+orm_tune <- extract_parameter_set_dials(orm_spec)
+( orm_grid <- grid_regular(orm_tune, levels = c(Inf, 2)) )
+
 vglm_tune <- extract_parameter_set_dials(vglm_spec)
 ( vglm_grid <- grid_regular(vglm_tune, levels = 2) )
 
 ordinalNet_tune <- extract_parameter_set_dials(ordinalNet_spec)
+# constrain the default c(-Inf, Inf) range for gridding
+idx <- which(ordinalNet_tune$name == "parallelPenaltyFactor")
+ordinalNet_tune$object[[idx]] <- parallel_penalty_factor(range = c(-1, 1))
 ( ordinalNet_grid <- grid_regular(ordinalNet_tune, levels = 2) )
-
-lrm_tune <- extract_parameter_set_dials(lrm_spec)
-( lrm_grid <- grid_regular(lrm_tune, levels = 2) )
-
-orm_tune <- extract_parameter_set_dials(orm_spec)
-( orm_grid <- grid_regular(orm_tune, levels = c(Inf, 2)) )
 
 glmnetcr_tune <- extract_parameter_set_dials(glmnetcr_spec)
 ( glmnetcr_grid <- grid_regular(glmnetcr_tune, levels = 2) )
@@ -144,10 +172,11 @@ workflow_set(
   preproc = list(formula = Sat ~ Infl + Type + Cont),
   models = list(
     polr = polr_spec,
-    vglm = vglm_spec,
-    ordinalNet = ordinalNet_spec,
+    clm = clm_spec,
     lrm = lrm_spec,
     orm = orm_spec,
+    vglm = vglm_spec,
+    ordinalNet = ordinalNet_spec,
     glmnetcr = glmnetcr_spec,
     vgam = vgam_spec,
     rpart = rpart_spec,
@@ -158,10 +187,11 @@ workflow_set(
   )
 ) |>
   option_add(grid = polr_grid, id = "formula_polr") |>
-  option_add(grid = vglm_grid, id = "formula_vglm") |>
-  option_add(grid = ordinalNet_grid, id = "formula_ordinalNet") |>
+  option_add(grid = clm_grid, id = "formula_clm") |>
   option_add(grid = lrm_grid, id = "formula_lrm") |>
   option_add(grid = orm_grid, id = "formula_orm") |>
+  option_add(grid = vglm_grid, id = "formula_vglm") |>
+  option_add(grid = ordinalNet_grid, id = "formula_ordinalNet") |>
   option_add(grid = glmnetcr_grid, id = "formula_glmnetcr") |>
   option_add(grid = vgam_grid, id = "formula_vgam") |>
   option_add(grid = rpart_grid, id = "formula_rpart") |>

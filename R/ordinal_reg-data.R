@@ -135,6 +135,22 @@ make_ordinal_reg_vglm <- function() {
     func = list(pkg = "dials", fun = "odds_link"),
     has_submodel = FALSE
   )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "vglm",
+    parsnip = "threshold_structure",
+    original = "Thresh",
+    func = list(pkg = "dials", fun = "threshold_structure"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "vglm",
+    parsnip = "parallel_reg",
+    original = "parallel",
+    func = list(pkg = "dials", fun = "parallel_reg"),
+    has_submodel = FALSE
+  )
 
   parsnip::set_fit(
     model = "ordinal_reg",
@@ -144,9 +160,7 @@ make_ordinal_reg_vglm <- function() {
       interface = "formula",
       protect = c("formula", "data", "weights"),
       func = c(pkg = "ordered", fun = "VGAM_vglm_wrapper"),
-      defaults = list(
-        parallel = TRUE
-      )
+      defaults = list()
     )
   )
 
@@ -241,6 +255,7 @@ make_ordinal_reg_ordinalNet <- function() {
     mode = "classification"
   )
 
+  # dials provided in {dials}
   parsnip::set_model_arg(
     model = "ordinal_reg",
     eng = "ordinalNet",
@@ -273,6 +288,24 @@ make_ordinal_reg_ordinalNet <- function() {
     parsnip = "odds_link",
     original = "family",
     func = list(pkg = "dials", fun = "odds_link"),
+    has_submodel = FALSE
+  )
+
+  # engine-specific arguments
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "ordinalNet",
+    parsnip = "parallelPenaltyFactor",
+    original = "parallelPenaltyFactor",
+    func = list(pkg = "ordered", fun = "parallel_penalty_factor"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "ordinalNet",
+    parsnip = "parallel_reg",
+    original = "parallel_reg",
+    func = list(pkg = "dials", fun = "parallel_reg"),
     has_submodel = FALSE
   )
 
@@ -413,7 +446,6 @@ make_ordinal_reg_lrm <- function() {
     func = list(pkg = "dials", fun = "penalty"),
     has_submodel = FALSE
   )
-
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "lrm",
@@ -536,7 +568,6 @@ make_ordinal_reg_lrm <- function() {
     func = list(pkg = "dials", fun = "penalty"),
     has_submodel = FALSE
   )
-
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "orm",
@@ -663,7 +694,6 @@ make_ordinal_reg_glmnetcr <- function() {
     func = list(pkg = "dials", fun = "mixture"),
     has_submodel = FALSE
   )
-
   parsnip::set_fit(
     model = "ordinal_reg",
     eng = "glmnetcr",
@@ -764,9 +794,17 @@ make_ordinal_reg_clm <- function() {
   parsnip::set_model_arg(
     model = "ordinal_reg",
     eng = "clm",
-    parsnip = "threshold",
+    parsnip = "threshold_structure",
     original = "threshold",
-    func = list(pkg = "ordered", fun = "threshold_structure"),
+    func = list(pkg = "dials", fun = "threshold_structure"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "clm",
+    parsnip = "parallel_reg",
+    original = "parallel_reg",
+    func = list(pkg = "dials", fun = "parallel_reg"),
     has_submodel = FALSE
   )
 
@@ -777,7 +815,7 @@ make_ordinal_reg_clm <- function() {
     value = list(
       interface = "formula",
       protect = c("formula", "data", "weights"),
-      func = c(pkg = "ordinal", fun = "clm"),
+      func = c(pkg = "ordered", fun = "clm_wrapper"),
       defaults = list()
     )
   )
@@ -820,13 +858,7 @@ make_ordinal_reg_clm <- function() {
     mode = "classification",
     type = "prob",
     value = list(
-      pre = function(new_data, object) {
-        resp <- all.vars(object$fit$terms[[2L]])
-        if (resp %in% names(new_data)) {
-          new_data <- new_data[, !names(new_data) %in% resp, drop = FALSE]
-        }
-        new_data
-      },
+      pre = predict_clm_pre,
       post = function(x, object) {
         x <- tibble::as_tibble(x$fit)
         x <- set_names(x, paste0(".pred_", colnames(x)))
@@ -848,13 +880,7 @@ make_ordinal_reg_clm <- function() {
     mode = "classification",
     type = "linear_pred",
     value = list(
-      pre = function(new_data, object) {
-        resp <- all.vars(object$fit$terms[[2L]])
-        if (resp %in% names(new_data)) {
-          new_data <- new_data[, !names(new_data) %in% resp, drop = FALSE]
-        }
-        new_data
-      },
+      pre = predict_clm_pre,
       post = function(x, object) {
         # x$eta1 = alpha_j - X*beta for each j; engine uses P(Y >= j)
         beta_x <- object$fit$alpha[1] - x$eta1[, 1]

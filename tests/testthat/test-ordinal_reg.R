@@ -29,3 +29,10 @@ test_that("check_args() works", {
   # Here for completeness, no checking is done
   expect_true(TRUE)
 })
+
+# parallel_reg validation ------------------------------------------------------
+
+test_that("parallel_reg accepts logical input", {
+  expect_snapshot(ordinal_reg(parallel_reg = TRUE))
+  expect_snapshot(ordinal_reg(parallel_reg = FALSE))
+})
