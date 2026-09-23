@@ -50,11 +50,12 @@
 #' values_threshold_structure_VGAM
 #' dials::threshold_structure(values = values_threshold_structure_VGAM)
 #'
+
+#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
-
-#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM") && utils::packageVersion("VGAM") == package_version("1.1.9")
-#' # {VGAM} version 1.1-9
+#'
+#' if (utils::packageVersion("VGAM") == package_version("1.1.9")) {#VGAM=1.1-9
 #'
 #' # fit wrapper for linear model
 #' ( fit_orig <- VGAM::vglm(
@@ -84,9 +85,10 @@
 #'   link = "cloglog", parallel = TRUE, Thresh = "symmetric0",
 #'   data = house_data
 #' ) )
-
-#' @examplesIf rlang::is_installed("MASS") && rlang::is_installed("VGAM") && utils::packageVersion("VGAM") > package_version("1.1.9")
-#' # {VGAM} version >= 1.1-10
+#'
+#' }#VGAM=1.1-9
+#'
+#' if (utils::packageVersion("VGAM") > package_version("1.1.9")) {#VGAM>1.1-9
 #'
 #' # fit wrapper for linear model
 #' ( fit_orig <- VGAM::vglm(
@@ -116,6 +118,8 @@
 #'   link = "cloglog", parallel = TRUE, Thresh = "symm0",
 #'   data = house_data
 #' ) )
+#'
+#' }#VGAM>1.1-9
 #' @export
 VGAM_vglm_wrapper <- function(
     formula, data,

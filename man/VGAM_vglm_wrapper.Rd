@@ -96,10 +96,11 @@ dials::ordinal_link(values = values_ordinal_link_VGAM)
 values_threshold_structure_VGAM
 dials::threshold_structure(values = values_threshold_structure_VGAM)
 
+\dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("VGAM")) withAutoprint(\{ # examplesIf}
 house_data <-
   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
-\dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("VGAM") && utils::packageVersion("VGAM") == package_version("1.1.9")) withAutoprint(\{ # examplesIf}
-# {VGAM} version 1.1-9
+
+if (utils::packageVersion("VGAM") == package_version("1.1.9")) {#VGAM=1.1-9
 
 # fit wrapper for linear model
 ( fit_orig <- VGAM::vglm(
@@ -129,9 +130,10 @@ house_data <-
   link = "cloglog", parallel = TRUE, Thresh = "symmetric0",
   data = house_data
 ) )
-\dontshow{\}) # examplesIf}
-\dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("VGAM") && utils::packageVersion("VGAM") > package_version("1.1.9")) withAutoprint(\{ # examplesIf}
-# {VGAM} version >= 1.1-10
+
+}#VGAM=1.1-9
+
+if (utils::packageVersion("VGAM") > package_version("1.1.9")) {#VGAM>1.1-9
 
 # fit wrapper for linear model
 ( fit_orig <- VGAM::vglm(
@@ -161,6 +163,8 @@ house_data <-
   link = "cloglog", parallel = TRUE, Thresh = "symm0",
   data = house_data
 ) )
+
+}#VGAM>1.1-9
 \dontshow{\}) # examplesIf}
 }
 \keyword{internal}

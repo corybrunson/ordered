@@ -22,7 +22,8 @@ Description: Bindings, methods, and tuners for using ordinal classification
     of Hornung (2020) <doi:10.1007/s00357-018-9302-x>
     in 'ordinalForest'.
 License: MIT + file LICENSE
-Depends: 
+Depends:
+    R (>= 4.1),
     parsnip (> 1.6.0)
 Imports: 
     cli,
