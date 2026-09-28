@@ -21,10 +21,10 @@ Extrapolative predictions, which err in `ordinalNet`, are overridden to use path
 
 ### additional ordinal regression and random forest engines
 
-This version introduces source code and unit tests for new engines:
+This version introduces source code and unit tests for new engines and dials:
 * `clm` from the **ordinal** package
   - cumulative link ordinal regression
-  - fit wrapper to translate formulae
+  - fit wrapper
   - additional `ordinal_link` dial values
 * `lrm` and `orm` from the **rms** package
   - regularized cumulative probability ordinal regression
@@ -37,6 +37,8 @@ This version introduces source code and unit tests for new engines:
   - conditional probability ordered random forests
   - fit wrapper
   - dials for `sample.fraction`, `honesty`, and `honesty.fraction` arguments
+* `ordinalNet` from the **ordinalNet** package (pre-existing engine)
+  - dial for the `parallelPenaltyFactor` argument
 
 Coordinated with [parsnip PR #1384](https://github.com/tidymodels/parsnip/pull/1384).
 
