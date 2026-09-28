@@ -24,7 +24,7 @@ Description: Bindings, methods, and tuners for using ordinal classification
 License: MIT + file LICENSE
 Depends:
     R (>= 4.1),
-    parsnip (> 1.6.0)
+    parsnip (>= 1.6.1)
 Imports: 
     cli,
     dials (> 1.4.4),
@@ -48,7 +48,6 @@ Suggests:
     spelling,
     testthat (>= 3.0.0)
 Remotes:
-    tidymodels/parsnip,
     corybrunson/dials@parallel-reg
 Config/testthat/edition: 3
 Encoding: UTF-8
