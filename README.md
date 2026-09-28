@@ -84,8 +84,7 @@ remotes::install_github("corybrunson/ordered")
 ## Available models, engines, and prediction types
 
 ordered provides new engines for several models, including all engines
-for `ordinal_reg()`, as summarized in the table. Currently only
-predictions of `type = "class"` and `type = "prob"` are supported.
+for `ordinal_reg()`:
 
 | model              | engine          | class | prob | linear_pred |
 |:-------------------|:----------------|:------|:-----|:------------|
@@ -100,6 +99,21 @@ predictions of `type = "class"` and `type = "prob"` are supported.
 | `ordinal_reg`      | `glmnetcr`      | ✔     | ✔    | ✖           |
 | `rand_forest`      | `ordinalForest` | ✔     | ✔    | ✖           |
 | `rand_forest`      | `orf`           | ✔     | ✔    | ✖           |
+
+## Tunable model arguments
+
+`ordinal_reg` recognizes several tunable arguments shared by at least
+two engines in ordered:
+
+| engine | ordinal_link | odds_link | threshold_structure | parallel_reg | penalty | mixture |
+|:---|:---|:---|:---|:---|:---|:---|
+| `polr` | ✔ | ✖ | ✖ | ✖ | ✖ | ✖ |
+| `clm` | ✔ | ✖ | ✔ | ✔ | ✖ | ✖ |
+| `lrm` | ✖ | ✖ | ✖ | ✖ | ✔ | ✖ |
+| `orm` | ✔ | ✖ | ✖ | ✖ | ✔ | ✖ |
+| `vglm` | ✔ | ✔ | ✔ | ✔ | ✖ | ✖ |
+| `ordinalNet` | ✔ | ✔ | ✖ | ✔ | ✔ | ✔ |
+| `glmnetcr` | ✖ | ✖ | ✖ | ✖ | ✔ | ✔ |
 
 ## Example
 
