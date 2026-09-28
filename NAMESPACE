@@ -11,8 +11,10 @@ S3method(predict_classprob,"_ordinalNet")
 S3method(predict_raw,"_ordinalNet")
 export(VGAM_vgam_wrapper)
 export(VGAM_vglm_wrapper)
+export(clm_wrapper)
 export(honesty)
 export(honesty_fraction)
+export(multi_predict_glmnetcr_wrapper)
 export(naive_scores)
 export(num_score_perms)
 export(num_score_trees)
@@ -22,6 +24,7 @@ export(ord_metric)
 export(ordinalForest_wrapper)
 export(ordinalNet_wrapper)
 export(orf_wrapper)
+export(parallel_penalty_factor)
 export(predict_glmnetcr_wrapper)
 export(predict_lrm_wrapper)
 export(predict_ordinalNet_wrapper)
@@ -29,14 +32,20 @@ export(prune_func)
 export(rpartScore_wrapper)
 export(sample_fraction)
 export(split_func)
-export(threshold_structure)
 export(values_ord_metric)
 export(values_ordinal_link_VGAM)
 export(values_ordinal_link_clm)
+export(values_threshold_structure_VGAM)
 import(parsnip)
 import(rlang)
-importFrom(parsnip,eval_args)
-importFrom(parsnip,multi_predict)
-importFrom(parsnip,predict_raw)
-importFrom(stats,approx)
-importFrom(stats,predict)
+importFrom(parsnip,
+  eval_args,
+  multi_predict,
+  predict_raw
+)
+importFrom(stats,
+  approx,
+  as.formula,
+  coef,
+  predict
+)

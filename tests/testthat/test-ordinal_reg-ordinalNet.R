@@ -42,7 +42,7 @@ test_that("model object (penalty path from original to tidy)", {
   )
 
   tidy_spec <-
-    ordinal_reg(penalty = 0.01, mixture = .5, odds_link = "stopping") |>
+    ordinal_reg(penalty = 0.01, mixture = .5, odds_link = "stopping_ratio") |>
     set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals)
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -90,7 +90,7 @@ test_that("model object (penalty path from tidy to original)", {
   # extra arguments
 
   tidy_spec <-
-    ordinal_reg(penalty = 0.001, mixture = .5, odds_link = "stopping") |>
+    ordinal_reg(penalty = 0.001, mixture = .5, odds_link = "stopping_ratio") |>
     set_engine("ordinalNet")
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -180,7 +180,7 @@ test_that("case weights", {
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
     set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
-    set_args(mixture = .5, odds_link = "stopping")
+    set_args(mixture = .5, odds_link = "stopping_ratio")
   tidy_data <- transform(house_data, Freq = frequency_weights(Freq))
   set.seed(seed)
   tidy_fit <- fit(
@@ -437,7 +437,7 @@ test_that("arguments agree", {
     ordinal_reg(
       penalty = 0.1,
       mixture = .25,
-      ordinal_link = "cloglog", odds_link = "stopping"
+      ordinal_link = "cloglog", odds_link = "stopping_ratio"
     ) |>
     set_mode("classification") |>
     set_engine("ordinalNet", path_values = 10 ^ seq(-6, -1))
@@ -451,4 +451,114 @@ test_that("arguments agree", {
   expect_equal(onet_arg_fit$fit$args$alpha, .25)
   expect_equal(onet_arg_fit$fit$args$link, "cloglog")
   expect_equal(onet_arg_fit$fit$args$family, "sratio")
+})
+
+# parallel regression ----------------------------------------------------------
+
+house_sub <- get_house()$sub |>
+  dplyr::filter(Type == "Apartment") |>
+  dplyr::select(-Type)
+house_vars <- model.matrix(
+  Sat ~ Infl + Cont + 0, data = house_sub,
+  contrasts.arg = lapply(house_sub[, 2:3], contrasts, contrasts = FALSE)
+)
+
+test_that("parallel regression argument handles logicals", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinalNet")
+
+  # all parallel regression
+
+  set.seed(seed)
+  orig_fit <- ordinalNet::ordinalNet(
+    house_vars,
+    y = house_sub$Sat,
+    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
+  )
+
+  set.seed(seed)
+  tidy_default <- ordinal_reg(penalty = 0.01) |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  set.seed(seed)
+  tidy_fit <- ordinal_reg(parallel_reg = TRUE, penalty = 0.01) |>
+    set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
+    fit(Sat ~ Infl + Cont, data = house_sub)
+
+  expect_equal(tidy_fit$fit, tidy_default$fit)
+  expect_equal(orig_fit$coefs, tidy_fit$fit$coefs)
+
+  # all category-specific
+
+  set.seed(seed)
+  expect_warning(
+    orig_fit <- ordinalNet::ordinalNet(
+      house_vars,
+      y = house_sub$Sat,
+      nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE,
+      nonparallelTerms = TRUE, parallelTerms = FALSE
+    ),
+    "nonparallelTerms"
+  )
+
+  set.seed(seed)
+  expect_warning(
+    tidy_fit <- ordinal_reg(parallel_reg = FALSE, penalty = 0.01) |>
+      set_engine("ordinalNet", path_values = !!orig_fit$lambdaVals) |>
+      fit(Sat ~ Infl + Cont, data = house_sub),
+    "nonparallelTerms"
+  )
+
+  expect_equal(orig_fit$coefs, tidy_fit$fit$coefs)
+})
+
+# argument translation ---------------------------------------------------------
+
+test_that("standardized link and family values are matched", {
+  expect_equal(match_ordinal_link_ordinalNet("logistic"), "logit")
+  expect_equal(match_ordinal_link_ordinalNet("logit"), "logit")
+  expect_equal(match_ordinal_link_ordinalNet("cloglog"), "cloglog")
+  expect_equal(match_ordinal_link_ordinalNet("probit"), "probit")
+  expect_equal(match_ordinal_link_ordinalNet("cauchit"), "cauchit")
+  expect_equal(match_ordinal_family("cumulative_link"), "cumulative")
+  expect_equal(match_ordinal_family("sratio"), "sratio")
+
+  expect_snapshot(error = TRUE, {
+    match_ordinal_link_ordinalNet("logitlink")
+  })
+  expect_snapshot(error = TRUE, {
+    match_ordinal_link_ordinalNet("logisitc")
+  })
+  expect_snapshot(error = TRUE, {
+    match_ordinal_family("cumu")
+  })
+})
+
+test_that("ordinalNet wrapper translates standardized argument values", {
+  skip_if_not_installed("ordinalNet")
+
+  # standardized values are converted and `parallel_reg = FALSE` is expanded
+  x <- matrix(rnorm(100), ncol = 2)
+  y <- factor(rep(1:3, length.out = 50), ordered = TRUE)
+  fits <- suppressWarnings(ordinalNet_wrapper(
+    x, y,
+    family = "cumulative_link", link = "cauchit",
+    parallel_reg = FALSE
+  ))
+  expect_equal(fits$args$family, "cumulative")
+  expect_equal(fits$args$link, "cauchit")
+  expect_false(fits$args$parallelTerms)
+  expect_true(fits$args$nonparallelTerms)
+
+  # native values and `parallel_reg = NULL` leave the defaults unchanged
+  native <- ordinalNet_wrapper(
+    x, y,
+    family = "sratio", link = "logit",
+    parallel_reg = NULL
+  )
+  expect_equal(native$args$family, "sratio")
+  expect_equal(native$args$link, "logit")
+  expect_true(native$args$parallelTerms)
+  expect_false(native$args$nonparallelTerms)
 })

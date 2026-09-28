@@ -23,7 +23,11 @@ predict(house_mod, newdata = house_test, type = "class")$fit |>
 house_rec <- recipe(Sat ~ Infl + Type + Cont, data = house_train)
 house_spec <- ordinal_reg() |>
   set_engine("clm") |>
-  set_args(ordinal_link = tune(), threshold = tune())
+  set_args(
+    ordinal_link = tune(),
+    threshold_structure = tune(),
+    parallel_reg = tune()
+  )
 house_tune <- extract_parameter_set_dials(house_spec)
 ( house_grid <- grid_regular(house_tune, levels = Inf) )
 
@@ -31,7 +35,11 @@ house_tune <- extract_parameter_set_dials(house_spec)
 house_prep <- prep(house_rec)
 # fitted model
 house_spec |>
-  set_args(ordinal_link = "logistic", threshold = "flexible") |>
+  set_args(
+    ordinal_link = "logistic",
+    threshold_structure = "flexible",
+    parallel_reg = TRUE
+  ) |>
   fit(formula(house_prep), data = house_train)
 
 # weighted kappa metric

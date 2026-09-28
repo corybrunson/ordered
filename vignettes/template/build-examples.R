@@ -39,7 +39,7 @@ list(
 # values must be character-ized
 list(
   polr = list(),
-  ordinalNet = list(),
+  ordinalNet = list(includeLambda0 = "TRUE"),
   vglm = list(),
   vgam = list(family = "\"stopping_ratio\""),
   rpartScore = list(split = "\"quad\""),

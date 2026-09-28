@@ -44,6 +44,22 @@ make_gen_additive_mod_vgam <- function() {
     func = list(pkg = "dials", fun = "odds_link"),
     has_submodel = FALSE
   )
+  parsnip::set_model_arg(
+    model = "gen_additive_mod",
+    eng = "vgam",
+    parsnip = "Thresh",
+    original = "Thresh",
+    func = list(pkg = "dials", fun = "threshold_structure"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "gen_additive_mod",
+    eng = "vgam",
+    parsnip = "parallel",
+    original = "parallel",
+    func = list(pkg = "dials", fun = "parallel_reg"),
+    has_submodel = FALSE
+  )
 
   parsnip::set_fit(
     model = "gen_additive_mod",
@@ -53,9 +69,7 @@ make_gen_additive_mod_vgam <- function() {
       interface = "formula",
       protect = c("formula", "data", "weights"),
       func = c(pkg = "ordered", fun = "VGAM_vgam_wrapper"),
-      defaults = list(
-        parallel = TRUE
-      )
+      defaults = list()
     )
   )
 

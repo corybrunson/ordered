@@ -102,8 +102,9 @@ for `ordinal_reg()`:
 
 ## Tunable model arguments
 
-`ordinal_reg` recognizes several tunable arguments shared by at least
-two engines in ordered:
+`ordinal_reg` recognizes several model arguments, each shared by at
+least two engines in ordered, that have parameter generating functions
+in dials:
 
 | engine | ordinal_link | odds_link | threshold_structure | parallel_reg | penalty | mixture |
 |:---|:---|:---|:---|:---|:---|:---|
