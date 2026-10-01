@@ -83,7 +83,11 @@
 #' )
 #' @export
 predict_glmnetcr_wrapper <- function(
-    object, newx, type, lambda, criteria = c("bic", "aic")
+  object,
+  newx,
+  type,
+  lambda,
+  criteria = c("bic", "aic")
 ) {
   criteria <- match.arg(criteria)
 
@@ -104,14 +108,17 @@ predict_glmnetcr_wrapper <- function(
   if (type == "class") {
     res[, 1L]
   } else {
-    res[, , 1L]
+    res[,, 1L]
   }
 }
 
 #' @rdname predict_glmnetcr_wrapper
 #' @export
 multi_predict_glmnetcr_wrapper <- function(
-    object, newx, type, lambda
+  object,
+  newx,
+  type,
+  lambda
 ) {
   type <- match.arg(type, c("prob", "class"))
 
@@ -137,10 +144,10 @@ multi_predict_glmnetcr_wrapper <- function(
   # bracketing steps and rescaled to add to 1
   probs_at <- function(lam, idx) {
     if (length(idx) == 1L) {
-      pred$probs[, , idx]
+      pred$probs[,, idx]
     } else {
       w <- (lam - lams[idx[1L]]) / (lams[idx[2L]] - lams[idx[1L]])
-      probs <- (1 - w) * pred$probs[, , idx[1L]] + w * pred$probs[, , idx[2L]]
+      probs <- (1 - w) * pred$probs[,, idx[1L]] + w * pred$probs[,, idx[2L]]
       sweep(probs, 1L, rowSums(probs), "/")
     }
   }
@@ -151,7 +158,7 @@ multi_predict_glmnetcr_wrapper <- function(
   if (type == "prob") {
     res <- array(NA_real_, c(n, ncol(pred$probs), n_pen))
     for (k in seq_len(n_pen)) {
-      res[, , k] <- probs_at(lambda[k], s_idx[[k]])
+      res[,, k] <- probs_at(lambda[k], s_idx[[k]])
     }
     dimnames(res) <- list(NULL, colnames(pred$probs), NULL)
   } else {
@@ -200,15 +207,15 @@ multi_predict_glmnetcr_wrapper <- function(
 #'   model specification.
 #' @export
 predict._glmnetcr <- function(
-    object,
-    new_data,
-    type = NULL,
-    opts = list(),
-    penalty = NULL,
-    multi = FALSE,
-    ...
+  object,
+  new_data,
+  type = NULL,
+  opts = list(),
+  penalty = NULL,
+  multi = FALSE,
+  ...
 ) {
-  if (is.null(penalty) && ! is.null(object$spec$args$penalty)) {
+  if (is.null(penalty) && !is.null(object$spec$args$penalty)) {
     penalty <- object$spec$args$penalty
   }
 
@@ -242,12 +249,12 @@ predict_classprob._glmnetcr <- function(object, new_data, ...) {
 #'   used.
 #' @export
 multi_predict._glmnetcr <- function(
-    object,
-    new_data,
-    type = NULL,
-    opts = list(),
-    penalty = NULL,
-    ...
+  object,
+  new_data,
+  type = NULL,
+  opts = list(),
+  penalty = NULL,
+  ...
 ) {
   type <- check_pred_type(object, type)
   check_spec_pred_type(object, type)
@@ -256,7 +263,7 @@ multi_predict._glmnetcr <- function(
   }
 
   if (is.null(penalty)) {
-    if (! is.null(object$spec$args$penalty)) {
+    if (!is.null(object$spec$args$penalty)) {
       penalty <- object$spec$args$penalty
     } else {
       penalty <- object$fit$lambda
@@ -296,7 +303,10 @@ multi_predict._glmnetcr <- function(
 
 multi_predict_classprob_glmnetcr <- function(object, newx, penalty) {
   probs <- multi_predict_glmnetcr_wrapper(
-    object, newx, type = "prob", lambda = penalty
+    object,
+    newx,
+    type = "prob",
+    lambda = penalty
   )
   lbls <- paste0(".pred_", dimnames(probs)[[2]])
   nested <- lapply(seq_len(nrow(newx)), function(i) {
@@ -308,7 +318,10 @@ multi_predict_classprob_glmnetcr <- function(object, newx, penalty) {
 
 multi_predict_class_glmnetcr <- function(object, newx, penalty, lvl) {
   classes <- multi_predict_glmnetcr_wrapper(
-    object, newx, type = "class", lambda = penalty
+    object,
+    newx,
+    type = "class",
+    lambda = penalty
   )
   nested <- lapply(seq_len(nrow(newx)), function(i) {
     tibble::tibble(

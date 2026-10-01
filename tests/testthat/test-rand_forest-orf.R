@@ -1,5 +1,3 @@
-seed <- 144688L
-
 # model: basic -----------------------------------------------------------------
 
 test_that("model object", {
@@ -16,18 +14,27 @@ test_that("model object", {
 
   set.seed(seed)
   orig_fit <- orf::orf(
-    house_mat, house_vec,
-    num.trees = 10, mtry = 4, min.node.size = 5,
-    replace = FALSE, sample.fraction = 0.5,
-    honesty = FALSE, inference = FALSE, importance = FALSE
+    house_mat,
+    house_vec,
+    num.trees = 10,
+    mtry = 4,
+    min.node.size = 5,
+    replace = FALSE,
+    sample.fraction = 0.5,
+    honesty = FALSE,
+    inference = FALSE,
+    importance = FALSE
   )
 
   tidy_spec <- rand_forest() |>
     set_engine("orf") |>
     set_mode("classification") |>
     set_args(
-      trees = 10, mtry = 4, min_n = 5,
-      sample.fraction = 0.5, honesty = FALSE
+      trees = 10,
+      mtry = 4,
+      min_n = 5,
+      sample.fraction = 0.5,
+      honesty = FALSE
     )
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Infl + Type + Cont, data = house_sub)
@@ -48,7 +55,8 @@ test_that("class prediction", {
     set_engine("orf") |>
     set_mode("classification") |>
     set_args(
-      sample.fraction = 0.5, honesty = FALSE
+      sample.fraction = 0.5,
+      honesty = FALSE
     )
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Cont, data = house_train)
@@ -79,7 +87,8 @@ test_that("probability prediction", {
     set_engine("orf") |>
     set_mode("classification") |>
     set_args(
-      sample.fraction = 0.5, honesty = FALSE
+      sample.fraction = 0.5,
+      honesty = FALSE
     )
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Cont, data = house_train)
@@ -150,7 +159,9 @@ test_that("arguments agree", {
     set_mode("classification") |>
     set_engine(
       "orf",
-      sample.fraction = 0.7, honesty = TRUE, honesty.fraction = 0.4
+      sample.fraction = 0.7,
+      honesty = TRUE,
+      honesty.fraction = 0.4
     )
   expect_snapshot(orf_arg_spec |> translate())
 

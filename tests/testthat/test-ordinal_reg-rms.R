@@ -1,5 +1,3 @@
-seed <- 144688L
-
 # model: basic -----------------------------------------------------------------
 
 test_that("model object (lrm)", {
@@ -371,8 +369,12 @@ test_that("arguments agree (lrm)", {
   # The penalty is passed to lrm(); compare to a direct call
   expect_equal(
     lrm_arg_fit$fit$penalty,
-    list(simple = 0.1, nonlinear = 0.1,
-         interaction = 0.1, nonlinear.interaction = 0.1)
+    list(
+      simple = 0.1,
+      nonlinear = 0.1,
+      interaction = 0.1,
+      nonlinear.interaction = 0.1
+    )
   )
 })
 
@@ -394,7 +396,11 @@ test_that("arguments agree (orm)", {
   expect_equal(orm_arg_fit$fit$family, "cauchit")
   expect_equal(
     orm_arg_fit$fit$penalty,
-    list(simple = 0.1, nonlinear = 0.1,
-         interaction = 0.1, nonlinear.interaction = 0.1)
+    list(
+      simple = 0.1,
+      nonlinear = 0.1,
+      interaction = 0.1,
+      nonlinear.interaction = 0.1
+    )
   )
 })

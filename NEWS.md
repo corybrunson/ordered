@@ -42,12 +42,15 @@ This version introduces source code and unit tests for new engines and dials:
 
 Coordinated with [parsnip PR #1384](https://github.com/tidymodels/parsnip/pull/1384).
 
-### linear prediction type
+### new prediction types
 
-Linear predictions are enabled for the `clm`, `lrm`, `orm`, `vglm`, and `ordinalNet` ordinal regression engines and for the `vgam` generalized additive model engine.
+Linear predictions via `predict_linear_pred()` are enabled for the `clm`, `lrm`, `orm`, `vglm`, and `ordinalNet` ordinal regression engines and for the `vgam` generalized additive model engine.
 They consistently return a single column of linear predictors (without threshold contributions).
 
 Coordinated with [parsnip PR #1391](https://github.com/tidymodels/parsnip/pull/1391).
+
+Confidence interval predictions via `predict_confint()` are enabled for the `clm` engine.
+They return pairs of columns containing pointwise intervals for each class probability.
 
 ### threshold structure and parallel regression model arguments
 

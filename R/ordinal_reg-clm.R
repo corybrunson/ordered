@@ -60,13 +60,13 @@ clm_wrapper <- function(
   }
 
   args <- c(formulas, list(data = data))
-  if (! is.null(weights)) {
+  if (!is.null(weights)) {
     args$weights <- weights
   }
-  if (! is.null(link)) {
+  if (!is.null(link)) {
     args$link <- match_ordinal_link_clm(link, call = call)
   }
-  if (! is.null(threshold)) {
+  if (!is.null(threshold)) {
     threshold <- switch(
       threshold,
       flexible = "flexible",
@@ -85,10 +85,10 @@ clm_wrapper <- function(
   # printing the fit shows the formulas and engine arguments that were used.
   res$call <- rlang::call2(
     "clm",
-    !!! formulas,
+    !!!formulas,
     data = rlang::sym("data"),
-    !!! arg_exprs,
-    !!! dot_exprs,
+    !!!arg_exprs,
+    !!!dot_exprs,
     .ns = "ordinal"
   )
 
@@ -96,7 +96,7 @@ clm_wrapper <- function(
 }
 
 match_ordinal_link_clm <- function(link, call = rlang::caller_env()) {
-  if (! is.character(link)) {
+  if (!is.character(link)) {
     return(link)
   }
   check_string(link, arg = "ordinal_link", call = call)
@@ -149,4 +149,25 @@ predict_clm_pre <- function(new_data, object) {
     new_data <- new_data[, !names(new_data) %in% resp, drop = FALSE]
   }
   new_data
+}
+
+clm_conf_int_post <- function(x, object) {
+  lvl <- object$lvl
+  bounds <- vector("list", 2L * length(lvl))
+  for (i in seq_along(lvl)) {
+    bounds[[2L * i - 1L]] <- unname(x$lwr[, i])
+    bounds[[2L * i]] <- unname(x$upr[, i])
+  }
+  names(bounds) <- c(
+    rbind(paste0(".pred_lower_", lvl), paste0(".pred_upper_", lvl))
+  )
+  res <- tibble::as_tibble(bounds)
+
+  if (isTRUE(object$spec$method$pred$conf_int$extras$std_error)) {
+    errors <- lapply(seq_along(lvl), function(i) unname(x$se.fit[, i]))
+    names(errors) <- paste0(".std_error_", lvl)
+    res <- tibble::as_tibble(c(bounds, errors))
+  }
+
+  res
 }

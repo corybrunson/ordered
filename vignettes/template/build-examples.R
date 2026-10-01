@@ -62,7 +62,8 @@ oxford_c <- function(x) {
   } else {
     paste0(
       paste(x[seq(length(x) - 1L)], collapse = ", "),
-      ", or ", x[[length(x)]]
+      ", or ",
+      x[[length(x)]]
     )
   }
   res
@@ -74,7 +75,6 @@ readLines("vignettes/template/_template-examples-front.Rmd") |>
   write(file = vignette_rmd, append = FALSE)
 
 for (model_name in ordered_mods$model) {
-
   model_hyphen <- str_replace_all(model_name, "\\_", "-")
   model_abbr <- str_replace_all(model_name, "(^|\\_)([a-z])[a-z]+", "\\2")
 
@@ -84,19 +84,21 @@ for (model_name in ordered_mods$model) {
   engine_names <- ordered_specs |> filter(model == model_name) |> pull(engine)
 
   for (engine_name in engine_names) {
-
     engine_hyphen <- str_replace_all(engine_name, "(\\_|\\.)", "-")
 
     model_args <- spec_args |>
       filter(engine == engine_name) |>
-      pull(args) |> unlist() |>
+      pull(args) |>
+      unlist() |>
       enframe(name = "arg", value = "value") |>
       unite(pass, arg, value, sep = " = ") |>
-      pull(pass) |> str_c(collapse = ", ")
+      pull(pass) |>
+      str_c(collapse = ", ")
 
     engine_args <- eng_args |>
       filter(engine == engine_name) |>
-      pull(args) |> unlist() |>
+      pull(args) |>
+      unlist() |>
       enframe(name = "arg", value = "value") |>
       unite(pass, arg, value, sep = " = ") |>
       pull(pass)
@@ -110,10 +112,13 @@ for (model_name in ordered_mods$model) {
     types_clause <- oxford_c(type_phrases[engine_types])
     type_lines <- map_chr(
       engine_types,
-      function(s) glue::glue(
-        "predict({abbr}_fit, house_test, type = \"{type}\")",
-        abbr = model_abbr, type = s
-      )
+      function(s) {
+        glue::glue(
+          "predict({abbr}_fit, house_test, type = \"{type}\")",
+          abbr = model_abbr,
+          type = s
+        )
+      }
     )
     types_chunk <- str_c(type_lines, collapse = "\n")
 
@@ -128,7 +133,5 @@ for (model_name in ordered_mods$model) {
       gsub(pattern = "\\{types_clause\\}", replacement = types_clause) |>
       gsub(pattern = "\\{types_chunk\\}", replacement = types_chunk) |>
       write(file = vignette_rmd, append = TRUE)
-
   }
-
 }

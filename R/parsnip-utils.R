@@ -1,11 +1,20 @@
 # mimicking file of same name in {censored}
 
 pred_types <- c(
-  "raw", "numeric", "class", "prob", "conf_int", "pred_int",
-  "quantile", "time", "survival", "linear_pred", "hazard"
+  "raw",
+  "numeric",
+  "class",
+  "prob",
+  "conf_int",
+  "pred_int",
+  "quantile",
+  "time",
+  "survival",
+  "linear_pred",
+  "hazard"
 )
 
-check_pred_type <- function (object, type, ..., call = rlang::caller_env()) {
+check_pred_type <- function(object, type, ..., call = rlang::caller_env()) {
   if (is.null(type)) {
     type <- switch(
       object$spec$mode,
@@ -13,55 +22,77 @@ check_pred_type <- function (object, type, ..., call = rlang::caller_env()) {
       classification = "class",
       `censored regression` = "time",
       `quantile regression` = "quantile",
-      cli::cli_abort("{.arg type} should be one of {.or {.val {all_modes}}}.",
-                     call = call)
+      cli::cli_abort(
+        "{.arg type} should be one of {.or {.val {all_modes}}}.",
+        call = call
+      )
     )
   }
-  if (!(type %in% pred_types))
-    cli::cli_abort("{.arg type} should be one of {.or {.arg {pred_types}}}.",
-                   call = call)
+  if (!(type %in% pred_types)) {
+    cli::cli_abort(
+      "{.arg type} should be one of {.or {.arg {pred_types}}}.",
+      call = call
+    )
+  }
   switch(
     type,
     numeric = if (object$spec$mode != "regression") {
-      cli::cli_abort("For numeric predictions,
+      cli::cli_abort(
+        "For numeric predictions,
                      the object should be a regression model.",
-                     call = call)
+        call = call
+      )
     },
     class = if (object$spec$mode != "classification") {
-      cli::cli_abort("For class predictions,
+      cli::cli_abort(
+        "For class predictions,
                      the object should be a classification model.",
-                     call = call)
+        call = call
+      )
     },
     prob = if (object$spec$mode != "classification") {
-      cli::cli_abort("For probability predictions,
+      cli::cli_abort(
+        "For probability predictions,
                      the object should be a classification model.",
-                     call = call)
+        call = call
+      )
     },
     time = if (object$spec$mode != "censored regression") {
-      cli::cli_abort("For event time predictions,
+      cli::cli_abort(
+        "For event time predictions,
                      the object should be a censored regression.",
-                     call = call)
+        call = call
+      )
     },
     survival = if (object$spec$mode != "censored regression") {
-      cli::cli_abort("For survival probability predictions,
+      cli::cli_abort(
+        "For survival probability predictions,
                      the object should be a censored regression.",
-                     call = call)
+        call = call
+      )
     },
     hazard = if (object$spec$mode != "censored regression") {
-      cli::cli_abort("For hazard predictions,
+      cli::cli_abort(
+        "For hazard predictions,
                      the object should be a censored regression.",
-                     call = call)
+        call = call
+      )
     },
-    linear_pred = if (object$spec$mode != "censored regression" &&
-                      ! inherits(object$spec, "ordinal_reg")) {
-      cli::cli_abort("For the linear predictor,
+    linear_pred = if (
+      object$spec$mode != "censored regression" &&
+        !inherits(object$spec, "ordinal_reg")
+    ) {
+      cli::cli_abort(
+        "For the linear predictor,
                      the object should be a censored or ordinal regression.",
-                     call = call)
-    })
+        call = call
+      )
+    }
+  )
   type
 }
 
-check_spec_levels <- function (spec) {
+check_spec_levels <- function(spec) {
   if ("class" %in% spec$lvl) {
     cli::cli_abort(
       c(
@@ -75,17 +106,19 @@ check_spec_levels <- function (spec) {
   }
 }
 
-check_spec_pred_type <- function (object, type, call = rlang::caller_env()) {
+check_spec_pred_type <- function(object, type, call = rlang::caller_env()) {
   if (!spec_has_pred_type(object, type)) {
     possible_preds <- names(object$spec$method$pred)
-    cli::cli_abort("No {.val {type}} prediction method available for this model.
+    cli::cli_abort(
+      "No {.val {type}} prediction method available for this model.
                    {.arg type} should be one of: {.val {possible_preds}}.",
-                   call = call)
+      call = call
+    )
   }
   invisible(NULL)
 }
 
-spec_has_pred_type <- function (object, type) {
+spec_has_pred_type <- function(object, type) {
   possible_preds <- names(object$spec$method$pred)
   any(possible_preds == type)
 }

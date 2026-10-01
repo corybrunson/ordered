@@ -12,7 +12,6 @@
 # `rpartScore::rpartScore` components
 
 make_decision_tree_rpartScore <- function() {
-
   parsnip::set_model_engine("decision_tree", "classification", "rpartScore")
   parsnip::set_dependency(
     "decision_tree",

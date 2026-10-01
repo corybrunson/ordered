@@ -12,7 +12,6 @@
 # `MASS::polr` components
 
 make_ordinal_reg_polr <- function() {
-
   parsnip::set_model_engine("ordinal_reg", "classification", "polr")
   parsnip::set_dependency(
     "ordinal_reg",
@@ -69,12 +68,11 @@ make_ordinal_reg_polr <- function() {
       pre = NULL,
       post = NULL,
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "class"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "class"
+      )
     )
   )
 
@@ -89,22 +87,19 @@ make_ordinal_reg_polr <- function() {
         tibble::as_tibble(x)
       },
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "probs"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "probs"
+      )
     )
   )
-
 }
 
 # ------------------------------------------------------------------------------
 # `VGAM::vglm` components
 
 make_ordinal_reg_vglm <- function() {
-
   parsnip::set_model_engine("ordinal_reg", "classification", "vglm")
   parsnip::set_dependency(
     "ordinal_reg",
@@ -185,12 +180,11 @@ make_ordinal_reg_vglm <- function() {
       pre = NULL,
       post = predict_VGAM_class_post,
       func = c(fun = "predictvglm", pkg = "VGAM"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "response"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "response"
+      )
     )
   )
 
@@ -203,12 +197,11 @@ make_ordinal_reg_vglm <- function() {
       pre = NULL,
       post = predict_VGAM_prob_post,
       func = c(fun = "predictvglm", pkg = "VGAM"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "response"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "response"
+      )
     )
   )
 
@@ -225,22 +218,19 @@ make_ordinal_reg_vglm <- function() {
         tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(fun = "predict", pkg = "VGAM"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "link"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "link"
+      )
     )
   )
-
 }
 
 # ------------------------------------------------------------------------------
 # `ordinalNet::ordinalNet` components
 
 make_ordinal_reg_ordinalNet <- function() {
-
   parsnip::set_model_engine("ordinal_reg", "classification", "ordinalNet")
   parsnip::set_dependency(
     "ordinal_reg",
@@ -358,13 +348,12 @@ make_ordinal_reg_ordinalNet <- function() {
         ordered(object$lvl[x], object$lvl)
       },
       func = c(fun = "predict_ordinalNet_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          newx = quote(new_data),
-          type = "class",
-          lambda = quote(object$spec$args$penalty)
-        )
+      args = list(
+        object = quote(object$fit),
+        newx = quote(new_data),
+        type = "class",
+        lambda = quote(object$spec$args$penalty)
+      )
     )
   )
 
@@ -381,13 +370,12 @@ make_ordinal_reg_ordinalNet <- function() {
         x
       },
       func = c(fun = "predict_ordinalNet_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          newx = quote(new_data),
-          type = "prob",
-          lambda = quote(object$spec$args$penalty)
-        )
+      args = list(
+        object = quote(object$fit),
+        newx = quote(new_data),
+        type = "prob",
+        lambda = quote(object$spec$args$penalty)
+      )
     )
   )
 
@@ -405,22 +393,19 @@ make_ordinal_reg_ordinalNet <- function() {
         tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newx = quote(new_data),
-          type = "link"
-        )
+      args = list(
+        object = quote(object$fit),
+        newx = quote(new_data),
+        type = "link"
+      )
     )
   )
-
 }
 
 # ------------------------------------------------------------------------------
 # `rms::lrm` and `rms::orm` components
 
 make_ordinal_reg_lrm <- function() {
-
   # ----------------------------------------------------------------------------
   # `rms::lrm` components
 
@@ -482,12 +467,11 @@ make_ordinal_reg_lrm <- function() {
         ordered(object$lvl[x], object$lvl)
       },
       func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "fitted.ind"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "fitted.ind"
+      )
     )
   )
 
@@ -504,12 +488,11 @@ make_ordinal_reg_lrm <- function() {
         x
       },
       func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "fitted.ind"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "fitted.ind"
+      )
     )
   )
 
@@ -526,12 +509,11 @@ make_ordinal_reg_lrm <- function() {
         tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "lp"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "lp"
+      )
     )
   )
 
@@ -604,12 +586,11 @@ make_ordinal_reg_lrm <- function() {
         ordered(object$lvl[x], object$lvl)
       },
       func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "fitted.ind"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "fitted.ind"
+      )
     )
   )
 
@@ -626,12 +607,11 @@ make_ordinal_reg_lrm <- function() {
         x
       },
       func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "fitted.ind"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "fitted.ind"
+      )
     )
   )
 
@@ -648,22 +628,19 @@ make_ordinal_reg_lrm <- function() {
         tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(pkg = "ordered", fun = "predict_lrm_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "lp"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "lp"
+      )
     )
   )
-
 }
 
 # ------------------------------------------------------------------------------
 # `glmnetcr::glmnetcr` components
 
 make_ordinal_reg_glmnetcr <- function() {
-
   parsnip::set_model_engine("ordinal_reg", "classification", "glmnetcr")
   parsnip::set_dependency(
     "ordinal_reg",
@@ -729,13 +706,12 @@ make_ordinal_reg_glmnetcr <- function() {
         ordered(x, levels = object$lvl)
       },
       func = c(fun = "predict_glmnetcr_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          newx = quote(new_data),
-          type = "class",
-          lambda = quote(object$spec$args$penalty)
-        )
+      args = list(
+        object = quote(object$fit),
+        newx = quote(new_data),
+        type = "class",
+        lambda = quote(object$spec$args$penalty)
+      )
     )
   )
 
@@ -752,23 +728,20 @@ make_ordinal_reg_glmnetcr <- function() {
         x
       },
       func = c(fun = "predict_glmnetcr_wrapper"),
-      args =
-        list(
-          object = quote(object$fit),
-          newx = quote(new_data),
-          type = "prob",
-          lambda = quote(object$spec$args$penalty)
-        )
+      args = list(
+        object = quote(object$fit),
+        newx = quote(new_data),
+        type = "prob",
+        lambda = quote(object$spec$args$penalty)
+      )
     )
   )
-
 }
 
 # ------------------------------------------------------------------------------
 # `ordinal::clm` components
 
 make_ordinal_reg_clm <- function() {
-
   parsnip::set_model_engine("ordinal_reg", "classification", "clm")
   parsnip::set_dependency(
     "ordinal_reg",
@@ -843,12 +816,11 @@ make_ordinal_reg_clm <- function() {
         tibble::tibble(.pred_class = x$fit)
       },
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "class"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "class"
+      )
     )
   )
 
@@ -865,12 +837,11 @@ make_ordinal_reg_clm <- function() {
         x
       },
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "prob"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "prob"
+      )
     )
   )
 
@@ -887,15 +858,33 @@ make_ordinal_reg_clm <- function() {
         tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "linear.predictor"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "linear.predictor"
+      )
     )
   )
 
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "clm",
+    mode = "classification",
+    type = "conf_int",
+    value = list(
+      pre = predict_clm_pre,
+      post = clm_conf_int_post,
+      func = c(fun = "predict"),
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "prob",
+        se.fit = TRUE,
+        interval = TRUE,
+        level = quote(level)
+      )
+    )
+  )
 }
 
 # nocov end

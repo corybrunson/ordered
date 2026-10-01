@@ -1,5 +1,3 @@
-seed <- 144688L
-
 # specification: arguments -----------------------------------------------------
 
 test_that("specification handles model parameters", {
@@ -53,7 +51,8 @@ test_that("model object", {
   )
 
   tidy_spec <- ordinal_reg(
-    ordinal_link = "probit", threshold_structure = "symmetric_median"
+    ordinal_link = "probit",
+    threshold_structure = "symmetric_median"
   ) |>
     set_engine("clm") |>
     set_mode("classification")
@@ -154,6 +153,94 @@ test_that("linear_pred prediction", {
   expect_equal(orig_pred, tidy_pred)
 })
 
+# prediction: conf_int ---------------------------------------------------------
+
+conf_int_bounds <- function(x) {
+  x <- as.matrix(x)
+  list(
+    lo = x[, grepl("^\\.pred_lower_", colnames(x)), drop = FALSE],
+    hi = x[, grepl("^\\.pred_upper_", colnames(x)), drop = FALSE]
+  )
+}
+
+test_that("conf_int prediction", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("ordinal")
+  house_sub <- get_house()$sub
+
+  tidy_spec <- ordinal_reg() |>
+    set_engine("clm") |>
+    set_mode("classification")
+  set.seed(seed)
+  tidy_fit <- fit(tidy_spec, Sat ~ Infl + Type + Cont, data = house_sub)
+
+  tidy_ci <- predict(tidy_fit, house_sub, type = "conf_int")
+  expect_identical(tidy_ci, predict_confint(tidy_fit, house_sub))
+  expect_identical(
+    names(tidy_ci),
+    c(
+      ".pred_lower_Low",
+      ".pred_upper_Low",
+      ".pred_lower_Medium",
+      ".pred_upper_Medium",
+      ".pred_lower_High",
+      ".pred_upper_High"
+    )
+  )
+  expect_identical(nrow(tidy_ci), nrow(house_sub))
+  expect_identical(attr(tidy_ci, "level"), 0.95)
+
+  bounds <- conf_int_bounds(tidy_ci)
+  expect_true(all(bounds$lo >= 0))
+  expect_true(all(bounds$hi <= 1))
+  expect_true(all(bounds$lo <= bounds$hi))
+
+  tidy_prob <- as.matrix(predict(tidy_fit, house_sub, type = "prob"))
+  expect_true(all(tidy_prob >= bounds$lo))
+  expect_true(all(tidy_prob <= bounds$hi))
+
+  ci_80 <- predict(tidy_fit, house_sub, type = "conf_int", level = 0.8)
+  expect_identical(attr(ci_80, "level"), 0.8)
+  bounds_80 <- conf_int_bounds(ci_80)
+  expect_true(all(bounds_80$lo >= bounds$lo))
+  expect_true(all(bounds_80$hi <= bounds$hi))
+  expect_lt(mean(bounds_80$hi - bounds_80$lo), mean(bounds$hi - bounds$lo))
+
+  # with standard errors
+
+  tidy_ci <- predict(tidy_fit, house_sub, type = "conf_int", std_error = TRUE)
+  expect_identical(
+    names(tidy_ci),
+    c(
+      ".pred_lower_Low",
+      ".pred_upper_Low",
+      ".pred_lower_Medium",
+      ".pred_upper_Medium",
+      ".pred_lower_High",
+      ".pred_upper_High",
+      ".std_error_Low",
+      ".std_error_Medium",
+      ".std_error_High"
+    )
+  )
+  tidy_se <-
+    tidy_ci[, c(".std_error_Low", ".std_error_Medium", ".std_error_High")]
+  expect_true(all(as.matrix(tidy_se) > 0))
+
+  bounds <- conf_int_bounds(tidy_ci)
+  orig_pred <- predict(
+    tidy_fit$fit,
+    newdata = house_sub |> subset(select = -Sat),
+    type = "prob",
+    se.fit = TRUE,
+    interval = TRUE,
+    level = 0.95
+  )
+  expect_equal(unname(as.matrix(tidy_se)), unname(orig_pred$se.fit))
+  expect_equal(unname(bounds$lo), unname(orig_pred$lwr))
+  expect_equal(unname(bounds$hi), unname(orig_pred$upr))
+})
+
 # translation & interfaces -----------------------------------------------------
 
 test_that("interfaces agree", {
@@ -224,7 +311,8 @@ test_that("parallel regression argument handles logicals", {
 
   set.seed(seed)
   orig_fit <- ordinal::clm(
-    Sat ~ Infl + Cont, data = house_sub
+    Sat ~ Infl + Cont,
+    data = house_sub
   )
 
   tidy_fit$fit$call <- orig_fit$call <- NULL
@@ -239,7 +327,8 @@ test_that("parallel regression argument handles logicals", {
 
   set.seed(seed)
   orig_fit <- ordinal::clm(
-    Sat ~ 1, data = house_sub,
+    Sat ~ 1,
+    data = house_sub,
     nominal = ~ Infl + Cont
   )
 
@@ -258,7 +347,8 @@ test_that("parallel regression argument handles logicals", {
   set.seed(seed)
   suppressWarnings(
     orig_fit <- ordinal::clm(
-      Sat ~ 1, data = house_sub,
+      Sat ~ 1,
+      data = house_sub,
       # wrapper expands full interaction expressions into summands
       nominal = ~ Infl + Cont + Infl:Cont
     )

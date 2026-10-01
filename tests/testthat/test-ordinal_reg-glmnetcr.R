@@ -1,5 +1,3 @@
-seed <- 144688L
-
 # model: basic -----------------------------------------------------------------
 
 test_that("model object (penalty path from original to tidy)", {
@@ -9,7 +7,8 @@ test_that("model object (penalty path from original to tidy)", {
 
   # https://stackoverflow.com/a/4569239
   house_vars <- model.matrix(
-    Sat ~ Type + Infl + Cont + 0, data = house_sub,
+    Sat ~ Type + Infl + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
   )
 
@@ -25,7 +24,7 @@ test_that("model object (penalty path from original to tidy)", {
   )
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
-    set_engine("glmnetcr", path_values = !! orig_fit$lambda)
+    set_engine("glmnetcr", path_values = !!orig_fit$lambda)
 
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -42,12 +41,13 @@ test_that("model object (penalty path from original to tidy)", {
       house_vars,
       y = house_sub$Sat,
       nlambda = 120,
-      alpha = .5, method = "forward"
+      alpha = .5,
+      method = "forward"
     )
   )
 
   tidy_spec <- ordinal_reg(penalty = 0.01, mixture = .5) |>
-    set_engine("glmnetcr", method = "forward", path_values = !! orig_fit$lambda)
+    set_engine("glmnetcr", method = "forward", path_values = !!orig_fit$lambda)
 
   set.seed(seed)
   tidy_fit <- fit(tidy_spec, Sat ~ Type + Infl + Cont, data = house_sub)
@@ -63,7 +63,8 @@ test_that("model object (penalty path from tidy to original)", {
   house_sub <- get_house()$sub
 
   house_vars <- model.matrix(
-    Sat ~ Type + Infl + Cont + 0, data = house_sub,
+    Sat ~ Type + Infl + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
   )
 
@@ -103,7 +104,8 @@ test_that("model object (penalty path from tidy to original)", {
       house_vars,
       y = house_sub$Sat,
       lambda = tidy_fit$fit$lambda,
-      alpha = .5, method = "forward"
+      alpha = .5,
+      method = "forward"
     )
   )
 
@@ -125,24 +127,27 @@ test_that("case weights", {
   wt_data <- transform(house_data, Freq = frequency_weights(Freq))
 
   wt_vars <- model.matrix(
-    Sat ~ Type + Infl + Cont + 0, data = wt_data,
+    Sat ~ Type + Infl + Cont + 0,
+    data = wt_data,
     contrasts.arg = lapply(wt_data[, 2:4], contrasts, contrasts = FALSE)
   )
 
   set.seed(seed)
   orig_fit <- suppressWarnings(
     glmnetcr::glmnetcr(
-      wt_vars, y = wt_data$Sat,
+      wt_vars,
+      y = wt_data$Sat,
       weights = wt_data$Freq
     )
   )
 
   tidy_spec <- ordinal_reg(penalty = 1) |>
-    set_engine("glmnetcr", path_values = !! orig_fit$lambda)
+    set_engine("glmnetcr", path_values = !!orig_fit$lambda)
   set.seed(seed)
   tidy_fit <- fit(
     tidy_spec,
-    Sat ~ Type + Infl + Cont, data = wt_data,
+    Sat ~ Type + Infl + Cont,
+    data = wt_data,
     case_weights = wt_data$Freq
   )
 
@@ -164,7 +169,8 @@ test_that("class prediction", {
   )
 
   house_vars <- model.matrix(
-    Sat ~ Type + Cont + 0, data = house_sub,
+    Sat ~ Type + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
 
@@ -176,7 +182,8 @@ test_that("class prediction", {
   orig_pred <- tibble::tibble(.pred_class = orig_pred)
 
   tidy_pred <- predict(
-    tidy_fit, house_sub,
+    tidy_fit,
+    house_sub,
     penalty = tidy_fit$fit$lambda[s_bic]
   )
 
@@ -196,19 +203,21 @@ test_that("prob prediction", {
   )
 
   house_vars <- model.matrix(
-    Sat ~ Type + Cont + 0, data = house_sub,
+    Sat ~ Type + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
 
   # use BIC-selected step (default)
   pred_all <- predict(tidy_fit$fit, newx = house_vars)
   s_bic <- which.min(pred_all$BIC)
-  orig_pred <- pred_all$probs[, , s_bic]
+  orig_pred <- pred_all$probs[,, s_bic]
   orig_pred <- tibble::as_tibble(orig_pred)
   orig_pred <- set_names(orig_pred, paste0(".pred_", colnames(orig_pred)))
 
   tidy_pred <- predict(
-    tidy_fit, house_sub,
+    tidy_fit,
+    house_sub,
     type = "prob",
     penalty = tidy_fit$fit$lambda[s_bic]
   )
@@ -232,19 +241,26 @@ test_that("multi-penalty wrapper output structure", {
   pen_vals <- fit$lambda[length(fit$lambda) * seq(4) / 5]
 
   house_vars <- model.matrix(
-    Sat ~ Type + Cont + 0, data = house_sub,
+    Sat ~ Type + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
 
   # probability: array [nrow, nclass, npenalty]
   prob_res <- multi_predict_glmnetcr_wrapper(
-    fit, house_vars, type = "prob", lambda = pen_vals
+    fit,
+    house_vars,
+    type = "prob",
+    lambda = pen_vals
   )
   expect_equal(dim(prob_res), c(n, length(tidy_fit$lvl), length(pen_vals)))
 
   # class: matrix [nrow, npenalty]
   class_res <- multi_predict_glmnetcr_wrapper(
-    fit, house_vars, type = "class", lambda = pen_vals
+    fit,
+    house_vars,
+    type = "class",
+    lambda = pen_vals
   )
   expect_equal(dim(class_res), c(n, length(pen_vals)))
 })
@@ -260,23 +276,36 @@ test_that("multi-penalty wrapper endpoint use", {
   )
   fit <- tidy_fit$fit
   house_vars <- model.matrix(
-    Sat ~ Type + Cont + 0, data = house_sub,
+    Sat ~ Type + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
 
   prob_lo <- multi_predict_glmnetcr_wrapper(
-    fit, house_vars, "prob", lambda = min(fit$lambda) / 10
+    fit,
+    house_vars,
+    "prob",
+    lambda = min(fit$lambda) / 10
   )
   prob_at <- multi_predict_glmnetcr_wrapper(
-    fit, house_vars, "prob", lambda = min(fit$lambda)
+    fit,
+    house_vars,
+    "prob",
+    lambda = min(fit$lambda)
   )
   expect_equal(prob_lo, prob_at)
 
   prob_hi <- multi_predict_glmnetcr_wrapper(
-    fit, house_vars, "prob", lambda = max(fit$lambda) * 10
+    fit,
+    house_vars,
+    "prob",
+    lambda = max(fit$lambda) * 10
   )
   prob_at <- multi_predict_glmnetcr_wrapper(
-    fit, house_vars, "prob", lambda = max(fit$lambda)
+    fit,
+    house_vars,
+    "prob",
+    lambda = max(fit$lambda)
   )
   expect_equal(prob_hi, prob_at)
 })
@@ -292,21 +321,28 @@ test_that("single- and multi-penalty wrappers agree", {
   )
   fit <- tidy_fit$fit
   house_vars <- model.matrix(
-    Sat ~ Type + Cont + 0, data = house_sub,
+    Sat ~ Type + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
   pen_vals <- fit$lambda[length(fit$lambda) * seq(4) / 5]
 
   for (type in c("class", "prob")) {
     multi_res <- multi_predict_glmnetcr_wrapper(
-      fit, house_vars, type = type, lambda = pen_vals
+      fit,
+      house_vars,
+      type = type,
+      lambda = pen_vals
     )
     for (i in seq_along(pen_vals)) {
       single_res <- predict_glmnetcr_wrapper(
-        fit, house_vars, type = type, lambda = pen_vals[i]
+        fit,
+        house_vars,
+        type = type,
+        lambda = pen_vals[i]
       )
       if (type == "prob") {
-        expect_equal(multi_res[, , i], single_res)
+        expect_equal(multi_res[,, i], single_res)
       } else {
         expect_equal(multi_res[, i], single_res)
       }
@@ -325,7 +361,8 @@ test_that("multiple prediction structure", {
   )
 
   house_vars <- model.matrix(
-    Sat ~ Type + Cont + 0, data = house_sub,
+    Sat ~ Type + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
 
@@ -392,7 +429,10 @@ test_that("multiple prediction values match sequential prediction values", {
     tidyr::unnest(cols = c(.pred))
   for (i in seq_along(pen_vals)) {
     single_pred <- predict(
-      tidy_fit, house_sub, type = "class", penalty = pen_vals[i]
+      tidy_fit,
+      house_sub,
+      type = "class",
+      penalty = pen_vals[i]
     )
     expect_equal(
       multi_pred |>
@@ -409,7 +449,10 @@ test_that("multiple prediction values match sequential prediction values", {
     tidyr::unnest(cols = c(.pred))
   for (i in seq_along(pen_vals)) {
     single_pred <- predict(
-      tidy_fit, house_sub, type = "prob", penalty = pen_vals[i]
+      tidy_fit,
+      house_sub,
+      type = "prob",
+      penalty = pen_vals[i]
     )
     expect_equal(
       multi_pred |>
@@ -460,7 +503,7 @@ test_that("arguments agree", {
   skip_if_not_installed("QSARdata")
 
   # using mixture as model-level parameter
-  pen_vec <- 10 ^ seq(0, -2, -.5)
+  pen_vec <- 10^seq(0, -2, -.5)
   gcr_arg_spec <-
     ordinal_reg(penalty = 1, mixture = .25) |>
     set_mode("classification") |>

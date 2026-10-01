@@ -26,7 +26,8 @@ test_that("model object", {
     expect_equal(
       slot(orig_fit, s),
       slot(tidy_fit$fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 
@@ -37,11 +38,15 @@ test_that("model object", {
     Sat ~ Type + Infl + Cont,
     family = if (utils::packageVersion("VGAM") == package_version("1.1.9")) {
       VGAM::cratio(
-        link = "probitlink", parallel = TRUE, threshold = "symmetric1"
+        link = "probitlink",
+        parallel = TRUE,
+        threshold = "symmetric1"
       )
     } else {
       VGAM::cratio(
-        link = "probitlink", parallel = TRUE, Thresh = "symm1"
+        link = "probitlink",
+        parallel = TRUE,
+        Thresh = "symm1"
       )
     },
     data = house_sub
@@ -51,7 +56,8 @@ test_that("model object", {
     set_engine("vglm") |>
     set_mode("classification") |>
     set_args(
-      ordinal_link = "probit", odds_link = "continuation_ratio",
+      ordinal_link = "probit",
+      odds_link = "continuation_ratio",
       threshold_structure = "symmetric_median"
     )
   set.seed(seed)
@@ -62,7 +68,8 @@ test_that("model object", {
     expect_equal(
       slot(orig_fit, s),
       slot(tidy_fit$fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 
@@ -106,7 +113,8 @@ test_that("case weights", {
     expect_equal(
       slot(orig_fit, s),
       slot(tidy_fit$fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 })
@@ -216,7 +224,8 @@ test_that("interfaces agree", {
     expect_equal(
       slot(onet_f_fit$fit, s),
       slot(onet_xy_fit$fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 })
@@ -228,7 +237,8 @@ test_that("arguments agree", {
   onet_arg_spec <-
     ordinal_reg(
       parallel_reg = TRUE,
-      ordinal_link = "cloglog", odds_link = "stopping_ratio"
+      ordinal_link = "cloglog",
+      odds_link = "stopping_ratio"
     ) |>
     set_mode("classification") |>
     set_engine("vglm")
@@ -269,7 +279,8 @@ test_that("parallel regression argument handles logicals", {
     expect_equal(
       slot(tidy_fit$fit, s),
       slot(orig_fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 
@@ -291,7 +302,8 @@ test_that("parallel regression argument handles logicals", {
     expect_equal(
       slot(tidy_fit$fit, s),
       slot(orig_fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 })
@@ -351,15 +363,21 @@ test_that("VGAM wrappers translate standardized argument values", {
   # native values pass through unchanged
   native <- if (utils::packageVersion("VGAM") == package_version("1.1.9")) {
     VGAM_vglm_wrapper(
-      Sat ~ Infl + Type, data = house_data,
-      family = "sratio", link = "probitlink",
-      threshold = "symmetric1", parallel = TRUE
+      Sat ~ Infl + Type,
+      data = house_data,
+      family = "sratio",
+      link = "probitlink",
+      threshold = "symmetric1",
+      parallel = TRUE
     )
   } else {
     VGAM_vglm_wrapper(
-      Sat ~ Infl + Type, data = house_data,
-      family = "sratio", link = "probitlink",
-      Thresh = "symm1", parallel = TRUE
+      Sat ~ Infl + Type,
+      data = house_data,
+      family = "sratio",
+      link = "probitlink",
+      Thresh = "symm1",
+      parallel = TRUE
     )
   }
   expect_equal(native@family@infos()$link, "probitlink")
@@ -367,8 +385,11 @@ test_that("VGAM wrappers translate standardized argument values", {
 
   # standardized values are converted
   standardized <- VGAM_vglm_wrapper(
-    Sat ~ Infl + Type, data = house_data,
-    family = "stopping_ratio", link = "probit", parallel = TRUE,
+    Sat ~ Infl + Type,
+    data = house_data,
+    family = "stopping_ratio",
+    link = "probit",
+    parallel = TRUE,
     Thresh = "symmetric_median"
   )
   expect_equal(standardized@family@infos()$link, "probitlink")
