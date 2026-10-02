@@ -151,7 +151,7 @@ predict_clm_pre <- function(new_data, object) {
   new_data
 }
 
-clm_conf_int_post <- function(x, object) {
+predict_clm_confint_post <- function(x, object) {
   lvl <- object$lvl
   bounds <- vector("list", 2L * length(lvl))
   for (i in seq_along(lvl)) {

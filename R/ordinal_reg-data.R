@@ -873,7 +873,7 @@ make_ordinal_reg_clm <- function() {
     type = "conf_int",
     value = list(
       pre = predict_clm_pre,
-      post = clm_conf_int_post,
+      post = predict_clm_confint_post,
       func = c(fun = "predict"),
       args = list(
         object = quote(object$fit),
