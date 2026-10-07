@@ -189,8 +189,7 @@ test_that("linear_pred prediction", {
 # translation & interfaces -----------------------------------------------------
 
 test_that("interfaces agree", {
-  skip_if_not_installed("VGAM")
-  skip_if_not(utils::packageVersion("VGAM") > package_version("1.1.9"))
+  skip_if_not_installed("VGAM", "1.1.9")
   skip_if_not_installed("QSARdata")
 
   onet_spec <-

@@ -4,7 +4,7 @@ seed <- 144688L
 
 test_that("model object (lrm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   # no extra arguments
@@ -46,7 +46,7 @@ test_that("model object (lrm)", {
 
 test_that("model object (orm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   # no extra arguments
@@ -91,7 +91,7 @@ test_that("model object (orm)", {
 
 test_that("case weights (lrm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   set.seed(seed)
@@ -127,7 +127,7 @@ test_that("case weights (lrm)", {
 
 test_that("case weights (orm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   set.seed(seed)
@@ -165,7 +165,7 @@ test_that("case weights (orm)", {
 
 test_that("class prediction (lrm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "lrm") |>
@@ -182,7 +182,7 @@ test_that("class prediction (lrm)", {
 
 test_that("class prediction (orm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "orm") |>
@@ -201,7 +201,7 @@ test_that("class prediction (orm)", {
 
 test_that("probability prediction (lrm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "lrm") |>
@@ -217,7 +217,7 @@ test_that("probability prediction (lrm)", {
 
 test_that("probability prediction (orm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "orm") |>
@@ -235,7 +235,7 @@ test_that("probability prediction (orm)", {
 
 test_that("linear_pred prediction (lrm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "lrm") |>
@@ -250,7 +250,7 @@ test_that("linear_pred prediction (lrm)", {
 
 test_that("linear_pred prediction (orm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "orm") |>
@@ -267,7 +267,7 @@ test_that("linear_pred prediction (orm)", {
 
 test_that("tibble input (lrm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "lrm") |>
@@ -281,7 +281,7 @@ test_that("tibble input (lrm)", {
 
 test_that("tibble input (orm)", {
   skip_if_not_installed("MASS")
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(engine = "orm") |>
@@ -296,7 +296,7 @@ test_that("tibble input (orm)", {
 # translation & interfaces -----------------------------------------------------
 
 test_that("interfaces agree (lrm)", {
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   skip_if_not_installed("QSARdata")
 
   lrm_spec <-
@@ -324,7 +324,7 @@ test_that("interfaces agree (lrm)", {
 })
 
 test_that("interfaces agree (orm)", {
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   skip_if_not_installed("QSARdata")
 
   orm_spec <-
@@ -354,7 +354,7 @@ test_that("interfaces agree (orm)", {
 })
 
 test_that("arguments agree (lrm)", {
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   skip_if_not_installed("QSARdata")
 
   lrm_arg_spec <-
@@ -377,7 +377,7 @@ test_that("arguments agree (lrm)", {
 })
 
 test_that("arguments agree (orm)", {
-  skip_if_not_installed("rms")
+  skip_if_not_installed("rms", "7.0.0")
   skip_if_not_installed("QSARdata")
 
   orm_arg_spec <-
