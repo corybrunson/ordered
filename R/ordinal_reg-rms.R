@@ -9,7 +9,7 @@
 #' @param ... Additional arguments passed to the underlying method.
 #' @keywords internal
 #' @returns The result of [stats::predict()] dispatched on `object`.
-#' @examplesIf rlang::is_installed("rms") && rlang::is_installed("MASS")
+#' @examplesIf rlang::is_installed("rms (>= 7.0.0)") && rlang::is_installed("MASS")
 #' house_data <-
 #'   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
 #' ( fit <- rms::lrm(Sat ~ Infl + Type + Cont, data = house_data) )
