@@ -24,7 +24,7 @@ does not accept tibble inputs. This wrapper ensures that \code{newdata} is
 converted to a plain data frame before the S3 method is dispatched.
 }
 \examples{
-\dontshow{if (rlang::is_installed("rms") && rlang::is_installed("MASS")) withAutoprint(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("rms (>= 7.0.0)") && rlang::is_installed("MASS")) withAutoprint(\{ # examplesIf}
 house_data <-
   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
 ( fit <- rms::lrm(Sat ~ Infl + Type + Cont, data = house_data) )

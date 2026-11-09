@@ -4,32 +4,56 @@
 \alias{VGAM_vglm_wrapper}
 \alias{VGAM_vgam_wrapper}
 \alias{values_ordinal_link_VGAM}
-\title{Wrappers for \code{VGAM}}
+\alias{values_threshold_structure_VGAM}
+\title{Fit wrappers for \code{VGAM}}
 \usage{
 VGAM_vglm_wrapper(
   formula,
   data,
-  family = "cumulative_link",
-  link = "logistic",
-  parallel = TRUE,
-  ...
+  family = "cumulative",
+  link = "logitlink",
+  parallel = FALSE,
+  Thresh = NULL,
+  ...,
+  call = rlang::caller_env()
 )
 
 VGAM_vgam_wrapper(
   formula,
   data,
-  family = "cumulative_link",
-  link = "logistic",
-  parallel = TRUE,
-  ...
+  family = "cumulative",
+  link = "logitlink",
+  parallel = FALSE,
+  Thresh = NULL,
+  ...,
+  call = rlang::caller_env()
 )
 
 values_ordinal_link_VGAM
+
+values_threshold_structure_VGAM
 }
 \arguments{
 \item{formula}{The formula to pass.}
 
 \item{data}{The data frame to pass.}
+
+\item{family}{The odds link function; either a standardized dial value
+(\code{"cumulative_link"}, \code{"adjacent_categories"}, \code{"continuation_ratio"},
+\code{"stopping_ratio"}) or a \code{VGAM} native value (\code{"cumulative"}, \code{"acat"},
+\code{"cratio"}, \code{"sratio"}).}
+
+\item{link}{The ordinal link function; either a standardized dial value (e.g.
+\code{"logistic"}, \code{"cloglog"}) or a \code{VGAM} native value (e.g. \code{"logitlink"},
+\code{"clogloglink"}).}
+
+\item{parallel}{Logical; whether predictor effects are shared across
+thresholds. It corresponds to the standardized \code{parallel_reg} argument (see
+\code{\link[dials:parallel_reg]{dials::parallel_reg()}}).}
+
+\item{Thresh}{Character; the threshold constraint pattern. It corresponds to
+the standardized \code{threshold_structure} argument (see
+\code{\link[dials:threshold_structure]{dials::threshold_structure()}}).}
 
 \item{...}{Additional arguments to pass.}
 }
@@ -38,14 +62,24 @@ An object of S3 parent class \code{VGAM} and primary classes \code{vglm} or
 \code{vgam} as returned by \code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
 }
 \description{
-These wrappers convert the standardized \code{odds_link} options encoded in
-\code{\link[dials:values_odds_link]{dials::values_odds_link}} to \code{\link[VGAM:vglmff-class]{VGAM::vglmff}} objects passed to the
-\code{family} argument of \code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
+These wrappers reorganize arguments into proper calls to \code{\link[VGAM:vglm]{VGAM::vglm()}} and
+\code{\link[VGAM:vgam]{VGAM::vgam()}}, which specialize to several families of ordinal regression
+models. The standardized argument values used by \code{parsnip::ordinal_reg()} and
+\code{parsnip::gen_additive_mod()} are matched and converted to the values native
+to \code{VGAM} within the wrappers.
 }
 \details{
 The vector \code{values_ordinal_link_VGAM} extends the default \code{ordinal_link}
 options encoded in \code{\link[dials:values_ordinal_link]{dials::values_ordinal_link}} to those accepted by
 \code{\link[VGAM:vglm]{VGAM::vglm()}} and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
+
+The vector \code{values_threshold_structure_VGAM} extends the default
+\code{threshold_structure} options encoded in
+\code{\link[dials:values_threshold_structure]{dials::values_threshold_structure}} to those accepted by \code{\link[VGAM:vglm]{VGAM::vglm()}}
+and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
+
+NB: Prediction with \code{vgam} models under VGAM version 1.1-9 does not yet
+support the use of smoothers \code{s()}.
 
 Note that \code{VGAM::vglm()} and \code{VGAM::vgam()} treat the rows of \code{data}
 as the units of observation: Compressed \code{data} with one row per predictor
@@ -59,31 +93,78 @@ single ordinal outcome column and therefore do not accept the convenient
 \examples{
 values_ordinal_link_VGAM
 dials::ordinal_link(values = values_ordinal_link_VGAM)
+values_threshold_structure_VGAM
+dials::threshold_structure(values = values_threshold_structure_VGAM)
+
 \dontshow{if (rlang::is_installed("MASS") && rlang::is_installed("VGAM")) withAutoprint(\{ # examplesIf}
 house_data <-
   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+
+if (utils::packageVersion("VGAM") == package_version("1.1.9")) {#VGAM=1.1-9
+
 # fit wrapper for linear model
 ( fit_orig <- VGAM::vglm(
   Sat ~ Type + Infl + Cont,
-  family = VGAM::sratio(link = "probitlink", parallel = TRUE),
+  family = VGAM::sratio(
+    link = "probitlink", parallel = TRUE, threshold = "symmetric0"
+  ),
   data = house_data
 ) )
 ( fit_wrap <- VGAM_vglm_wrapper(
   Sat ~ Type + Infl + Cont,
-  family = "stopping_ratio", link = "probit",
+  family = "sratio",
+  link = "probitlink", parallel = TRUE, Thresh = "symmetric_zero",
   data = house_data
 ) )
 # fit wrapper for additive model
 ( fit_orig <- VGAM::vgam(
   Sat ~ Type + Infl + Cont,
-  family = VGAM::cratio(link = "clogloglink", parallel = TRUE),
+  family = VGAM::cratio(
+    link = "clogloglink", parallel = TRUE, threshold = "symmetric0",
+  ),
   data = house_data
 ) )
 ( fit_wrap <- VGAM_vgam_wrapper(
   Sat ~ Type + Infl + Cont,
-  family = "continuation_ratio", link = "cloglog",
+  family = "cratio",
+  link = "cloglog", parallel = TRUE, Thresh = "symmetric0",
   data = house_data
 ) )
+
+}#VGAM=1.1-9
+
+if (utils::packageVersion("VGAM") > package_version("1.1.9")) {#VGAM>1.1-9
+
+# fit wrapper for linear model
+( fit_orig <- VGAM::vglm(
+  Sat ~ Type + Infl + Cont,
+  family = VGAM::sratio(
+    link = "probitlink", parallel = TRUE, Thresh = "symm0"
+  ),
+  data = house_data
+) )
+( fit_wrap <- VGAM_vglm_wrapper(
+  Sat ~ Type + Infl + Cont,
+  family = "sratio",
+  link = "probitlink", parallel = TRUE, Thresh = "symmetric_zero",
+  data = house_data
+) )
+# fit wrapper for additive model
+( fit_orig <- VGAM::vgam(
+  Sat ~ Type + Infl + Cont,
+  family = VGAM::cratio(
+    link = "clogloglink", parallel = TRUE, Thresh = "symm0",
+  ),
+  data = house_data
+) )
+( fit_wrap <- VGAM_vgam_wrapper(
+  Sat ~ Type + Infl + Cont,
+  family = "cratio",
+  link = "cloglog", parallel = TRUE, Thresh = "symm0",
+  data = house_data
+) )
+
+}#VGAM>1.1-9
 \dontshow{\}) # examplesIf}
 }
 \keyword{internal}

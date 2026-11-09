@@ -1,10 +1,10 @@
-#' A wrapper for `ordinalForest`
+#' Fit wrapper for `ordinalForest`
 #'
 #' A wrapper is needed since they have a non-standard model interface that
-#' required the data set and the column name (character string) for the outcome.
+#' requires the data set and the column name (character string) for the outcome.
 #' @param x The predictor data.
 #' @param y The outcome factor.
-#' @param ... Arguments to pass to the underlying model function.
+#' @param ... Additional arguments to pass.
 #' @keywords internal
 #' @returns An object of S3 class `ordfor` as returned by
 #'   [ordinalForest::ordfor()].

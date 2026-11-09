@@ -94,7 +94,7 @@ get_from_env("models") |>
 
 ## Tunable model arguments
 
-`ordinal_reg` recognizes several model arguments, shared by at least two engines in ordered, that have parameter generating functions in dials:
+`ordinal_reg` recognizes several model arguments, each shared by at least two engines in ordered, that have parameter generating functions in dials:
 
 ```{r, echo=FALSE, message=FALSE}
 ordinal_reg_formals <- names(formals(ordinal_reg))

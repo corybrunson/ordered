@@ -29,7 +29,7 @@
       ordinal_reg(mode = "regression")
     Condition
       Error in `ordinal_reg()`:
-      ! `mode` should be 'classification'
+      ! `mode` should be "classification".
 
 ---
 
@@ -39,4 +39,30 @@
       Error in `set_engine()`:
       x Engine "wat?" is not supported for `ordinal_reg()`.
       i See `show_engines("ordinal_reg")`.
+
+# parallel_reg accepts logical input
+
+    Code
+      ordinal_reg(parallel_reg = TRUE)
+    Output
+      Ordinal Regression Model Specification (classification)
+      
+      Main Arguments:
+        parallel_reg = TRUE
+      
+      Computational engine: polr 
+      
+
+---
+
+    Code
+      ordinal_reg(parallel_reg = FALSE)
+    Output
+      Ordinal Regression Model Specification (classification)
+      
+      Main Arguments:
+        parallel_reg = FALSE
+      
+      Computational engine: polr 
+      
 

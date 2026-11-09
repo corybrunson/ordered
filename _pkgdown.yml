@@ -13,6 +13,8 @@ reference:
   desc: >
     Wrappers for Ordinal Classification Engines
   contents:
+  - '`clm_wrapper`'
+  - '`predict_lrm_wrapper`'
   - '`ordinalNet_wrapper`'
   - '`predict_glmnetcr_wrapper`'
   - '`VGAM_vglm_wrapper`'
@@ -25,6 +27,7 @@ reference:
     Tunable Engine Parameters
   contents:
   - '`clm_parameters`'
+  - '`ordinalNet_parameters`'
   - '`rpartScore_parameters`'
   - '`ordinalForest_parameters`'
   - '`orf_parameters`'
