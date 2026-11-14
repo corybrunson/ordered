@@ -1,6 +1,6 @@
 Package: ordered
 Title: 'parsnip' Engines and Wrappers for Ordinal Classification Models
-Version: 0.1.0.9003
+Version: 0.2.0
 Authors@R: c(
     person("Max", "Kuhn", , "max@posit.co",
            role = "aut",
@@ -38,7 +38,7 @@ Suggests:
     MASS,
     ordinal,
     ordinalNet,
-    rms (>= 7.0.0),
+    rms (>= 6.8-0),
     glmnetcr,
     VGAM (>= 1.1-9),
     rpartScore,

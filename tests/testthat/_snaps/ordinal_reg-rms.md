@@ -1,3 +1,33 @@
+# old {rms} version gates unsupported `orm` arguments
+
+    Code
+      fit(tidy_spec, Sat ~ Type + Cont, data = house_sub, case_weights = frequency_weights(
+        rep(1L, nrow(house_sub))))
+    Condition
+      Error:
+      ! The "orm" engine does not support case weights with rms "6.9.0".
+      i Use rms >= 7.0-0 or omit `case_weights`.
+
+---
+
+    Code
+      fit(set_mode(set_engine(ordinal_reg(penalty = 0.01), "orm"), "classification"),
+      Sat ~ Type + Cont, data = house_sub)
+    Condition
+      Error:
+      ! The "orm" engine does not support a nonzero `penalty` with rms "6.9.0".
+      i Use rms >= 7.0-0 or omit `penalty`.
+
+---
+
+    Code
+      zero_penalty_fit <- fit(set_mode(set_engine(ordinal_reg(penalty = 0), "orm"),
+      "classification"), Sat ~ Type + Cont, data = house_sub)
+    Condition
+      Warning:
+      The `penalty` argument was set to 0, which is not supported by rms "6.9.0" for the "orm" engine.
+      i The argument will be omitted, giving an unpenalized fit.
+
 # interfaces agree (lrm)
 
     Code
@@ -74,7 +104,8 @@
       Computational engine: orm 
       
       Model fit template:
-      rms::orm(formula = missing_arg(), data = missing_arg(), weights = missing_arg())
+      ordered::rms_orm_wrapper(formula = missing_arg(), data = missing_arg(), 
+          weights = missing_arg())
 
 ---
 
@@ -172,8 +203,8 @@
       Computational engine: orm 
       
       Model fit template:
-      rms::orm(formula = missing_arg(), data = missing_arg(), weights = missing_arg(), 
-          family = "cauchit", penalty = 0.1)
+      ordered::rms_orm_wrapper(formula = missing_arg(), data = missing_arg(), 
+          weights = missing_arg(), family = "cauchit", penalty = 0.1)
 
 ---
 

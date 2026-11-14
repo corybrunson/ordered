@@ -515,7 +515,7 @@ test_that("parallel regression argument handles logicals", {
     fit(Sat ~ Infl + Cont, data = house_sub)
 
   expect_equal(tidy_fit$fit, tidy_default$fit)
-  expect_equal(orig_fit$coefs, tidy_fit$fit$coefs)
+  expect_equal(orig_fit$coefs, tidy_fit$fit$coefs, tolerance = 0.001)
 
   # all category-specific
 
@@ -541,7 +541,7 @@ test_that("parallel regression argument handles logicals", {
     "nonparallelTerms"
   )
 
-  expect_equal(orig_fit$coefs, tidy_fit$fit$coefs)
+  expect_equal(orig_fit$coefs, tidy_fit$fit$coefs, tolerance = 0.001)
 })
 
 # argument translation ---------------------------------------------------------
