@@ -575,7 +575,7 @@ make_ordinal_reg_lrm <- function() {
     value = list(
       interface = "formula",
       protect = c("formula", "data", "weights"),
-      func = c(pkg = "rms", fun = "orm"),
+      func = c(pkg = "ordered", fun = "rms_orm_wrapper"),
       defaults = list()
     )
   )

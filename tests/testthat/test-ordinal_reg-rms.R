@@ -161,6 +161,58 @@ test_that("case weights (orm)", {
   expect_equal(orig_fit, tidy_fit$fit, ignore_attr = TRUE)
 })
 
+# compatibility: rms < 7.0-0 ---------------------------------------------------
+
+test_that("old {rms} version gates unsupported arguments (orm)", {
+  skip_if_not_installed("MASS")
+  skip_if_not_installed("rms")
+  house_sub <- get_house()$sub
+
+  local_mocked_bindings(
+    rms_version = function() package_version("6.9-0")
+  )
+
+  tidy_spec <- ordinal_reg() |>
+    set_engine("orm") |>
+    set_mode("classification")
+
+  expect_snapshot(
+    error = TRUE,
+    fit(
+      tidy_spec,
+      Sat ~ Type + Cont,
+      data = house_sub,
+      case_weights = frequency_weights(rep(1L, nrow(house_sub)))
+    )
+  )
+
+  expect_snapshot(
+    error = TRUE,
+    fit(
+      ordinal_reg(penalty = 0.01) |>
+        set_engine("orm") |>
+        set_mode("classification"),
+      Sat ~ Type + Cont,
+      data = house_sub
+    )
+  )
+
+  expect_snapshot(
+    zero_penalty_fit <- fit(
+      ordinal_reg(penalty = 0) |>
+        set_engine("orm") |>
+        set_mode("classification"),
+      Sat ~ Type + Cont,
+      data = house_sub
+    )
+  )
+  expect_null(zero_penalty_fit$fit$penalty)
+
+  expect_no_error(
+    fit(tidy_spec, Sat ~ Type + Cont, data = house_sub)
+  )
+})
+
 # prediction: class ------------------------------------------------------------
 
 test_that("class prediction (lrm)", {

@@ -38,7 +38,7 @@ Suggests:
     MASS,
     ordinal,
     ordinalNet,
-    rms (>= 7.0.0),
+    rms (>= 6.8-0),
     glmnetcr,
     VGAM (>= 1.1-9),
     rpartScore,
