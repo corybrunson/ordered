@@ -1,7 +1,10 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.github$
+
 ^\.opencode$
+^AGENTS\.md$
+^opencode\.json$
 
 ^codecov\.yml$
 ^CODE_OF_CONDUCT\.md$
