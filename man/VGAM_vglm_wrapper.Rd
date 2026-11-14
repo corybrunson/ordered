@@ -81,7 +81,7 @@ and \code{\link[VGAM:vgam]{VGAM::vgam()}}.
 \code{vgam} prediction with \code{s()} terms requires a VGAM version later than 1.1-9.
 ordered does not yet support the \code{sm.os()} and \code{sm.ps()} smoother terms
 available to \code{\link[VGAM:vgam]{VGAM::vgam()}}, which \code{VGAM} recommends instead of \code{s()} for
-certain G1-VGAMs; see \code{\link[VGAM:vgam]{VGAM::vgam()}} (\code{WARNING} section).
+certain models; see \code{\link[VGAM:vgam]{VGAM::vgam()}} (\code{WARNING} section).
 
 Note that \code{VGAM::vglm()} and \code{VGAM::vgam()} treat the rows of \code{data}
 as the units of observation: Compressed \code{data} with one row per predictor

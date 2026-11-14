@@ -18,7 +18,7 @@
 #' `vgam` prediction with `s()` terms requires a VGAM version later than 1.1-9.
 #' ordered does not yet support the `sm.os()` and `sm.ps()` smoother terms
 #' available to [`VGAM::vgam()`], which `VGAM` recommends instead of `s()` for
-#' certain G1-VGAMs; see [`VGAM::vgam()`] (`WARNING` section).
+#' certain models; see [`VGAM::vgam()`] (`WARNING` section).
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.
 #' @param family The odds link function; either a standardized dial value
