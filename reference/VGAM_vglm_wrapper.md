@@ -102,8 +102,13 @@ to those accepted by
 [`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
 [`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html).
 
-NB: Prediction with `vgam` models under VGAM version 1.1-9 does not yet
-support the use of smoothers `s()`.
+`vgam` prediction with `s()` terms requires a VGAM version later than
+1.1-9. ordered does not yet support the `sm.os()` and `sm.ps()` smoother
+terms available to
+[`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html), which `VGAM`
+recommends instead of `s()` for certain models; see
+[`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html) (`WARNING`
+section).
 
 Note that [`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
 [`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html) treat the rows

@@ -143,8 +143,10 @@ options encoded in <code><a href="https://dials.tidymodels.org/reference/ordinal
 <code>threshold_structure</code> options encoded in
 <code><a href="https://dials.tidymodels.org/reference/threshold_structure.html" class="external-link">dials::values_threshold_structure</a></code> to those accepted by <code><a href="https://rdrr.io/pkg/VGAM/man/vglm.html" class="external-link">VGAM::vglm()</a></code>
 and <code><a href="https://rdrr.io/pkg/VGAM/man/vgam.html" class="external-link">VGAM::vgam()</a></code>.</p>
-<p>NB: Prediction with <code>vgam</code> models under VGAM version 1.1-9 does not yet
-support the use of smoothers <code>s()</code>.</p>
+<p><code>vgam</code> prediction with <code>s()</code> terms requires a VGAM version later than 1.1-9.
+ordered does not yet support the <code>sm.os()</code> and <code>sm.ps()</code> smoother terms
+available to <code><a href="https://rdrr.io/pkg/VGAM/man/vgam.html" class="external-link">VGAM::vgam()</a></code>, which <code>VGAM</code> recommends instead of <code>s()</code> for
+certain models; see <code><a href="https://rdrr.io/pkg/VGAM/man/vgam.html" class="external-link">VGAM::vgam()</a></code> (<code>WARNING</code> section).</p>
 <p>Note that <code><a href="https://rdrr.io/pkg/VGAM/man/vglm.html" class="external-link">VGAM::vglm()</a></code> and <code><a href="https://rdrr.io/pkg/VGAM/man/vgam.html" class="external-link">VGAM::vgam()</a></code> treat the rows of <code>data</code>
 as the units of observation: Compressed <code>data</code> with one row per predictor
 set will be understood as having a multinomial-valued outcome; only
