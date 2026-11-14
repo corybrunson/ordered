@@ -86,19 +86,19 @@ remotes::install_github("corybrunson/ordered")
 ordered provides new engines for several models, including all engines
 for `ordinal_reg()`:
 
-| model              | engine          | class | prob | linear_pred |
-|:-------------------|:----------------|:------|:-----|:------------|
-| `decision_tree`    | `rpartScore`    | ✔     | ✖    | ✖           |
-| `gen_additive_mod` | `vgam`          | ✔     | ✔    | ✔           |
-| `ordinal_reg`      | `polr`          | ✔     | ✔    | ✖           |
-| `ordinal_reg`      | `clm`           | ✔     | ✔    | ✔           |
-| `ordinal_reg`      | `lrm`           | ✔     | ✔    | ✔           |
-| `ordinal_reg`      | `orm`           | ✔     | ✔    | ✔           |
-| `ordinal_reg`      | `vglm`          | ✔     | ✔    | ✔           |
-| `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    | ✔           |
-| `ordinal_reg`      | `glmnetcr`      | ✔     | ✔    | ✖           |
-| `rand_forest`      | `ordinalForest` | ✔     | ✔    | ✖           |
-| `rand_forest`      | `orf`           | ✔     | ✔    | ✖           |
+| model              | engine          | class | prob | linear_pred | conf_int |
+|:-------------------|:----------------|:------|:-----|:------------|:---------|
+| `decision_tree`    | `rpartScore`    | ✔     | ✖    | ✖           | ✖        |
+| `gen_additive_mod` | `vgam`          | ✔     | ✔    | ✔           | ✖        |
+| `ordinal_reg`      | `polr`          | ✔     | ✔    | ✖           | ✖        |
+| `ordinal_reg`      | `clm`           | ✔     | ✔    | ✔           | ✔        |
+| `ordinal_reg`      | `lrm`           | ✔     | ✔    | ✔           | ✖        |
+| `ordinal_reg`      | `orm`           | ✔     | ✔    | ✔           | ✖        |
+| `ordinal_reg`      | `vglm`          | ✔     | ✔    | ✔           | ✖        |
+| `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    | ✔           | ✖        |
+| `ordinal_reg`      | `glmnetcr`      | ✔     | ✔    | ✖           | ✖        |
+| `rand_forest`      | `ordinalForest` | ✔     | ✔    | ✖           | ✖        |
+| `rand_forest`      | `orf`           | ✔     | ✔    | ✖           | ✖        |
 
 ## Tunable model arguments
 

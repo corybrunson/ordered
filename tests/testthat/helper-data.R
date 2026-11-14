@@ -18,7 +18,7 @@ if (rlang::is_installed("QSARdata")) {
     ) |>
     dplyr::slice_sample(n = 20, by = class)
   caco_train <- caco_dat[-c(1:2, 21:22, 41:42), ]
-  caco_test  <- caco_dat[ c(1:2, 21:22, 41:42), ]
+  caco_test <- caco_dat[c(1:2, 21:22, 41:42), ]
 }
 
 get_house <- function() {

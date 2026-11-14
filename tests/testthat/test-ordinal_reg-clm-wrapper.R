@@ -119,7 +119,8 @@ test_that("clm_wrapper() records relays revalued arguments in the call", {
   res <- clm_wrapper(
     SURENESS ~ PROD,
     data = soup,
-    link = "logistic", threshold = "symmetric_zero"
+    link = "logistic",
+    threshold = "symmetric_zero"
   )
   # unmodified call
   expect_equal(res$call$link, "logistic")

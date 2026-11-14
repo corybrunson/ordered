@@ -122,13 +122,14 @@
 #' }#VGAM>1.1-9
 #' @export
 VGAM_vglm_wrapper <- function(
-    formula, data,
-    family = "cumulative",
-    link = "logitlink",
-    parallel = FALSE,
-    Thresh = NULL,
-    ...,
-    call = rlang::caller_env()
+  formula,
+  data,
+  family = "cumulative",
+  link = "logitlink",
+  parallel = FALSE,
+  Thresh = NULL,
+  ...,
+  call = rlang::caller_env()
 ) {
   rlang::check_installed("VGAM")
   VGAM_1_1_9 <- utils::packageVersion("VGAM") == package_version("1.1.9")
@@ -149,18 +150,26 @@ VGAM_vglm_wrapper <- function(
   # execute nested call on modified inputs
   family_call <- if (VGAM_1_1_9) {
     rlang::call2(
-      .fn = family, .ns = "VGAM",
-      link = link, parallel = parallel, threshold = Thresh
+      .fn = family,
+      .ns = "VGAM",
+      link = link,
+      parallel = parallel,
+      threshold = Thresh
     )
   } else {
     rlang::call2(
-      .fn = family, .ns = "VGAM",
-      link = link, parallel = parallel, Thresh = Thresh
+      .fn = family,
+      .ns = "VGAM",
+      link = link,
+      parallel = parallel,
+      Thresh = Thresh
     )
   }
   cl <- rlang::call2(
-    .fn = "vglm", .ns = "VGAM",
-    formula = rlang::expr(formula), data = rlang::expr(data),
+    .fn = "vglm",
+    .ns = "VGAM",
+    formula = rlang::expr(formula),
+    data = rlang::expr(data),
     family = family_call,
     ...
   )
@@ -170,13 +179,14 @@ VGAM_vglm_wrapper <- function(
 #' @rdname VGAM_vglm_wrapper
 #' @export
 VGAM_vgam_wrapper <- function(
-    formula, data,
-    family = "cumulative",
-    link = "logitlink",
-    parallel = FALSE,
-    Thresh = NULL,
-    ...,
-    call = rlang::caller_env()
+  formula,
+  data,
+  family = "cumulative",
+  link = "logitlink",
+  parallel = FALSE,
+  Thresh = NULL,
+  ...,
+  call = rlang::caller_env()
 ) {
   rlang::check_installed("VGAM")
   VGAM_1_1_9 <- utils::packageVersion("VGAM") == package_version("1.1.9")
@@ -194,18 +204,26 @@ VGAM_vgam_wrapper <- function(
   # execute nested call on modified inputs
   family_call <- if (VGAM_1_1_9) {
     rlang::call2(
-      .fn = family, .ns = "VGAM",
-      link = link, parallel = parallel, threshold = Thresh
+      .fn = family,
+      .ns = "VGAM",
+      link = link,
+      parallel = parallel,
+      threshold = Thresh
     )
   } else {
     rlang::call2(
-      .fn = family, .ns = "VGAM",
-      link = link, parallel = parallel, Thresh = Thresh
+      .fn = family,
+      .ns = "VGAM",
+      link = link,
+      parallel = parallel,
+      Thresh = Thresh
     )
   }
   cl <- rlang::call2(
-    .fn = "vgam", .ns = "VGAM",
-    formula = rlang::expr(formula), data = rlang::expr(data),
+    .fn = "vgam",
+    .ns = "VGAM",
+    formula = rlang::expr(formula),
+    data = rlang::expr(data),
     family = family_call,
     ...
   )
@@ -256,17 +274,26 @@ match_ordinal_family <- function(family, call = rlang::caller_env()) {
 }
 
 match_ordinal_link_VGAM <- function(link, call = rlang::caller_env()) {
-  if (! is.character(link)) {
+  if (!is.character(link)) {
     return(link)
   }
   check_string(link, arg = "ordinal_link", call = call)
 
   if (
     # keep native values
-    ! link %in% c(
-      "logitlink", "probitlink", "logloglink", "clogloglink", "cauchitlink",
-      "foldsqrtlink", "logclink", "gordlink", "pordlink", "nbordlink"
-    )
+    !link %in%
+      c(
+        "logitlink",
+        "probitlink",
+        "logloglink",
+        "clogloglink",
+        "cauchitlink",
+        "foldsqrtlink",
+        "logclink",
+        "gordlink",
+        "pordlink",
+        "nbordlink"
+      )
   ) {
     # modify standardized values
     link <- rlang::arg_match0(
@@ -294,10 +321,11 @@ match_ordinal_link_VGAM <- function(link, call = rlang::caller_env()) {
 }
 
 match_threshold_structure_VGAM <- function(
-  Thresh, v_1_1_9 = FALSE,
+  Thresh,
+  v_1_1_9 = FALSE,
   call = rlang::caller_env()
 ) {
-  if (! is.character(Thresh)) {
+  if (!is.character(Thresh)) {
     return(Thresh)
   }
   check_string(Thresh, arg = "threshold_structure", call = call)
@@ -310,7 +338,7 @@ match_threshold_structure_VGAM <- function(
 
   if (
     # keep native values
-    ! Thresh %in% native_vals
+    !Thresh %in% native_vals
   ) {
     # modify standardized values
     Thresh <- rlang::arg_match0(

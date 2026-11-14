@@ -133,7 +133,9 @@ test_that("class prediction", {
     fit(class ~ s(mol_weight) + volume + s(ClogP), data = caco_train)
 
   orig_pred <- VGAM::predict(
-    tidy_fit$fit, newdata = caco_train, type = "response"
+    tidy_fit$fit,
+    newdata = caco_train,
+    type = "response"
   )
   orig_pred <- apply(orig_pred, 1L, which.max)
   orig_pred <- ordered(tidy_fit$lvl[orig_pred], tidy_fit$lvl)
@@ -160,7 +162,9 @@ test_that("probability prediction", {
     fit(class ~ mol_weight + s(volume) + s(ClogP), data = caco_train)
 
   orig_pred <- VGAM::predict(
-    tidy_fit$fit, newdata = caco_train, type = "response"
+    tidy_fit$fit,
+    newdata = caco_train,
+    type = "response"
   )
   orig_pred <- tibble::as_tibble(orig_pred)
   names(orig_pred) <- paste0(".pred_", names(orig_pred))
@@ -222,7 +226,8 @@ test_that("interfaces agree", {
     expect_equal(
       slot(onet_f_fit$fit, s),
       slot(onet_xy_fit$fit, s),
-      ignore_attr = TRUE, ignore_formula_env = TRUE
+      ignore_attr = TRUE,
+      ignore_formula_env = TRUE
     )
   }
 })

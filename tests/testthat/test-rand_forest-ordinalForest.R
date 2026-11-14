@@ -20,7 +20,10 @@ test_that("model object", {
     set_engine("ordinalForest") |>
     set_mode("classification") |>
     set_args(
-      nsets = 10, min_n = 20, ntreeperdiv = 100, trees = 10,
+      nsets = 10,
+      min_n = 20,
+      ntreeperdiv = 100,
+      trees = 10,
       # prevent 'min.node.size' warning
       perffunction = "equal"
     )
@@ -55,7 +58,10 @@ test_that("model object w/ probability metric", {
     set_engine("ordinalForest") |>
     set_mode("classification") |>
     set_args(
-      nsets = 10, min_n = 20, ntreeperdiv = 100, trees = 10,
+      nsets = 10,
+      min_n = 20,
+      ntreeperdiv = 100,
+      trees = 10,
       perffunction = "probability"
     )
   set.seed(seed)
@@ -139,8 +145,12 @@ test_that("class prediction", {
   tidy_fit <- rand_forest(trees = 10) |>
     set_engine("ordinalForest") |>
     set_mode("classification") |>
-    set_args(nsets = 10, ntreeperdiv = 100,
-             perffunction = "oneclass", classimp = "Medium") |>
+    set_args(
+      nsets = 10,
+      ntreeperdiv = 100,
+      perffunction = "oneclass",
+      classimp = "Medium"
+    ) |>
     fit(Sat ~ Type + Cont, data = house_sub)
 
   set.seed(seed)
@@ -219,7 +229,10 @@ test_that("arguments agree", {
     set_mode("classification") |>
     set_engine(
       "ordinalForest",
-      nsets = 50, ntreeperdiv = 80, npermtrial = 70, nbest = 10
+      nsets = 50,
+      ntreeperdiv = 80,
+      npermtrial = 70,
+      nbest = 10
     ) |>
     set_args(perffunction = "probability")
   expect_snapshot(orf_arg_spec |> translate())
