@@ -61,25 +61,24 @@ if (rlang::is_installed("ordinalForest")) {
 
 fit_orf <- rand_forest(mode = "classification") %>%
   set_engine("ordinalForest") %>%
-  set_args(nsets = 50, ntreefinal = 100, perffunction = "probability") %>%
+  set_args(nsets = 50, trees = 100, perffunction = "probability") %>%
   fit(Sat ~ Infl + Type + Cont, data = house_train)
 predict(fit_orf, house_test, type = "prob")
 
 }
 }
-#> Warning: The argument `ntreefinal` cannot be manually modified and was removed.
 #> # A tibble: 40 × 3
 #>    .pred_Low .pred_Medium .pred_High
 #>        <dbl>        <dbl>      <dbl>
-#>  1     0.120        0.347      0.533
-#>  2     0.514        0.192      0.294
-#>  3     0.426        0.328      0.246
-#>  4     0.514        0.192      0.294
-#>  5     0.227        0.274      0.499
-#>  6     0.442        0.326      0.233
-#>  7     0.150        0.411      0.439
-#>  8     0.231        0.220      0.550
-#>  9     0.442        0.326      0.233
-#> 10     0.120        0.347      0.533
+#>  1     0.124        0.331      0.545
+#>  2     0.514        0.198      0.288
+#>  3     0.430        0.310      0.260
+#>  4     0.514        0.198      0.288
+#>  5     0.205        0.289      0.506
+#>  6     0.444        0.322      0.234
+#>  7     0.128        0.406      0.466
+#>  8     0.278        0.198      0.524
+#>  9     0.444        0.322      0.234
+#> 10     0.124        0.331      0.545
 #> # ℹ 30 more rows
 ```

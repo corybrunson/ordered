@@ -1,4 +1,4 @@
-# A wrapper for `orf`
+# Fit wrapper for `orf`
 
 The `orf` package uses a non-standard interface that requires the
 predictor matrix `X` and the outcome vector `Y` as separate arguments,
@@ -24,8 +24,7 @@ orf_wrapper(X, Y, ...)
 
 - ...:
 
-  Arguments to pass to
-  [`orf::orf()`](https://rdrr.io/pkg/orf/man/orf.html).
+  Additional arguments to pass.
 
 ## Value
 
@@ -41,11 +40,11 @@ house_data <- house_data[sample(nrow(house_data), 50), ]
 # encode factors as dummy variables before passing to wrapper
 X_mat <- model.matrix(~ Infl + Type + Cont - 1, data = house_data)
 # fit wrapper
-(fit_wrap <- orf_wrapper(
+( fit_wrap <- orf_wrapper(
   X = X_mat,
   Y = house_data$Sat,
   num.trees = 10
-))
+) )
 #> Ordered Forest object of class orf 
 #> 
 #> Number of Categories:             3 

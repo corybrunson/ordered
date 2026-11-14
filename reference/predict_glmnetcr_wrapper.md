@@ -1,8 +1,9 @@
-# Prediction wrapper for `glmnetcr`
+# Predict wrappers for `glmnetcr`
 
-Selects predictions at a specific penalty value from the regularization
-path. When the requested penalty lies between two path values, linearly
-interpolates between the probability matrices at the neighboring steps.
+Select predictions at a specific penalty value or a vector of penalty
+values. For penalties between path values, linearly interpolate between
+the probability matrices at the neighboring steps. For penalties outside
+the path range, use the path endpoints.
 
 ## Usage
 
@@ -15,8 +16,18 @@ predict_glmnetcr_wrapper(
   criteria = c("bic", "aic")
 )
 
+multi_predict_glmnetcr_wrapper(object, newx, type, lambda)
+
 # S3 method for class '`_glmnetcr`'
-predict(object, new_data, type = NULL, opts = list(), penalty = NULL, ...)
+predict(
+  object,
+  new_data,
+  type = NULL,
+  opts = list(),
+  penalty = NULL,
+  multi = FALSE,
+  ...
+)
 
 # S3 method for class '`_glmnetcr`'
 predict_class(object, new_data, ...)
@@ -51,12 +62,12 @@ multi_predict(
 
 - lambda:
 
-  A penalty value at which to predict. If `NULL`, the step minimizing
-  `criteria` is used.
+  A penalty value or vector at which to predict. If `NULL`, the step
+  minimizing `criteria` is used (single penalty only).
 
 - criteria:
 
-  Criterion by which to select `lambda` within the path sequence.
+  The criterion by which to select `lambda` within the path sequence.
   Defaults to `"bic"` for consistency with
   [`glmnetcr::predict.glmnetcr()`](https://rdrr.io/pkg/glmnetcr/man/predict.glmnetcr.html).
   (NB: This contrasts with
@@ -69,8 +80,13 @@ multi_predict(
 
 ## Value
 
-A character vector of class predictions or a matrix of class
-probabilities.
+`predict_glmnetcr_wrapper()` returns a character vector of class
+predictions or a matrix of class probabilities.
+`multi_predict_glmnetcr_wrapper()` returns a numeric array with one
+slice per penalty value for class probabilities, or a character matrix
+with one column per penalty value for class predictions. Both outputs
+mimic those of
+[`glmnetcr::predict.glmnetcr()`](https://rdrr.io/pkg/glmnetcr/man/predict.glmnetcr.html).
 
 ## Examples
 
@@ -82,7 +98,7 @@ house_matrix <- model.matrix(
   data = house_data,
   contrasts.arg = lapply(house_data[, 2:4], contrasts, contrasts = FALSE)
 )
-pen_vec <- 10 ^ seq(-1, -3, -.5)
+pen_vec <- 10 ^ seq(-1, -2, -.25)
 fit <- glmnetcr::glmnetcr(
   house_matrix, y = house_data$Sat,
   lambda = pen_vec
@@ -92,44 +108,161 @@ fit <- glmnetcr::glmnetcr(
 #> Warning: Passing 'dfmax' to glmnet() is deprecated. Use control = list(dfmax = ...) instead.
 #> Warning: Passing 'pmax' to glmnet() is deprecated. Use control = list(pmax = ...) instead.
 #> Warning: Passing 'trace.it' to glmnet() is deprecated. Use control = list(trace.it = ...) instead.
-#> Warning: from glmnet C++ code (error code -10004); Number of nonzero coefficients along the path exceeds pmax=9 at 4th lambda value; solutions for larger lambdas returned
 # predictions (may disagree if `lambda` is not on the path `fit$lambda`)
-# probability
+set.seed(34091)
+house_submatrix <- house_matrix[sample(nrow(house_matrix), 6), ]
+# single, probability
 predict(
   fit,
-  newx = head(house_matrix)
-)$probs[, , which.min(abs(fit$lambda - 0.02))]
-#>            Low    Medium     High
-#> [1,] 0.3784433 0.2703317 0.351225
-#> [2,] 0.3784433 0.2703317 0.351225
-#> [3,] 0.3784433 0.2703317 0.351225
-#> [4,] 0.3784433 0.2703317 0.351225
-#> [5,] 0.3784433 0.2703317 0.351225
-#> [6,] 0.3784433 0.2703317 0.351225
+  newx = house_submatrix
+)$probs[, , which.min(abs(fit$lambda - .02))]
+#>            Low    Medium      High
+#> [1,] 0.3366422 0.2754545 0.3879033
+#> [2,] 0.4071144 0.2610529 0.3318327
+#> [3,] 0.2558453 0.2828634 0.4612913
+#> [4,] 0.4071144 0.2610529 0.3318327
+#> [5,] 0.2082957 0.2808630 0.5108413
+#> [6,] 0.3121271 0.2788845 0.4089884
 predict_glmnetcr_wrapper(
   fit,
-  newx = head(house_matrix),
+  newx = house_submatrix,
   type = "prob",
-  lambda = 0.02
+  lambda = .02
 )
-#>            Low    Medium     High
-#> [1,] 0.3755644 0.2678286 0.356607
-#> [2,] 0.3755644 0.2678286 0.356607
-#> [3,] 0.3755644 0.2678286 0.356607
-#> [4,] 0.3755644 0.2678286 0.356607
-#> [5,] 0.3755644 0.2678286 0.356607
-#> [6,] 0.3755644 0.2678286 0.356607
-# class
+#>            Low    Medium      High
+#> [1,] 0.3346839 0.2750789 0.3902372
+#> [2,] 0.4044382 0.2610532 0.3345086
+#> [3,] 0.2640999 0.2816406 0.4542595
+#> [4,] 0.4044382 0.2610532 0.3345086
+#> [5,] 0.2148620 0.2805043 0.5046337
+#> [6,] 0.3140962 0.2779594 0.4079444
+# single, class
 predict(
   fit,
-  newx = head(house_matrix)
-)$class[, which.min(abs(fit$lambda - 0.02))]
-#> [1] "Low" "Low" "Low" "Low" "Low" "Low"
+  newx = house_submatrix
+)$class[, which.min(abs(fit$lambda - .02))]
+#> [1] "High" "Low"  "High" "Low"  "High" "High"
 predict_glmnetcr_wrapper(
   fit,
-  newx = head(house_matrix),
+  newx = house_submatrix,
   type = "class",
-  lambda = 0.02
+  lambda = .02
 )
-#> [1] "Low" "Low" "Low" "Low" "Low" "Low"
+#> [1] "High" "Low"  "High" "Low"  "High" "High"
+# multiple, probabilities
+predict(
+  fit,
+  newx = house_submatrix
+)$probs
+#> , , s0
+#> 
+#>            Low   Medium      High
+#> [1,] 0.3372999 0.265316 0.3973841
+#> [2,] 0.3372999 0.265316 0.3973841
+#> [3,] 0.3372999 0.265316 0.3973841
+#> [4,] 0.3372999 0.265316 0.3973841
+#> [5,] 0.3372999 0.265316 0.3973841
+#> [6,] 0.3372999 0.265316 0.3973841
+#> 
+#> , , s1
+#> 
+#>            Low    Medium      High
+#> [1,] 0.3350792 0.2668287 0.3980921
+#> [2,] 0.3505946 0.2643341 0.3850713
+#> [3,] 0.3350792 0.2668287 0.3980921
+#> [4,] 0.3505946 0.2643341 0.3850713
+#> [5,] 0.3146669 0.2695901 0.4157430
+#> [6,] 0.3350792 0.2668287 0.3980921
+#> 
+#> , , s2
+#> 
+#>            Low    Medium      High
+#> [1,] 0.3244186 0.2731098 0.4024716
+#> [2,] 0.3904093 0.2610549 0.3485358
+#> [3,] 0.3073711 0.2752307 0.4173982
+#> [4,] 0.3904093 0.2610549 0.3485358
+#> [5,] 0.2492828 0.2786238 0.4720934
+#> [6,] 0.3244186 0.2731098 0.4024716
+#> 
+#> , , s3
+#> 
+#>            Low    Medium      High
+#> [1,] 0.3366422 0.2754545 0.3879033
+#> [2,] 0.4071144 0.2610529 0.3318327
+#> [3,] 0.2558453 0.2828634 0.4612913
+#> [4,] 0.4071144 0.2610529 0.3318327
+#> [5,] 0.2082957 0.2808630 0.5108413
+#> [6,] 0.3121271 0.2788845 0.4089884
+#> 
+#> , , s4
+#> 
+#>            Low    Medium      High
+#> [1,] 0.3579498 0.2745176 0.3675326
+#> [2,] 0.4151922 0.2616352 0.3231726
+#> [3,] 0.2204409 0.2848423 0.4947169
+#> [4,] 0.4151922 0.2616352 0.3231726
+#> [5,] 0.1833356 0.2801171 0.5365473
+#> [6,] 0.2858834 0.2843518 0.4297647
+#> 
+multi_predict_glmnetcr_wrapper(
+  fit,
+  newx = house_submatrix,
+  type = "prob",
+  lambda = c(.2, .02, .002)
+)
+#> , , 1
+#> 
+#>            Low   Medium      High
+#> [1,] 0.3372999 0.265316 0.3973841
+#> [2,] 0.3372999 0.265316 0.3973841
+#> [3,] 0.3372999 0.265316 0.3973841
+#> [4,] 0.3372999 0.265316 0.3973841
+#> [5,] 0.3372999 0.265316 0.3973841
+#> [6,] 0.3372999 0.265316 0.3973841
+#> 
+#> , , 2
+#> 
+#>            Low    Medium      High
+#> [1,] 0.3346839 0.2750789 0.3902372
+#> [2,] 0.4044382 0.2610532 0.3345086
+#> [3,] 0.2640999 0.2816406 0.4542595
+#> [4,] 0.4044382 0.2610532 0.3345086
+#> [5,] 0.2148620 0.2805043 0.5046337
+#> [6,] 0.3140962 0.2779594 0.4079444
+#> 
+#> , , 3
+#> 
+#>            Low    Medium      High
+#> [1,] 0.3579498 0.2745176 0.3675326
+#> [2,] 0.4151922 0.2616352 0.3231726
+#> [3,] 0.2204409 0.2848423 0.4947169
+#> [4,] 0.4151922 0.2616352 0.3231726
+#> [5,] 0.1833356 0.2801171 0.5365473
+#> [6,] 0.2858834 0.2843518 0.4297647
+#> 
+# multiple, class
+predict(
+  fit,
+  newx = house_submatrix
+)$class
+#>      [,1]   [,2]   [,3]   [,4]   [,5]  
+#> [1,] "High" "High" "High" "High" "High"
+#> [2,] "High" "High" "Low"  "Low"  "Low" 
+#> [3,] "High" "High" "High" "High" "High"
+#> [4,] "High" "High" "Low"  "Low"  "Low" 
+#> [5,] "High" "High" "High" "High" "High"
+#> [6,] "High" "High" "High" "High" "High"
+multi_predict_glmnetcr_wrapper(
+  fit,
+  newx = house_submatrix,
+  type = "class",
+  lambda = c(.2, .02, .002)
+)
+#>      0.2    0.02   0.002 
+#> [1,] "High" "High" "High"
+#> [2,] "High" "Low"  "Low" 
+#> [3,] "High" "High" "High"
+#> [4,] "High" "Low"  "Low" 
+#> [5,] "High" "High" "High"
+#> [6,] "High" "High" "High"
 ```

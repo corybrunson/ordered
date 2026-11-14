@@ -1,8 +1,7 @@
-# Wrappers for `ordinalNet`
+# Fit and predict wrappers for `ordinalNet`
 
-The fit wrapper converts the standardized `odds_link` options encoded in
-[`dials::values_odds_link`](https://dials.tidymodels.org/reference/ordinal_link.html)
-to the `family` options of
+The fit wrapper restructures case weights and reorganizes arguments into
+a call to
 [`ordinalNet::ordinalNet()`](https://rdrr.io/pkg/ordinalNet/man/ordinalNet.html).
 The prediction wrapper interpolates between fitted penalties to enable
 submodel prediction at specified penalties.
@@ -14,9 +13,14 @@ ordinalNet_wrapper(
   x,
   y,
   weights = NULL,
-  family = "cumulative_link",
-  link = "logistic",
-  ...
+  family = "cumulative",
+  link = "logit",
+  parallel_reg = NULL,
+  parallelTerms = TRUE,
+  nonparallelTerms = FALSE,
+  parallelPenaltyFactor = 1,
+  ...,
+  call = rlang::caller_env()
 )
 
 predict_ordinalNet_wrapper(
@@ -68,6 +72,43 @@ predict_class(object, new_data, ...)
 
   The outcome vector.
 
+- weights:
+
+  An optional numeric vector of case weights. When provided, the outcome
+  is restructured into a multinomial matrix of weighted indicators.
+
+- family:
+
+  The odds link function; either a standardized dial value
+  (`"cumulative_link"`, `"adjacent_categories"`, `"continuation_ratio"`,
+  `"stopping_ratio"`) or an `ordinalNet` native value (`"cumulative"`,
+  `"acat"`, `"cratio"`, `"sratio"`).
+
+- link:
+
+  The ordinal link function; either a standardized dial value (e.g.
+  `"logistic"`, `"probit"`) or a `ordinalNet` native value (e.g.
+  `"logit"`, `"probit"`).
+
+- parallel_reg:
+
+  Logical; whether predictors share effects across thresholds. When
+  `FALSE`, `parallelTerms` is set to `FALSE` and `nonparallelTerms` to
+  `TRUE`.
+
+- parallelTerms:
+
+  Logical; whether to use parallel terms.
+
+- nonparallelTerms:
+
+  Logical; whether to use non-parallel terms.
+
+- parallelPenaltyFactor:
+
+  Numeric; scale factor applied to the penalty on parallel terms. Errs
+  when used without parallel terms.
+
 - ...:
 
   Additional arguments to pass.
@@ -106,11 +147,11 @@ pen_vec <- 10 ^ seq(-2.5, -.5, 1)
 #>    lambdaVals nNonzero    loglik     devPct      aic      bic
 #> 1 0.316227766        2 -1824.439 0.00000000 3652.878 3663.732
 #> 2 0.031622777        8 -1753.373 0.03895240 3522.745 3566.162
-#> 3 0.003162278        9 -1741.769 0.04531243 3501.538 3550.382
+#> 3 0.003162278        8 -1741.769 0.04531243 3499.538 3542.955
 #> 
 ( fit_wrap <- ordinalNet_wrapper(
   house_matrix, y = house_data$Sat,
-  family = "stopping_ratio", link = "logistic",
+  family = "sratio", link = "logit",
   lambdaVals = pen_vec
 ) )
 #> 
@@ -119,7 +160,7 @@ pen_vec <- 10 ^ seq(-2.5, -.5, 1)
 #>    lambdaVals nNonzero    loglik     devPct      aic      bic
 #> 1 0.316227766        2 -1824.439 0.00000000 3652.878 3663.732
 #> 2 0.031622777        8 -1753.373 0.03895240 3522.745 3566.162
-#> 3 0.003162278        9 -1741.769 0.04531243 3501.538 3550.382
+#> 3 0.003162278        8 -1741.769 0.04531243 3499.538 3542.955
 #> 
 fit_tidy <-
   ordinal_reg(ordinal_link = "logistic", odds_link = "stopping_ratio") %>%
@@ -133,7 +174,7 @@ fit_tidy$fit
 #>    lambdaVals nNonzero    loglik     devPct      aic      bic
 #> 1 0.316227766        2 -1824.439 0.00000000 3652.878 3663.732
 #> 2 0.031622777        8 -1753.373 0.03895240 3522.745 3566.162
-#> 3 0.003162278        9 -1741.769 0.04531243 3501.538 3550.382
+#> 3 0.003162278        8 -1741.769 0.04531243 3499.538 3542.955
 #> 
 # predict wrapper
 predict(

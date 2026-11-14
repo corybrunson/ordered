@@ -1,11 +1,15 @@
-# Wrappers for `VGAM`
+# Fit wrappers for `VGAM`
 
-These wrappers convert the standardized `odds_link` options encoded in
-[`dials::values_odds_link`](https://dials.tidymodels.org/reference/ordinal_link.html)
-to [`VGAM::vglmff`](https://rdrr.io/pkg/VGAM/man/vglmff-class.html)
-objects passed to the `family` argument of
+These wrappers reorganize arguments into proper calls to
 [`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
-[`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html).
+[`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html), which
+specialize to several families of ordinal regression models. The
+standardized argument values used by
+[`parsnip::ordinal_reg()`](https://parsnip.tidymodels.org/reference/ordinal_reg.html)
+and
+[`parsnip::gen_additive_mod()`](https://parsnip.tidymodels.org/reference/gen_additive_mod.html)
+are matched and converted to the values native to `VGAM` within the
+wrappers.
 
 ## Usage
 
@@ -13,22 +17,28 @@ objects passed to the `family` argument of
 VGAM_vglm_wrapper(
   formula,
   data,
-  family = "cumulative_link",
-  link = "logistic",
-  parallel = TRUE,
-  ...
+  family = "cumulative",
+  link = "logitlink",
+  parallel = FALSE,
+  Thresh = NULL,
+  ...,
+  call = rlang::caller_env()
 )
 
 VGAM_vgam_wrapper(
   formula,
   data,
-  family = "cumulative_link",
-  link = "logistic",
-  parallel = TRUE,
-  ...
+  family = "cumulative",
+  link = "logitlink",
+  parallel = FALSE,
+  Thresh = NULL,
+  ...,
+  call = rlang::caller_env()
 )
 
 values_ordinal_link_VGAM
+
+values_threshold_structure_VGAM
 ```
 
 ## Arguments
@@ -40,6 +50,31 @@ values_ordinal_link_VGAM
 - data:
 
   The data frame to pass.
+
+- family:
+
+  The odds link function; either a standardized dial value
+  (`"cumulative_link"`, `"adjacent_categories"`, `"continuation_ratio"`,
+  `"stopping_ratio"`) or a `VGAM` native value (`"cumulative"`,
+  `"acat"`, `"cratio"`, `"sratio"`).
+
+- link:
+
+  The ordinal link function; either a standardized dial value (e.g.
+  `"logistic"`, `"cloglog"`) or a `VGAM` native value (e.g.
+  `"logitlink"`, `"clogloglink"`).
+
+- parallel:
+
+  Logical; whether predictor effects are shared across thresholds. It
+  corresponds to the standardized `parallel_reg` argument (see
+  [`dials::parallel_reg()`](https://dials.tidymodels.org/reference/parallel_reg.html)).
+
+- Thresh:
+
+  Character; the threshold constraint pattern. It corresponds to the
+  standardized `threshold_structure` argument (see
+  [`dials::threshold_structure()`](https://dials.tidymodels.org/reference/threshold_structure.html)).
 
 - ...:
 
@@ -59,6 +94,16 @@ options encoded in
 to those accepted by
 [`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
 [`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html).
+
+The vector `values_threshold_structure_VGAM` extends the default
+`threshold_structure` options encoded in
+[`dials::values_threshold_structure`](https://dials.tidymodels.org/reference/threshold_structure.html)
+to those accepted by
+[`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
+[`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html).
+
+NB: Prediction with `vgam` models under VGAM version 1.1-9 does not yet
+support the use of smoothers `s()`.
 
 Note that [`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
 [`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html) treat the rows
@@ -82,76 +127,89 @@ dials::ordinal_link(values = values_ordinal_link_VGAM)
 #> 10 possible values include:
 #> 'logistic', 'probit', 'loglog', 'cloglog', 'cauchit', 'foldsqrt', 'logc',
 #> 'gord', 'pord', and 'nbord'
+values_threshold_structure_VGAM
+#> [1] "flexible"         "symmetric_median" "symmetric_zero"   "equidistant"     
+#> [5] "qnorm"           
+dials::threshold_structure(values = values_threshold_structure_VGAM)
+#> Threshold Structure (qualitative)
+#> 5 possible values include:
+#> 'flexible', 'symmetric_median', 'symmetric_zero', 'equidistant', and 'qnorm'
+
 house_data <-
   MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+
+if (utils::packageVersion("VGAM") == package_version("1.1.9")) {#VGAM=1.1-9
+
 # fit wrapper for linear model
 ( fit_orig <- VGAM::vglm(
   Sat ~ Type + Infl + Cont,
-  family = VGAM::sratio(link = "probitlink", parallel = TRUE),
+  family = VGAM::sratio(
+    link = "probitlink", parallel = TRUE, threshold = "symmetric0"
+  ),
   data = house_data
 ) )
-#> 
-#> Call:
-#> VGAM::vglm(formula = Sat ~ Type + Infl + Cont, family = VGAM::sratio(link = "probitlink", 
-#>     parallel = TRUE), data = house_data)
-#> 
-#> 
-#> Coefficients:
-#> (Intercept):1 (Intercept):2 TypeApartment    TypeAtrium   TypeTerrace 
-#>   -0.32396038   -0.08231777    0.29782985    0.21180232    0.58344529 
-#>    InflMedium      InflHigh      ContHigh 
-#>   -0.30063564   -0.68628214   -0.17688128 
-#> 
-#> Degrees of Freedom: 3362 Total; 3354 Residual
-#> Residual deviance: 3483.463 
-#> Log-likelihood: -1741.731 
 ( fit_wrap <- VGAM_vglm_wrapper(
   Sat ~ Type + Infl + Cont,
-  family = "stopping_ratio", link = "probit",
+  family = "sratio",
+  link = "probitlink", parallel = TRUE, Thresh = "symmetric_zero",
   data = house_data
 ) )
-#> 
-#> Call:
-#> VGAM::vglm(formula = formula, family = VGAM::sratio(link = "probitlink", 
-#>     parallel = TRUE), data = data)
-#> 
-#> 
-#> Coefficients:
-#> (Intercept):1 (Intercept):2 TypeApartment    TypeAtrium   TypeTerrace 
-#>   -0.32396038   -0.08231777    0.29782985    0.21180232    0.58344529 
-#>    InflMedium      InflHigh      ContHigh 
-#>   -0.30063564   -0.68628214   -0.17688128 
-#> 
-#> Degrees of Freedom: 3362 Total; 3354 Residual
-#> Residual deviance: 3483.463 
-#> Log-likelihood: -1741.731 
 # fit wrapper for additive model
 ( fit_orig <- VGAM::vgam(
   Sat ~ Type + Infl + Cont,
-  family = VGAM::cratio(link = "clogloglink", parallel = TRUE),
+  family = VGAM::cratio(
+    link = "clogloglink", parallel = TRUE, threshold = "symmetric0",
+  ),
   data = house_data
 ) )
-#> 
-#> Call:
-#> VGAM::vgam(formula = Sat ~ Type + Infl + Cont, family = VGAM::cratio(link = "clogloglink", 
-#>     parallel = TRUE), data = house_data)
-#> 
-#> 
-#> Degrees of Freedom: 3362 Total; 3354 Residual
-#> Residual deviance: 3484.088 
-#> Log-likelihood: -1742.044 
 ( fit_wrap <- VGAM_vgam_wrapper(
   Sat ~ Type + Infl + Cont,
-  family = "continuation_ratio", link = "cloglog",
+  family = "cratio",
+  link = "cloglog", parallel = TRUE, Thresh = "symmetric0",
   data = house_data
 ) )
+
+}#VGAM=1.1-9
+
+if (utils::packageVersion("VGAM") > package_version("1.1.9")) {#VGAM>1.1-9
+
+# fit wrapper for linear model
+( fit_orig <- VGAM::vglm(
+  Sat ~ Type + Infl + Cont,
+  family = VGAM::sratio(
+    link = "probitlink", parallel = TRUE, Thresh = "symm0"
+  ),
+  data = house_data
+) )
+( fit_wrap <- VGAM_vglm_wrapper(
+  Sat ~ Type + Infl + Cont,
+  family = "sratio",
+  link = "probitlink", parallel = TRUE, Thresh = "symmetric_zero",
+  data = house_data
+) )
+# fit wrapper for additive model
+( fit_orig <- VGAM::vgam(
+  Sat ~ Type + Infl + Cont,
+  family = VGAM::cratio(
+    link = "clogloglink", parallel = TRUE, Thresh = "symm0",
+  ),
+  data = house_data
+) )
+( fit_wrap <- VGAM_vgam_wrapper(
+  Sat ~ Type + Infl + Cont,
+  family = "cratio",
+  link = "cloglog", parallel = TRUE, Thresh = "symm0",
+  data = house_data
+) )
+
+}#VGAM>1.1-9
 #> 
 #> Call:
 #> VGAM::vgam(formula = formula, family = VGAM::cratio(link = "clogloglink", 
-#>     parallel = TRUE), data = data)
+#>     parallel = TRUE, Thresh = "symm0"), data = data)
 #> 
 #> 
-#> Degrees of Freedom: 3362 Total; 3354 Residual
-#> Residual deviance: 3484.088 
-#> Log-likelihood: -1742.044 
+#> Degrees of Freedom: 3362 Total; 3355 Residual
+#> Residual deviance: 3490.264 
+#> Log-likelihood: -1745.132 
 ```
