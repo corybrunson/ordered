@@ -19,10 +19,11 @@ Wrappers for Ordinal Classification Engines
   Fit wrapper for
   [`ordinal::clm()`](https://rdrr.io/pkg/ordinal/man/clm.html)
 
-- [`predict_lrm_wrapper()`](https://corybrunson.github.io/ordered/reference/predict_lrm_wrapper.md)
+- [`rms_orm_wrapper()`](https://corybrunson.github.io/ordered/reference/rms_orm_wrapper.md)
+  [`predict_lrm_wrapper()`](https://corybrunson.github.io/ordered/reference/rms_orm_wrapper.md)
   :
 
-  Wrapper for `rms` predictions
+  Fit and predict wrappers for `lrm` and `orm`
 
 - [`ordinalNet_wrapper()`](https://corybrunson.github.io/ordered/reference/ordinalNet_wrapper.md)
   [`predict_ordinalNet_wrapper()`](https://corybrunson.github.io/ordered/reference/ordinalNet_wrapper.md)
