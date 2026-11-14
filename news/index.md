@@ -11,6 +11,9 @@ patched. Previously, [`predict()`](https://rdrr.io/r/stats/predict.html)
 was used, which triggers S3 dispatch when **VGAM** is not attached but
 S4 dispatched when it is. Now `predictvglm()` is used instead.
 
+Additionally, `vglm` and `vgam` probability predictions now use the
+outcome levels as column names.
+
 #### refactor
 
 [`ordinal_reg()`](https://parsnip.tidymodels.org/reference/ordinal_reg.html)
@@ -80,7 +83,8 @@ The
 [`gen_additive_mod()`](https://parsnip.tidymodels.org/reference/gen_additive_mod.html)
 `vgam` engine additionally registers the `Thresh` and `parallel` engine
 arguments. These may be tuned using the `threshold_structure` and
-`parallel_reg` dials.
+`parallel_reg` dials. Accordingly, the `vgam` engine now defaults to
+non-parallel terms.
 
 Coordinated with [parsnip
 PR](https://github.com/tidymodels/parsnip/pull/1393)

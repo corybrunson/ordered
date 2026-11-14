@@ -49,6 +49,7 @@
 <div class="section level4">
 <h4 id="bug-fix-0-2-0">bug fix<a class="anchor" aria-label="anchor" href="#bug-fix-0-2-0"></a></h4>
 <p>A bug in the prediction of <code>vglm</code> models, and associated tests, were patched. Previously, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> was used, which triggers S3 dispatch when <strong>VGAM</strong> is not attached but S4 dispatched when it is. Now <code>predictvglm()</code> is used instead.</p>
+<p>Additionally, <code>vglm</code> and <code>vgam</code> probability predictions now use the outcome levels as column names.</p>
 </div>
 <div class="section level4">
 <h4 id="refactor-0-2-0">refactor<a class="anchor" aria-label="anchor" href="#refactor-0-2-0"></a></h4>
@@ -75,7 +76,7 @@
 <h4 id="threshold-structure-and-parallel-regression-model-arguments-0-2-0">threshold structure and parallel regression model arguments<a class="anchor" aria-label="anchor" href="#threshold-structure-and-parallel-regression-model-arguments-0-2-0"></a></h4>
 <p>The <code>threshold_structure</code> model argument for <code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code> controls what constraints, if any, are imposed on the ordered thresholds. It can be used by the <code>clm</code> and <code>vglm</code> engines, including with VGAM version 1.1-9.</p>
 <p>The <code>parallel_reg</code> model argument for <code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code> controls the parallel regression assumption with a logical value applied to all predictors. It can be used by the <code>clm</code>, <code>vglm</code>, and <code>ordinalNet</code> engines. Note that the default is to defer to the engine, and the <code>vglm</code> engine defaults to non-parallel terms.</p>
-<p>The <code><a href="https://parsnip.tidymodels.org/reference/gen_additive_mod.html" class="external-link">gen_additive_mod()</a></code> <code>vgam</code> engine additionally registers the <code>Thresh</code> and <code>parallel</code> engine arguments. These may be tuned using the <code>threshold_structure</code> and <code>parallel_reg</code> dials.</p>
+<p>The <code><a href="https://parsnip.tidymodels.org/reference/gen_additive_mod.html" class="external-link">gen_additive_mod()</a></code> <code>vgam</code> engine additionally registers the <code>Thresh</code> and <code>parallel</code> engine arguments. These may be tuned using the <code>threshold_structure</code> and <code>parallel_reg</code> dials. Accordingly, the <code>vgam</code> engine now defaults to non-parallel terms.</p>
 <p>Coordinated with <a href="https://github.com/tidymodels/parsnip/pull/1393" class="external-link">parsnip PR </a><a href="https://github.com/corybrunson/ordered/issues/1393" class="external-link">#1393</a> and <a href="https://github.com/tidymodels/dials/pull/462" class="external-link">dials PR </a><a href="https://github.com/corybrunson/ordered/issues/462" class="external-link">#462</a>.</p>
 </div>
 </div>
