@@ -15,8 +15,10 @@
 #' [`dials::values_threshold_structure`] to those accepted by [`VGAM::vglm()`]
 #' and [`VGAM::vgam()`].
 #'
-#' NB: Prediction with `vgam` models under VGAM version 1.1-9 does not yet
-#' support the use of smoothers `s()`.
+#' `vgam` prediction with `s()` terms requires a VGAM version later than 1.1-9.
+#' ordered does not yet support the `sm.os()` and `sm.ps()` smoother terms
+#' available to [`VGAM::vgam()`], which `VGAM` recommends instead of `s()` for
+#' certain G1-VGAMs; see [`VGAM::vgam()`] (`WARNING` section).
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.
 #' @param family The odds link function; either a standardized dial value

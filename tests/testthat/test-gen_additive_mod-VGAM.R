@@ -126,10 +126,8 @@ test_that("class prediction", {
   # for `s()` and friends in GAM formula
   suppressPackageStartupMessages(library(VGAM))
 
-  # FIXME: Errs with message "something went wrong in the C function 'vbfa'".
-  # Likely due to {VGAM} v1.1-9; if tests are conditioned on this version (as
-  # done now), then documentation should include a note about it.
   tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
+    set_engine("vgam", parallel = TRUE) |>
     fit(class ~ s(mol_weight) + volume + s(ClogP), data = caco_train)
 
   orig_pred <- VGAM::predict(
@@ -155,8 +153,8 @@ test_that("probability prediction", {
   # for `s()` and friends in GAM formula
   suppressPackageStartupMessages(library(VGAM))
 
-  # FIXME: See above.
   tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
+    set_engine("vgam", parallel = TRUE) |>
     fit(class ~ mol_weight + s(volume) + s(ClogP), data = caco_train)
 
   orig_pred <- VGAM::predict(
@@ -181,8 +179,8 @@ test_that("linear_pred prediction", {
   # for `s()` and friends in GAM formula
   suppressPackageStartupMessages(library(VGAM))
 
-  # FIXME: See above.
   tidy_fit <- gen_additive_mod(engine = "vgam", mode = "classification") |>
+    set_engine("vgam", parallel = TRUE) |>
     fit(class ~ s(mol_weight) + volume + s(ClogP), data = caco_train)
 
   orig_link <- predict(tidy_fit$fit, newdata = caco_train, type = "link")
