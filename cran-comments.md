@@ -15,16 +15,18 @@
 
 ## Check results
 
-* This is a new release so the NEWS is minimal.
-
 * The following words were flagged but are correctly spelled:
-  Galimberti (19:8)
-  Hanlon (16:14)
-  Hornung (22:8)
-  Maso (19:38)
-  Rathouz (16:26)
-  Soffritti (19:20)
-  Wurm (16:8)
+  Galimberti
+  Hanlon
+  Hornung
+  Maso
+  Rathouz
+  Soffritti
+  Wurm
+
+* One URL was marked as possibly invalid due to not being in canonical form for CRAN packages:
+  <https://cran.r-project.org/web/packages/ordinal/vignettes/clm_article.pdf>
+  (It is to a package vignette, not to the package.)
 
 * Occasionally my computers could not verify the current time.
 

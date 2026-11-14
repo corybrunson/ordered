@@ -8,6 +8,8 @@ A bug in the prediction of `vglm` models, and associated tests, were patched.
 Previously, `predict()` was used, which triggers S3 dispatch when **VGAM** is not attached but S4 dispatched when it is.
 Now `predictvglm()` is used instead.
 
+Additionally, `vglm` and `vgam` probability predictions now use the outcome levels as column names.
+
 ### refactor
 
 `ordinal_reg()` argument value translation has been moved from the `translate()` method in parsnip to engine wrappers in ordered, with the exception of penalty path assembly for `ordinalNet` and `glmnetcr`, in coordination with [parsnip PR #1393](https://github.com/tidymodels/parsnip/pull/1393).
@@ -63,6 +65,7 @@ Note that the default is to defer to the engine, and the `vglm` engine defaults 
 
 The `gen_additive_mod()` `vgam` engine additionally registers the `Thresh` and `parallel` engine arguments.
 These may be tuned using the `threshold_structure` and `parallel_reg` dials.
+Accordingly, the `vgam` engine now defaults to non-parallel terms.
 
 Coordinated with [parsnip PR #1393](https://github.com/tidymodels/parsnip/pull/1393) and [dials PR #462](https://github.com/tidymodels/dials/pull/462).
 
