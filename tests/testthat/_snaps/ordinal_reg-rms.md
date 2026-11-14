@@ -1,4 +1,4 @@
-# old {rms} version gates unsupported `orm` arguments
+# old {rms} version gates unsupported arguments (orm)
 
     Code
       fit(tidy_spec, Sat ~ Type + Cont, data = house_sub, case_weights = frequency_weights(
@@ -26,7 +26,7 @@
     Condition
       Warning:
       The `penalty` argument was set to 0, which is not supported by rms "6.9.0" for the "orm" engine.
-      i The argument will be omitted, giving an unpenalized fit.
+      i The argument will be omitted.
 
 # interfaces agree (lrm)
 
