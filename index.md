@@ -10,7 +10,7 @@ combinations in the parsnip package that can be used, this package adds:
 - cumulative link ordinal regression via
   [`ordinal::clm()`](https://rdrr.io/pkg/ordinal/man/clm.html)
   ([Christensen,
-  2023](https://cran.r-project.org/web/packages/ordinal/vignettes/clm_article.pdf))
+  2023](https://cran.r-project.org/package=ordinal/vignettes/clm_article.pdf))
 - generalized linear and generalized additive ordinal regression models
   of cumulative link, adjacent categories, continuation ratio, and
   stopping ratio families via
