@@ -24,10 +24,6 @@
   Soffritti
   Wurm
 
-* One URL was marked as possibly invalid due to not being in canonical form for CRAN packages:
-  <https://cran.r-project.org/web/packages/ordinal/vignettes/clm_article.pdf>
-  (It is to a package vignette, not to the package.)
-
 * Occasionally my computers could not verify the current time.
 
 No ERRORs, WARNINGs, or other NOTEs obtained.
