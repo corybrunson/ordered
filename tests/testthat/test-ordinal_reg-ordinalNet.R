@@ -7,7 +7,8 @@ test_that("model object (penalty path from original to tidy)", {
 
   # https://stackoverflow.com/a/4569239
   house_vars <- model.matrix(
-    Sat ~ Type + Infl + Cont + 0, data = house_sub,
+    Sat ~ Type + Infl + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
   )
 
@@ -17,7 +18,9 @@ test_that("model object (penalty path from original to tidy)", {
   orig_fit <- ordinalNet::ordinalNet(
     house_vars,
     y = house_sub$Sat,
-    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
+    nLambda = 120,
+    lambdaMinRatio = .001,
+    includeLambda0 = TRUE
   )
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
@@ -37,8 +40,11 @@ test_that("model object (penalty path from original to tidy)", {
   orig_fit <- ordinalNet::ordinalNet(
     house_vars,
     y = house_sub$Sat,
-    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE,
-    alpha = .5, family = "sratio"
+    nLambda = 120,
+    lambdaMinRatio = .001,
+    includeLambda0 = TRUE,
+    alpha = .5,
+    family = "sratio"
   )
 
   tidy_spec <-
@@ -62,7 +68,8 @@ test_that("model object (penalty path from tidy to original)", {
 
   # https://stackoverflow.com/a/4569239
   house_vars <- model.matrix(
-    Sat ~ Type + Infl + Cont + 0, data = house_sub,
+    Sat ~ Type + Infl + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
   )
 
@@ -100,7 +107,8 @@ test_that("model object (penalty path from tidy to original)", {
     house_vars,
     y = house_sub$Sat,
     lambdaVals = tidy_fit$fit$lambdaVals,
-    alpha = .5, family = "sratio"
+    alpha = .5,
+    family = "sratio"
   )
 
   # FIXME: Why are these not equal? (The penalty paths are equal.)
@@ -126,12 +134,12 @@ test_that("case weights", {
       Medium = ifelse(Sat == "Medium", Freq, 0L),
       High = ifelse(Sat == "High", Freq, 0L)
     ) |>
-    subset(select = -c(Sat, Freq)) ->
-    house_nums
+    subset(select = -c(Sat, Freq)) -> house_nums
 
   house_vars <- house_nums[, 1:3]
   house_vars <- model.matrix(
-    ~ Type + Infl + Cont + 0, data = house_vars,
+    ~ Type + Infl + Cont + 0,
+    data = house_vars,
     contrasts.arg = lapply(house_vars, contrasts, contrasts = FALSE)
   )
 
@@ -147,7 +155,9 @@ test_that("case weights", {
     house_vars,
     y = house_resp,
     # lambdaVals = .001
-    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
+    nLambda = 120,
+    lambdaMinRatio = .001,
+    includeLambda0 = TRUE
   )
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
@@ -174,8 +184,11 @@ test_that("case weights", {
     house_vars,
     y = house_resp,
     # lambdaVals = .001
-    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE,
-    alpha = .5, family = "sratio"
+    nLambda = 120,
+    lambdaMinRatio = .001,
+    includeLambda0 = TRUE,
+    alpha = .5,
+    family = "sratio"
   )
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
@@ -214,12 +227,12 @@ test_that("multinomial formulation", {
       direction = "wide",
       idvar = c("Infl", "Type", "Cont"),
       timevar = "Sat"
-    ) ->
-    house_agg
+    ) -> house_agg
 
   house_vars <- house_agg[, 1:3]
   house_vars <- model.matrix(
-    ~ Type + Infl + Cont + 0, data = house_vars,
+    ~ Type + Infl + Cont + 0,
+    data = house_vars,
     contrasts.arg = lapply(house_vars, contrasts, contrasts = FALSE)
   )
 
@@ -232,7 +245,9 @@ test_that("multinomial formulation", {
   orig_fit <- ordinalNet::ordinalNet(
     house_vars,
     y = house_resp,
-    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
+    nLambda = 120,
+    lambdaMinRatio = .001,
+    includeLambda0 = TRUE
   )
 
   tidy_spec <- ordinal_reg(penalty = 0.01) |>
@@ -261,7 +276,8 @@ test_that("class prediction", {
 
   # NB: `newx` must contain exactly those predictors used in the fit.
   house_vars <- model.matrix(
-    Sat ~ Type + Cont + 0, data = house_sub,
+    Sat ~ Type + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
 
@@ -286,7 +302,8 @@ test_that("multiple prediction structure", {
     fit(Sat ~ Type + Cont, data = house_sub)
 
   house_vars <- model.matrix(
-    Sat ~ Type + Cont + 0, data = house_sub,
+    Sat ~ Type + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 3:4], contrasts, contrasts = FALSE)
   )
 
@@ -350,7 +367,10 @@ test_that("multiple prediction values match sequential prediction values", {
     tidyr::unnest(cols = c(.pred))
   for (i in seq_along(pen_vals)) {
     single_pred <- predict(
-      tidy_fit, house_sub, type = "class", penalty = pen_vals[i]
+      tidy_fit,
+      house_sub,
+      type = "class",
+      penalty = pen_vals[i]
     )
     expect_equal(
       multi_pred |>
@@ -367,7 +387,10 @@ test_that("multiple prediction values match sequential prediction values", {
     tidyr::unnest(cols = c(.pred))
   for (i in seq_along(pen_vals)) {
     single_pred <- predict(
-      tidy_fit, house_sub, type = "prob", penalty = pen_vals[i]
+      tidy_fit,
+      house_sub,
+      type = "prob",
+      penalty = pen_vals[i]
     )
     expect_equal(
       multi_pred |>
@@ -386,10 +409,11 @@ test_that("linear_pred prediction", {
   house_sub <- get_house()$sub
 
   tidy_fit <- ordinal_reg(penalty = 0.01, engine = "ordinalNet") |>
-  fit(Sat ~ Type + Infl + Cont, data = house_sub)
+    fit(Sat ~ Type + Infl + Cont, data = house_sub)
 
   house_vars <- model.matrix(
-    Sat ~ Type + Infl + Cont + 0, data = house_sub,
+    Sat ~ Type + Infl + Cont + 0,
+    data = house_sub,
     contrasts.arg = lapply(house_sub[, 2:4], contrasts, contrasts = FALSE)
   )
   orig_link <- predict(tidy_fit$fit, newx = house_vars, type = "link")
@@ -437,17 +461,18 @@ test_that("arguments agree", {
     ordinal_reg(
       penalty = 0.1,
       mixture = .25,
-      ordinal_link = "cloglog", odds_link = "stopping_ratio"
+      ordinal_link = "cloglog",
+      odds_link = "stopping_ratio"
     ) |>
     set_mode("classification") |>
-    set_engine("ordinalNet", path_values = 10 ^ seq(-6, -1))
+    set_engine("ordinalNet", path_values = 10^seq(-6, -1))
   expect_snapshot(onet_arg_spec |> translate())
 
   expect_snapshot({
     set.seed(13)
     onet_arg_fit <- fit(onet_arg_spec, class ~ ., data = caco_train)
   })
-  expect_equal(onet_arg_fit$fit$args$lambdaVals, 10 ^ seq(-6, -1))
+  expect_equal(onet_arg_fit$fit$args$lambdaVals, 10^seq(-6, -1))
   expect_equal(onet_arg_fit$fit$args$alpha, .25)
   expect_equal(onet_arg_fit$fit$args$link, "cloglog")
   expect_equal(onet_arg_fit$fit$args$family, "sratio")
@@ -459,7 +484,8 @@ house_sub <- get_house()$sub |>
   dplyr::filter(Type == "Apartment") |>
   dplyr::select(-Type)
 house_vars <- model.matrix(
-  Sat ~ Infl + Cont + 0, data = house_sub,
+  Sat ~ Infl + Cont + 0,
+  data = house_sub,
   contrasts.arg = lapply(house_sub[, 2:3], contrasts, contrasts = FALSE)
 )
 
@@ -473,7 +499,9 @@ test_that("parallel regression argument handles logicals", {
   orig_fit <- ordinalNet::ordinalNet(
     house_vars,
     y = house_sub$Sat,
-    nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE
+    nLambda = 120,
+    lambdaMinRatio = .001,
+    includeLambda0 = TRUE
   )
 
   set.seed(seed)
@@ -496,8 +524,11 @@ test_that("parallel regression argument handles logicals", {
     orig_fit <- ordinalNet::ordinalNet(
       house_vars,
       y = house_sub$Sat,
-      nLambda = 120, lambdaMinRatio = .001, includeLambda0 = TRUE,
-      nonparallelTerms = TRUE, parallelTerms = FALSE
+      nLambda = 120,
+      lambdaMinRatio = .001,
+      includeLambda0 = TRUE,
+      nonparallelTerms = TRUE,
+      parallelTerms = FALSE
     ),
     "nonparallelTerms"
   )
@@ -542,8 +573,10 @@ test_that("ordinalNet wrapper translates standardized argument values", {
   x <- matrix(rnorm(100), ncol = 2)
   y <- factor(rep(1:3, length.out = 50), ordered = TRUE)
   fits <- suppressWarnings(ordinalNet_wrapper(
-    x, y,
-    family = "cumulative_link", link = "cauchit",
+    x,
+    y,
+    family = "cumulative_link",
+    link = "cauchit",
     parallel_reg = FALSE
   ))
   expect_equal(fits$args$family, "cumulative")
@@ -553,8 +586,10 @@ test_that("ordinalNet wrapper translates standardized argument values", {
 
   # native values and `parallel_reg = NULL` leave the defaults unchanged
   native <- ordinalNet_wrapper(
-    x, y,
-    family = "sratio", link = "logit",
+    x,
+    y,
+    family = "sratio",
+    link = "logit",
     parallel_reg = NULL
   )
   expect_equal(native$args$family, "sratio")

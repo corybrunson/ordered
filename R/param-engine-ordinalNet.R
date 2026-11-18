@@ -32,8 +32,8 @@
 #' @export
 #' @rdname ordinalNet_parameters
 parallel_penalty_factor <- function(
-    range = c(-Inf, Inf),
-    trans = scales::transform_log10()
+  range = c(-Inf, Inf),
+  trans = scales::transform_log10()
 ) {
   dials::new_quant_param(
     type = "double",

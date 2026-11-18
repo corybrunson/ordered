@@ -12,7 +12,6 @@
 # `ordinalForest::ordfor` components
 
 make_rand_forest_ordinalForest <- function() {
-
   parsnip::set_model_engine("rand_forest", "classification", "ordinalForest")
   parsnip::set_dependency(
     "rand_forest",
@@ -113,11 +112,10 @@ make_rand_forest_ordinalForest <- function() {
       data = c(x = "x", y = "y"),
       protect = c("x", "y"),
       func = c(pkg = "ordered", fun = "ordinalForest_wrapper"),
-      defaults =
-        list(
-          num.threads = 1,
-          perffunction = "probability"
-        )
+      defaults = list(
+        num.threads = 1,
+        perffunction = "probability"
+      )
     )
   )
 
@@ -142,11 +140,10 @@ make_rand_forest_ordinalForest <- function() {
       pre = NULL,
       post = function(x, object) x$ypred,
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data)
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data)
+      )
     )
   )
 
@@ -175,11 +172,10 @@ make_rand_forest_ordinalForest <- function() {
         tibble::as_tibble(x)
       },
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data)
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data)
+      )
     )
   )
 }
@@ -188,7 +184,6 @@ make_rand_forest_ordinalForest <- function() {
 # `orf::orf` components
 
 make_rand_forest_orf <- function() {
-
   parsnip::set_model_engine("rand_forest", "classification", "orf")
   parsnip::set_dependency(
     "rand_forest",
@@ -290,12 +285,11 @@ make_rand_forest_orf <- function() {
       pre = NULL,
       post = orf_class_post,
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "class"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "class"
+      )
     )
   )
 
@@ -308,12 +302,11 @@ make_rand_forest_orf <- function() {
       pre = NULL,
       post = orf_prob_post,
       func = c(fun = "predict"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "probs"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "probs"
+      )
     )
   )
 }
