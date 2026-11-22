@@ -1,6 +1,15 @@
 # Changelog
 
+## ordered 0.2.1
+
+Despite seed-setting, some `ordinalNet` model fits (on some systems)
+initialize penalty paths differently. This patch modifies two unit tests
+of these fits by omitting metadata equality checks and reducing the
+precision of path comparisons.
+
 ## ordered 0.2.0
+
+CRAN release: 2026-11-17
 
 ### maintenance
 
