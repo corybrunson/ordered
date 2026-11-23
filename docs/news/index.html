@@ -5,7 +5,7 @@
       fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
     }
   };
-</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Changelog"></head><body>
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet"><script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet"><link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet"><script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Changelog"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ordered</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,10 +43,54 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.1" id="ordered-021">ordered 0.2.1<a class="anchor" aria-label="anchor" href="#ordered-021"></a></h2><p class="text-muted">CRAN release: 2026-11-23</p>
+<p>Despite seed-setting, some <code>ordinalNet</code> model fits (on some systems) initialize penalty paths differently. This patch modifies two unit tests of these fits by omitting metadata equality checks and reducing the precision of path comparisons.</p>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="ordered-020">ordered 0.2.0<a class="anchor" aria-label="anchor" href="#ordered-020"></a></h2><p class="text-muted">CRAN release: 2026-11-17</p>
+<div class="section level3">
+<h3 id="maintenance-0-2-0">maintenance<a class="anchor" aria-label="anchor" href="#maintenance-0-2-0"></a></h3>
+<div class="section level4">
+<h4 id="bug-fix-0-2-0">bug fix<a class="anchor" aria-label="anchor" href="#bug-fix-0-2-0"></a></h4>
+<p>A bug in the prediction of <code>vglm</code> models, and associated tests, were patched. Previously, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> was used, which triggers S3 dispatch when <strong>VGAM</strong> is not attached but S4 dispatched when it is. Now <code>predictvglm()</code> is used instead.</p>
+<p>Additionally, <code>vglm</code> and <code>vgam</code> probability predictions now use the outcome levels as column names.</p>
+</div>
+<div class="section level4">
+<h4 id="refactor-0-2-0">refactor<a class="anchor" aria-label="anchor" href="#refactor-0-2-0"></a></h4>
+<p><code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code> argument value translation has been moved from the <code><a href="https://parsnip.tidymodels.org/reference/translate.html" class="external-link">translate()</a></code> method in parsnip to engine wrappers in ordered, with the exception of penalty path assembly for <code>ordinalNet</code> and <code>glmnetcr</code>, in coordination with <a href="https://github.com/tidymodels/parsnip/pull/1393" class="external-link">parsnip PR </a><a href="https://github.com/corybrunson/ordered/issues/1393" class="external-link">#1393</a>.</p>
+</div>
+<div class="section level4">
+<h4 id="penalty-paths-breaking-change-0-2-0">penalty paths (breaking change)<a class="anchor" aria-label="anchor" href="#penalty-paths-breaking-change-0-2-0"></a></h4>
+<p>Penalty path arguments in <code>ordinalNet</code> are no longer silently internally modified; for example, the user must specify <code>includeLambda0 = TRUE</code> if they want the path to include zero. Extrapolative predictions, which err in <code>ordinalNet</code>, are overridden to use path endpoint values for consistency with <code>glmnet</code> and <code>glmnetcr</code>.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="new-features-0-2-0">new features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h3>
+<div class="section level4">
+<h4 id="additional-ordinal-regression-and-random-forest-engines-0-2-0">additional ordinal regression and random forest engines<a class="anchor" aria-label="anchor" href="#additional-ordinal-regression-and-random-forest-engines-0-2-0"></a></h4>
+<p>This version introduces source code and unit tests for new engines and dials: * <code>clm</code> from the <strong>ordinal</strong> package - cumulative link ordinal regression - fit wrapper - additional <code>ordinal_link</code> dial values * <code>lrm</code> and <code>orm</code> from the <strong>rms</strong> package - regularized cumulative probability ordinal regression - shared prediction wrapper * <code>glmnetcr</code> from the <strong>glmnetcr</strong> package - elastic net regularized continuation ratio models - penalty paths handled as with <code>ordinalNet</code> - prediction wrapper * <code>orf</code> from the <strong>orf</strong> package - conditional probability ordered random forests - fit wrapper - dials for <code>sample.fraction</code>, <code>honesty</code>, and <code>honesty.fraction</code> arguments * <code>ordinalNet</code> from the <strong>ordinalNet</strong> package (pre-existing engine) - dial for the <code>parallelPenaltyFactor</code> argument</p>
+<p>Coordinated with <a href="https://github.com/tidymodels/parsnip/pull/1384" class="external-link">parsnip PR </a><a href="https://github.com/corybrunson/ordered/issues/1384" class="external-link">#1384</a>.</p>
+</div>
+<div class="section level4">
+<h4 id="linear-prediction-type-0-2-0">linear prediction type<a class="anchor" aria-label="anchor" href="#linear-prediction-type-0-2-0"></a></h4>
+<p>Linear predictions are enabled for the <code>clm</code>, <code>lrm</code>, <code>orm</code>, <code>vglm</code>, and <code>ordinalNet</code> ordinal regression engines and for the <code>vgam</code> generalized additive model engine. They consistently return a single column of linear predictors (without threshold contributions).</p>
+<p>Coordinated with <a href="https://github.com/tidymodels/parsnip/pull/1391" class="external-link">parsnip PR </a><a href="https://github.com/corybrunson/ordered/issues/1391" class="external-link">#1391</a>.</p>
+</div>
+<div class="section level4">
+<h4 id="threshold-structure-and-parallel-regression-model-arguments-0-2-0">threshold structure and parallel regression model arguments<a class="anchor" aria-label="anchor" href="#threshold-structure-and-parallel-regression-model-arguments-0-2-0"></a></h4>
+<p>The <code>threshold_structure</code> model argument for <code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code> controls what constraints, if any, are imposed on the ordered thresholds. It can be used by the <code>clm</code> and <code>vglm</code> engines, including with VGAM version 1.1-9.</p>
+<p>The <code>parallel_reg</code> model argument for <code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code> controls the parallel regression assumption with a logical value applied to all predictors. It can be used by the <code>clm</code>, <code>vglm</code>, and <code>ordinalNet</code> engines. Note that the default is to defer to the engine, and the <code>vglm</code> engine defaults to non-parallel terms.</p>
+<p>The <code><a href="https://parsnip.tidymodels.org/reference/gen_additive_mod.html" class="external-link">gen_additive_mod()</a></code> <code>vgam</code> engine additionally registers the <code>Thresh</code> and <code>parallel</code> engine arguments. These may be tuned using the <code>threshold_structure</code> and <code>parallel_reg</code> dials. Accordingly, the <code>vgam</code> engine now defaults to non-parallel terms.</p>
+<p>Coordinated with <a href="https://github.com/tidymodels/parsnip/pull/1393" class="external-link">parsnip PR </a><a href="https://github.com/corybrunson/ordered/issues/1393" class="external-link">#1393</a> and <a href="https://github.com/tidymodels/dials/pull/462" class="external-link">dials PR </a><a href="https://github.com/corybrunson/ordered/issues/462" class="external-link">#462</a>.</p>
+</div>
+</div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="ordered-010">ordered 0.1.0<a class="anchor" aria-label="anchor" href="#ordered-010"></a></h2><p class="text-muted">CRAN release: 2026-04-21</p>
 <p>Initial CRAN submission.</p>
 </div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
@@ -54,7 +98,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

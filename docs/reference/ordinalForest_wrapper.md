@@ -1,7 +1,7 @@
-# A wrapper for `ordinalForest`
+# Fit wrapper for `ordinalForest`
 
 A wrapper is needed since they have a non-standard model interface that
-required the data set and the column name (character string) for the
+requires the data set and the column name (character string) for the
 outcome.
 
 ## Usage
@@ -22,7 +22,7 @@ ordinalForest_wrapper(x, y, ...)
 
 - ...:
 
-  Arguments to pass to the underlying model function.
+  Additional arguments to pass.
 
 ## Value
 

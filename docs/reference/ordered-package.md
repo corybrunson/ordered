@@ -22,6 +22,9 @@ Useful links:
 
 Authors:
 
+- Jason Cory Brunson <cornelioid@gmail.com>
+  ([ORCID](https://orcid.org/0000-0003-3126-9494))
+
 - Max Kuhn <max@posit.co>
   ([ORCID](https://orcid.org/0000-0003-2402-136X))
 
@@ -58,25 +61,24 @@ if (rlang::is_installed("ordinalForest")) {
 
 fit_orf <- rand_forest(mode = "classification") %>%
   set_engine("ordinalForest") %>%
-  set_args(nsets = 50, ntreefinal = 100, perffunction = "probability") %>%
+  set_args(nsets = 50, trees = 100, perffunction = "probability") %>%
   fit(Sat ~ Infl + Type + Cont, data = house_train)
 predict(fit_orf, house_test, type = "prob")
 
 }
 }
-#> Warning: The argument `ntreefinal` cannot be manually modified and was removed.
 #> # A tibble: 40 × 3
 #>    .pred_Low .pred_Medium .pred_High
 #>        <dbl>        <dbl>      <dbl>
-#>  1     0.123        0.343      0.534
-#>  2     0.514        0.193      0.292
-#>  3     0.422        0.328      0.250
-#>  4     0.514        0.193      0.292
-#>  5     0.232        0.276      0.492
-#>  6     0.436        0.328      0.236
-#>  7     0.155        0.412      0.434
-#>  8     0.239        0.218      0.544
-#>  9     0.436        0.328      0.236
-#> 10     0.123        0.343      0.534
+#>  1     0.141        0.345      0.514
+#>  2     0.520        0.190      0.290
+#>  3     0.423        0.315      0.262
+#>  4     0.520        0.190      0.290
+#>  5     0.233        0.282      0.486
+#>  6     0.446        0.307      0.247
+#>  7     0.165        0.398      0.437
+#>  8     0.270        0.198      0.532
+#>  9     0.446        0.307      0.247
+#> 10     0.141        0.345      0.514
 #> # ℹ 30 more rows
 ```

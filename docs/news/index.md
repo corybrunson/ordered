@@ -1,5 +1,108 @@
 # Changelog
 
+## ordered 0.2.1
+
+CRAN release: 2026-11-23
+
+Despite seed-setting, some `ordinalNet` model fits (on some systems)
+initialize penalty paths differently. This patch modifies two unit tests
+of these fits by omitting metadata equality checks and reducing the
+precision of path comparisons.
+
+## ordered 0.2.0
+
+CRAN release: 2026-11-17
+
+### maintenance
+
+#### bug fix
+
+A bug in the prediction of `vglm` models, and associated tests, were
+patched. Previously, [`predict()`](https://rdrr.io/r/stats/predict.html)
+was used, which triggers S3 dispatch when **VGAM** is not attached but
+S4 dispatched when it is. Now `predictvglm()` is used instead.
+
+Additionally, `vglm` and `vgam` probability predictions now use the
+outcome levels as column names.
+
+#### refactor
+
+[`ordinal_reg()`](https://parsnip.tidymodels.org/reference/ordinal_reg.html)
+argument value translation has been moved from the
+[`translate()`](https://parsnip.tidymodels.org/reference/translate.html)
+method in parsnip to engine wrappers in ordered, with the exception of
+penalty path assembly for `ordinalNet` and `glmnetcr`, in coordination
+with [parsnip PR](https://github.com/tidymodels/parsnip/pull/1393)
+[\#1393](https://github.com/corybrunson/ordered/issues/1393).
+
+#### penalty paths (breaking change)
+
+Penalty path arguments in `ordinalNet` are no longer silently internally
+modified; for example, the user must specify `includeLambda0 = TRUE` if
+they want the path to include zero. Extrapolative predictions, which err
+in `ordinalNet`, are overridden to use path endpoint values for
+consistency with `glmnet` and `glmnetcr`.
+
+### new features
+
+#### additional ordinal regression and random forest engines
+
+This version introduces source code and unit tests for new engines and
+dials: \* `clm` from the **ordinal** package - cumulative link ordinal
+regression - fit wrapper - additional `ordinal_link` dial values \*
+`lrm` and `orm` from the **rms** package - regularized cumulative
+probability ordinal regression - shared prediction wrapper \* `glmnetcr`
+from the **glmnetcr** package - elastic net regularized continuation
+ratio models - penalty paths handled as with `ordinalNet` - prediction
+wrapper \* `orf` from the **orf** package - conditional probability
+ordered random forests - fit wrapper - dials for `sample.fraction`,
+`honesty`, and `honesty.fraction` arguments \* `ordinalNet` from the
+**ordinalNet** package (pre-existing engine) - dial for the
+`parallelPenaltyFactor` argument
+
+Coordinated with [parsnip
+PR](https://github.com/tidymodels/parsnip/pull/1384)
+[\#1384](https://github.com/corybrunson/ordered/issues/1384).
+
+#### linear prediction type
+
+Linear predictions are enabled for the `clm`, `lrm`, `orm`, `vglm`, and
+`ordinalNet` ordinal regression engines and for the `vgam` generalized
+additive model engine. They consistently return a single column of
+linear predictors (without threshold contributions).
+
+Coordinated with [parsnip
+PR](https://github.com/tidymodels/parsnip/pull/1391)
+[\#1391](https://github.com/corybrunson/ordered/issues/1391).
+
+#### threshold structure and parallel regression model arguments
+
+The `threshold_structure` model argument for
+[`ordinal_reg()`](https://parsnip.tidymodels.org/reference/ordinal_reg.html)
+controls what constraints, if any, are imposed on the ordered
+thresholds. It can be used by the `clm` and `vglm` engines, including
+with VGAM version 1.1-9.
+
+The `parallel_reg` model argument for
+[`ordinal_reg()`](https://parsnip.tidymodels.org/reference/ordinal_reg.html)
+controls the parallel regression assumption with a logical value applied
+to all predictors. It can be used by the `clm`, `vglm`, and `ordinalNet`
+engines. Note that the default is to defer to the engine, and the `vglm`
+engine defaults to non-parallel terms.
+
+The
+[`gen_additive_mod()`](https://parsnip.tidymodels.org/reference/gen_additive_mod.html)
+`vgam` engine additionally registers the `Thresh` and `parallel` engine
+arguments. These may be tuned using the `threshold_structure` and
+`parallel_reg` dials. Accordingly, the `vgam` engine now defaults to
+non-parallel terms.
+
+Coordinated with [parsnip
+PR](https://github.com/tidymodels/parsnip/pull/1393)
+[\#1393](https://github.com/corybrunson/ordered/issues/1393) and [dials
+PR](https://github.com/tidymodels/dials/pull/462)
+[\#462](https://github.com/corybrunson/ordered/issues/462).
+
 ## ordered 0.1.0
 
 CRAN release: 2026-04-21

@@ -13,8 +13,8 @@
     }
   };
 </script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="parsnip Engines and Wrappers for Ordinal Classification Models">
 <meta name="description" content="Bindings, methods, and tuners for using ordinal classification models with the parsnip and dials packages. These include the regularized elastic net ordinal regression of Wurm, Hanlon, and Rathouz (2021) &lt;doi:10.18637/jss.v099.i06&gt; in ordinalNet, the ordinal classification trees of Galimberti, Soffritti, and Di Maso (2012) &lt;doi:10.18637/jss.v047.i10&gt; in rpartScore, and the latent variable ordinal forests of Hornung (2020) &lt;doi:10.1007/s00357-018-9302-x&gt; in ordinalForest.">
@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ordered</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,78 +63,216 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><code>ordered</code> is a <a href="https://parsnip.tidymodels.org/" class="external-link">parsnip</a> extension to enable additional classification models for ordinal outcomes (e.g., “low”, “medium”, “high”). While there are several model/engine combinations in the parsnip package that can be used, this package adds:</p>
+<p>ordered is a <a href="https://parsnip.tidymodels.org/" class="external-link">parsnip</a> extension to enable additional classification models for ordinal outcomes (e.g., “low”, “medium”, “high”). While there are several model/engine combinations in the parsnip package that can be used, this package adds:</p>
 <ul>
 <li>cumulative link (cumulative logit) ordinal regression via <code><a href="https://rdrr.io/pkg/MASS/man/polr.html" class="external-link">MASS::polr()</a></code>
 </li>
+<li>cumulative link ordinal regression via <code><a href="https://rdrr.io/pkg/ordinal/man/clm.html" class="external-link">ordinal::clm()</a></code> (<a href="https://cran.r-project.org/package=ordinal/vignettes/clm_article.pdf" class="external-link">Christensen, 2023</a>)</li>
 <li>generalized linear and generalized additive ordinal regression models of cumulative link, adjacent categories, continuation ratio, and stopping ratio families via <code><a href="https://rdrr.io/pkg/VGAM/man/vglm.html" class="external-link">VGAM::vglm()</a></code> and <code><a href="https://rdrr.io/pkg/VGAM/man/vgam.html" class="external-link">VGAM::vgam()</a></code> (<a href="https://doi.org/10.18637/jss.v032.i10" class="external-link">Yee, 2015</a>)</li>
 <li>regularized elastic net ordinal regression models of cumulative link, adjacent categories, continuation ratio, and stopping ratio families via <code><a href="https://rdrr.io/pkg/ordinalNet/man/ordinalNet.html" class="external-link">ordinalNet::ordinalNet()</a></code> (<a href="https://doi.org/10.18637/jss.v099.i06" class="external-link">Wurm, Hanlon, and Rathouz, 2021</a>)</li>
+<li>regularized cumulative probability ordinal regression models via <code><a href="https://rdrr.io/pkg/rms/man/lrm.html" class="external-link">rms::lrm()</a></code> and <code><a href="https://rdrr.io/pkg/rms/man/orm.html" class="external-link">rms::orm()</a></code> (<a href="https://doi.org/10.1007/978-3-319-19425-7" class="external-link">Harrell, 2015</a>)</li>
+<li>regularized elastic net continuation ratio ordinal regression via <code><a href="https://rdrr.io/pkg/glmnetcr/man/glmnetcr.html" class="external-link">glmnetcr::glmnetcr()</a></code> (<a href="https://doi.org/10.1002/sim.4484" class="external-link">Archer and Williams, 2012</a>)</li>
 <li>ordinal classification trees via <code><a href="https://rdrr.io/pkg/rpartScore/man/rpartScore.html" class="external-link">rpartScore::rpartScore()</a></code> (<a href="https://doi.org/10.18637/jss.v047.i10" class="external-link">Galimberti, Soffritti, and Di Maso, 2012</a>)</li>
 <li>latent variable ordinal forests via <code><a href="https://rdrr.io/pkg/ordinalForest/man/ordfor.html" class="external-link">ordinalForest::ordfor()</a></code> (<a href="https://doi.org/10.1007/s00357-018-9302-x" class="external-link">Hornung, 2020</a>)</li>
+<li>conditional probability ordered forests via <code><a href="https://rdrr.io/pkg/orf/man/orf.html" class="external-link">orf::orf()</a></code> (<a href="https://doi.org/10.1007/s00181-024-02646-4" class="external-link">Lechner and Okasa, 2025</a>)</li>
 </ul>
-<p>More will be added.</p>
-<p>There are some existing features in tidymodels packages that are useful for ordinal outcomes:</p>
+<p>Some features in other tidymodels packages are useful for ordinal outcomes:</p>
 <ul>
-<li>The <a href="https://cran.r-project.org/package=partykit" class="external-link">partykit</a> engines for <code><a href="https://parsnip.tidymodels.org/reference/decision_tree.html" class="external-link">parsnip::decision_tree()</a></code> and <code><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">parsnip::rand_forest()</a></code> use the ordered nature of the factors to train the model.</li>
-<li>The yardstick package has <code><a href="https://yardstick.tidymodels.org/reference/kap.html" class="external-link">yardstick::kap()</a></code> for weighted and unweighted Kappa statistics (the former being of more interest). Also, <code><a href="https://yardstick.tidymodels.org/reference/classification_cost.html" class="external-link">yardstick::classification_cost()</a></code> can utilize more complex cost structures and uses the class probabilities for estimation.</li>
+<li>The <a href="https://cran.r-project.org/package=partykit" class="external-link">partykit</a> engines for <code><a href="https://parsnip.tidymodels.org/reference/decision_tree.html" class="external-link">parsnip::decision_tree()</a></code> and <code><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">parsnip::rand_forest()</a></code>, provided by <a href="https://bonsai.tidymodels.org/" class="external-link">bonsai</a>, use the ordinal nature of ordered factors to train the model, yielding different fits than for unordered factors.</li>
+<li>The <a href="https://yardstick.tidymodels.org/" class="external-link">yardstick</a> package has <code><a href="https://yardstick.tidymodels.org/reference/kap.html" class="external-link">yardstick::kap()</a></code> for weighted and unweighted Kappa statistics (the former being of more interest). Also, <code><a href="https://yardstick.tidymodels.org/reference/classification_cost.html" class="external-link">yardstick::classification_cost()</a></code> can utilize more complex cost structures and uses the class probabilities for estimation.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of ordered like so:</p>
+<p>You can install the latest released version of ordered from CRAN via</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"corybrunson/ordered"</span>, dependencies <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p>Currently, ordered relies on engine registration in a parsnip fork and dial registration in the current development version:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"ordered"</span><span class="op">)</span></span></code></pre></div>
+<p>and the development version of ordered from GitHub via</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"corybrunson/parsnip@ordered"</span>, dependencies <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"tidymodels/dials"</span>, dependencies <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"corybrunson/ordered"</span><span class="op">)</span></span></code></pre></div>
+<p>or</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"corybrunson/ordered"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="available-models-engines-and-prediction-types">Available models, engines, and prediction types<a class="anchor" aria-label="anchor" href="#available-models-engines-and-prediction-types"></a>
 </h2>
-<p>ordered provides new engines for several models, including all engines for <code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code>, as summarized in the table. Currently only predictions of <code>type = "class"</code> and <code>type = "prob"</code> are supported.</p>
+<p>ordered provides new engines for several models, including all engines for <code><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg()</a></code>:</p>
 <table class="table">
-<thead><tr class="header">
+<thead><tr>
 <th align="left">model</th>
 <th align="left">engine</th>
 <th align="left">class</th>
 <th align="left">prob</th>
+<th align="left">linear_pred</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td align="left"><code>decision_tree</code></td>
 <td align="left"><code>rpartScore</code></td>
 <td align="left">✔</td>
 <td align="left">✖</td>
+<td align="left">✖</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left"><code>gen_additive_mod</code></td>
 <td align="left"><code>vgam</code></td>
 <td align="left">✔</td>
 <td align="left">✔</td>
+<td align="left">✔</td>
 </tr>
-<tr class="odd">
+<tr>
 <td align="left"><code>ordinal_reg</code></td>
 <td align="left"><code>polr</code></td>
 <td align="left">✔</td>
 <td align="left">✔</td>
+<td align="left">✖</td>
 </tr>
-<tr class="even">
+<tr>
 <td align="left"><code>ordinal_reg</code></td>
-<td align="left"><code>ordinalNet</code></td>
+<td align="left"><code>clm</code></td>
+<td align="left">✔</td>
 <td align="left">✔</td>
 <td align="left">✔</td>
 </tr>
-<tr class="odd">
+<tr>
+<td align="left"><code>ordinal_reg</code></td>
+<td align="left"><code>lrm</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+</tr>
+<tr>
+<td align="left"><code>ordinal_reg</code></td>
+<td align="left"><code>orm</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+</tr>
+<tr>
 <td align="left"><code>ordinal_reg</code></td>
 <td align="left"><code>vglm</code></td>
 <td align="left">✔</td>
 <td align="left">✔</td>
+<td align="left">✔</td>
 </tr>
-<tr class="even">
+<tr>
+<td align="left"><code>ordinal_reg</code></td>
+<td align="left"><code>ordinalNet</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+</tr>
+<tr>
+<td align="left"><code>ordinal_reg</code></td>
+<td align="left"><code>glmnetcr</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+</tr>
+<tr>
 <td align="left"><code>rand_forest</code></td>
 <td align="left"><code>ordinalForest</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>rand_forest</code></td>
+<td align="left"><code>orf</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="tunable-model-arguments">Tunable model arguments<a class="anchor" aria-label="anchor" href="#tunable-model-arguments"></a>
+</h2>
+<p><code>ordinal_reg</code> recognizes several model arguments, each shared by at least two engines in ordered, that have parameter generating functions in dials:</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+</colgroup>
+<thead><tr>
+<th align="left">engine</th>
+<th align="left">ordinal_link</th>
+<th align="left">odds_link</th>
+<th align="left">threshold_structure</th>
+<th align="left">parallel_reg</th>
+<th align="left">penalty</th>
+<th align="left">mixture</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left"><code>polr</code></td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>clm</code></td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>lrm</code></td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>orm</code></td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>vglm</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+</tr>
+<tr>
+<td align="left"><code>ordinalNet</code></td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✖</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+<td align="left">✔</td>
+</tr>
+<tr>
+<td align="left"><code>glmnetcr</code></td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
+<td align="left">✖</td>
 <td align="left">✔</td>
 <td align="left">✔</td>
 </tr>
@@ -145,7 +283,7 @@
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>Here is a simple example using computational chemistry data to predict the permeability of a molecule:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
 <span></span>
@@ -175,22 +313,27 @@
 <span><span class="co">#&gt; # A tibble: 10 × 8</span></span>
 <span><span class="co">#&gt;    .pred_class .pred_L .pred_M .pred_H class mol_weight volume  ClogP</span></span>
 <span><span class="co">#&gt;    &lt;ord&gt;         &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;ord&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 M            0.370    0.384  0.246  M           123.   445.  0.799</span></span>
-<span><span class="co">#&gt;  2 M            0.250    0.533  0.217  L           290.   856.  0.534</span></span>
-<span><span class="co">#&gt;  3 M            0.178    0.801  0.0212 M           519.  1576.  1.02 </span></span>
-<span><span class="co">#&gt;  4 M            0.221    0.736  0.0431 M           533.  1606.  1.58 </span></span>
-<span><span class="co">#&gt;  5 M            0.135    0.762  0.103  M           505.  1517.  1.71 </span></span>
-<span><span class="co">#&gt;  6 M            0.0698   0.913  0.0176 M           519.  1547.  2.27 </span></span>
-<span><span class="co">#&gt;  7 M            0.220    0.738  0.0417 M           517.  1600.  1.78 </span></span>
-<span><span class="co">#&gt;  8 M            0.109    0.868  0.0229 M           531.  1631.  2.34 </span></span>
-<span><span class="co">#&gt;  9 M            0.0307   0.952  0.0177 M           517.  1572.  2.81 </span></span>
-<span><span class="co">#&gt; 10 L            0.603    0.394  0.003  L           588.  1799. -1.85</span></span></code></pre></div>
+<span><span class="co">#&gt;  1 L            0.374    0.368  0.258  M           123.   445.  0.799</span></span>
+<span><span class="co">#&gt;  2 M            0.289    0.512  0.199  L           290.   856.  0.534</span></span>
+<span><span class="co">#&gt;  3 M            0.170    0.809  0.0212 M           519.  1576.  1.02 </span></span>
+<span><span class="co">#&gt;  4 M            0.209    0.740  0.0503 M           533.  1606.  1.58 </span></span>
+<span><span class="co">#&gt;  5 M            0.126    0.762  0.113  M           505.  1517.  1.71 </span></span>
+<span><span class="co">#&gt;  6 M            0.0657   0.917  0.0176 M           519.  1547.  2.27 </span></span>
+<span><span class="co">#&gt;  7 M            0.213    0.747  0.0401 M           517.  1600.  1.78 </span></span>
+<span><span class="co">#&gt;  8 M            0.111    0.859  0.0306 M           531.  1631.  2.34 </span></span>
+<span><span class="co">#&gt;  9 M            0.0403   0.932  0.0277 M           517.  1572.  2.81 </span></span>
+<span><span class="co">#&gt; 10 L            0.569    0.428  0.003  L           588.  1799. -1.85</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
 </h2>
 <p>Please note that the ordered project is released with a <a href="https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html" class="external-link">Contributor Code of Conduct</a>. By contributing to this project, you agree to abide by its terms.</p>
 <p>To voice support for or volunteer to contribute additional engines, please comment on <a href="https://github.com/corybrunson/ordered/issues/15" class="external-link">this issue</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="acknowledgments">Acknowledgments<a class="anchor" aria-label="anchor" href="#acknowledgments"></a>
+</h2>
+<p>Jason Cory Brunson was supported in part by <a href="https://reporter.nih.gov/search/oglGXI8zaU2b_BVRqwNHEA/project-details/11122743" class="external-link">NIH/NIDCD R01DC022733</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -252,7 +395,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
