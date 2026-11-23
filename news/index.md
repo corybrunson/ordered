@@ -2,6 +2,8 @@
 
 ## ordered 0.2.1
 
+CRAN release: 2026-11-23
+
 Despite seed-setting, some `ordinalNet` model fits (on some systems)
 initialize penalty paths differently. This patch modifies two unit tests
 of these fits by omitting metadata equality checks and reducing the
