@@ -1,5 +1,3 @@
-seed <- 144688L
-
 # model: basic -----------------------------------------------------------------
 
 test_that("model object (lrm)", {
@@ -361,18 +359,40 @@ test_that("interfaces agree (lrm)", {
     set.seed(13)
     lrm_f_fit <- fit(lrm_spec, class ~ ., data = caco_train)
   })
-  expect_snapshot(lrm_f_fit)
+  expect_s3_class(lrm_f_fit$fit, "lrm")
 
   expect_no_error({
     set.seed(13)
     lrm_xy_fit <- fit_xy(lrm_spec, x = caco_train[, -1], y = caco_train$class)
   })
+  expect_s3_class(lrm_xy_fit$fit, "lrm")
+
+  # NB: Update these snapshots manually when the print format changes.
+  skip_if_not_installed("rms", "8.0-0")
+  expect_snapshot(lrm_f_fit)
   expect_snapshot(lrm_xy_fit)
 
   lrm_f_fit$fit$call <- lrm_xy_fit$fit$call <- NULL
   lrm_f_fit$fit$sformula <- lrm_xy_fit$fit$sformula <- NULL
   lrm_f_fit$fit$terms <- lrm_xy_fit$fit$terms <- NULL
   expect_equal(lrm_f_fit$fit, lrm_xy_fit$fit, ignore_attr = TRUE)
+
+  expect_equal(lrm_f_fit$fit$non.slopes, 2L)
+  expect_equal(
+    unname(coef(lrm_f_fit$fit)),
+    unname(coef(lrm_xy_fit$fit)),
+    tolerance = 1e-6
+  )
+  expect_equal(
+    unname(vcov(lrm_f_fit$fit)),
+    unname(vcov(lrm_xy_fit$fit)),
+    tolerance = 1e-6
+  )
+  expect_equal(
+    lrm_f_fit$fit$stats[["Model L.R."]],
+    lrm_xy_fit$fit$stats[["Model L.R."]],
+    tolerance = 1e-6
+  )
 })
 
 test_that("interfaces agree (orm)", {
@@ -389,13 +409,13 @@ test_that("interfaces agree (orm)", {
     set.seed(13)
     orm_f_fit <- fit(orm_spec, class ~ ., data = caco_train)
   })
-  expect_snapshot(orm_f_fit)
+  expect_s3_class(orm_f_fit$fit, "orm")
 
   expect_no_error({
     set.seed(13)
     orm_xy_fit <- fit_xy(orm_spec, x = caco_train[, -1], y = caco_train$class)
   })
-  expect_snapshot(orm_xy_fit)
+  expect_s3_class(orm_xy_fit$fit, "orm")
 
   orm_f_fit$fit$call <- orm_xy_fit$fit$call <- NULL
   orm_f_fit$fit$sformula <- orm_xy_fit$fit$sformula <- NULL
@@ -403,6 +423,24 @@ test_that("interfaces agree (orm)", {
   orm_f_fit$fit$yname <- orm_xy_fit$fit$yname <- NULL
   orm_f_fit$fit$yplabel <- orm_xy_fit$fit$yplabel <- NULL
   expect_equal(orm_f_fit$fit, orm_xy_fit$fit, ignore_attr = TRUE)
+
+  expect_equal(orm_f_fit$fit$non.slopes, 2L)
+  expect_equal(orm_f_fit$fit$family, "logistic")
+  expect_equal(
+    unname(coef(orm_f_fit$fit)),
+    unname(coef(orm_xy_fit$fit)),
+    tolerance = 1e-6
+  )
+  expect_equal(
+    unname(vcov(orm_f_fit$fit)),
+    unname(vcov(orm_xy_fit$fit)),
+    tolerance = 1e-6
+  )
+  expect_equal(
+    orm_f_fit$fit$stats[["Model L.R."]],
+    orm_xy_fit$fit$stats[["Model L.R."]],
+    tolerance = 1e-6
+  )
 })
 
 test_that("arguments agree (lrm)", {
@@ -415,17 +453,17 @@ test_that("arguments agree (lrm)", {
     set_engine("lrm")
   expect_snapshot(lrm_arg_spec |> translate())
 
-  expect_snapshot({
+  expect_no_error({
     set.seed(13)
     lrm_arg_fit <- fit(lrm_arg_spec, class ~ ., data = caco_train)
   })
-
-  # The penalty is passed to lrm(); compare to a direct call
+  expect_s3_class(lrm_arg_fit$fit, "lrm")
   expect_equal(
     lrm_arg_fit$fit$penalty,
     list(simple = 0.1, nonlinear = 0.1,
          interaction = 0.1, nonlinear.interaction = 0.1)
   )
+  expect_true(is.finite(lrm_arg_fit$fit$stats[["Model L.R."]]))
 })
 
 test_that("arguments agree (orm)", {
@@ -438,15 +476,16 @@ test_that("arguments agree (orm)", {
     set_engine("orm")
   expect_snapshot(orm_arg_spec |> translate())
 
-  expect_snapshot({
+  expect_no_error({
     set.seed(13)
     orm_arg_fit <- fit(orm_arg_spec, class ~ ., data = caco_train)
   })
-
+  expect_s3_class(orm_arg_fit$fit, "orm")
   expect_equal(orm_arg_fit$fit$family, "cauchit")
   expect_equal(
     orm_arg_fit$fit$penalty,
     list(simple = 0.1, nonlinear = 0.1,
          interaction = 0.1, nonlinear.interaction = 0.1)
   )
+  expect_true(is.finite(orm_arg_fit$fit$stats[["Model L.R."]]))
 })

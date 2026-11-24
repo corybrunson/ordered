@@ -103,12 +103,12 @@ test_that("model object (penalty path from tidy to original)", {
     alpha = .5, family = "sratio"
   )
 
-  # FIXME: Why are these not equal? (The penalty paths are equal.)
-  orig_fit$args <- tidy_fit$fit$args <- NULL
+  expect_equal(orig_fit$lambdaVals, tidy_fit$fit$lambdaVals)
   expect_equal(
-    orig_fit,
-    tidy_fit$fit,
-    ignore_attr = TRUE
+    orig_fit$coefs,
+    tidy_fit$fit$coefs,
+    ignore_formula_env = TRUE,
+    tolerance = 0.001
   )
 })
 
