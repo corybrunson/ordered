@@ -103,11 +103,14 @@ conditions.</p>
 <p>We can define the model with specific parameters:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dt_spec</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/decision_tree.html" class="external-link">decision_tree</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/decision_tree.html" class="external-link">decision_tree</a></span><span class="op">(</span>tree_depth <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"rpartScore"</span>, split <span class="op">=</span> <span class="st">"quad"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
 <span><span class="va">dt_spec</span></span></code></pre></div>
 <pre><code><span><span class="co">## Decision Tree Model Specification (classification)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Main Arguments:</span></span>
+<span><span class="co">##   tree_depth = 3</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Engine-Specific Arguments:</span></span>
 <span><span class="co">##   split = quad</span></span>
@@ -196,44 +199,61 @@ conditions.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Degrees of Freedom: 3338 Total; 3324 Residual</span></span>
-<span><span class="co">## Residual deviance: 3447.008 </span></span>
-<span><span class="co">## Log-likelihood: -1723.504</span></span></code></pre>
-<p>The holdout data can be predicted for the most likely class or all
-class probabilities:</p>
+<span><span class="co">## Residual deviance: 3443.78 </span></span>
+<span><span class="co">## Log-likelihood: -1721.89</span></span></code></pre>
+<p>The holdout data can be predicted for the most likely class, all
+class probabilities, or the linear predictor:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">gam_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
 <span><span class="co">##    .pred_class</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>      </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 1</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Low        </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Low        </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 5</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 8</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">gam_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
 <span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
 <span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.256        0.263      0.481</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.256        0.263      0.481</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.153        0.190      0.657</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.542        0.233      0.225</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.182        0.268      0.550</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.184        0.272      0.545</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.436        0.274      0.290</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.297        0.286      0.417</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.217        0.358      0.425</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.127        0.268      0.604</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.549        0.269      0.183</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.399        0.311      0.291</span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.256        0.260      0.483</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.390        0.258      0.352</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.390        0.258      0.352</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.390        0.258      0.352</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.256        0.210      0.534</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.512        0.264      0.224</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.361        0.247      0.392</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.108        0.187      0.705</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.435        0.273      0.292</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.435        0.273      0.292</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.293        0.285      0.422</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.558        0.265      0.177</span></span></code></pre>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">gam_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"linear_pred"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_linear_pred</span></span>
+<span><span class="co">##                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>          0.616   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>          0.000<span style="text-decoration: underline;">272</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>          0.000<span style="text-decoration: underline;">272</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>          0.000<span style="text-decoration: underline;">272</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>          0.617   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>         -<span style="color: #BB0000;">0.495</span>   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>          0.121   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>          1.66    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>         -<span style="color: #BB0000;">0.186</span>   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>         -<span style="color: #BB0000;">0.186</span>   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>          0.430   </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>         -<span style="color: #BB0000;">0.681</span></span></span></code></pre>
 </details>
 </div>
 <div class="section level2">
@@ -244,7 +264,7 @@ class probabilities:</p>
 With the <code>"polr"</code> engine
 </summary><p>We’ll model satisfaction of householders under varying
 conditions.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
 <span></span>
@@ -254,7 +274,7 @@ conditions.</p>
 <span><span class="va">house_train</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="op">-</span><span class="va">house_sample</span>, <span class="op">]</span></span>
 <span><span class="va">house_test</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="va">house_sample</span>, <span class="op">]</span></span></code></pre></div>
 <p>We can define the model with specific parameters:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">or_spec</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span>ordinal_link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"polr"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -267,7 +287,7 @@ conditions.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Computational engine: polr</span></span></code></pre>
 <p>Now we create the model fit object:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">or_fit</span> <span class="op">&lt;-</span> <span class="va">or_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span>
 <span><span class="va">or_fit</span></span></code></pre></div>
@@ -290,7 +310,7 @@ conditions.</p>
 <span><span class="co">## AIC: 3471.989</span></span></code></pre>
 <p>The holdout data can be predicted for the most likely class or all
 class probabilities:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
 <span><span class="co">##    .pred_class</span></span>
@@ -307,7 +327,7 @@ class probabilities:</p>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
 <span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
@@ -324,11 +344,11 @@ class probabilities:</p>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.169        0.240      0.591</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.169        0.240      0.591</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.556        0.251      0.193</span></span></code></pre>
-</details><details id="ordinal-reg-ordinalNet"><summary>
-With the <code>"ordinalNet"</code> engine
+</details><details id="ordinal-reg-clm"><summary>
+With the <code>"clm"</code> engine
 </summary><p>We’ll model satisfaction of householders under varying
 conditions.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
 <span></span>
@@ -338,7 +358,450 @@ conditions.</p>
 <span><span class="va">house_train</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="op">-</span><span class="va">house_sample</span>, <span class="op">]</span></span>
 <span><span class="va">house_test</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="va">house_sample</span>, <span class="op">]</span></span></code></pre></div>
 <p>We can define the model with specific parameters:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">or_spec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span>ordinal_link <span class="op">=</span> <span class="st">"Aranda-Ordaz"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"clm"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
+<span><span class="va">or_spec</span></span></code></pre></div>
+<pre><code><span><span class="co">## Ordinal Regression Model Specification (classification)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Main Arguments:</span></span>
+<span><span class="co">##   ordinal_link = Aranda-Ordaz</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Computational engine: clm</span></span></code></pre>
+<p>Now we create the model fit object:</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">or_fit</span> <span class="op">&lt;-</span> <span class="va">or_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Changing to 'nlminb' optimizer for flexible link function</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: (-1) Model failed to converge with max|grad| = 0.00128666 (tol =</span></span>
+<span><span class="co">## 1e-06)</span></span></code></pre>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">or_fit</span></span></code></pre></div>
+<pre><code><span><span class="co">## parsnip model object</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## formula: Sat ~ Infl + Type + Cont</span></span>
+<span><span class="co">## data:    data</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##  link         threshold nobs logLik   AIC     niter   max.grad cond.H </span></span>
+<span><span class="co">##  Aranda-Ordaz flexible  1669 -1727.63 3473.26 52(530) 1.29e-03 3.2e+02</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Coefficients:</span></span>
+<span><span class="co">##    InflMedium      InflHigh TypeApartment    TypeAtrium   TypeTerrace </span></span>
+<span><span class="co">##        0.5169        1.2131       -0.5375       -0.3361       -1.0251 </span></span>
+<span><span class="co">##      ContHigh </span></span>
+<span><span class="co">##        0.3273 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Link coefficient:</span></span>
+<span><span class="co">## lambda </span></span>
+<span><span class="co">## 0.7958 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Threshold coefficients:</span></span>
+<span><span class="co">##  Low|Medium Medium|High </span></span>
+<span><span class="co">##     -0.5625      0.5529</span></span></code></pre>
+<p>The holdout data can be predicted for the most likely class, all
+class probabilities, or the linear predictor:</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_class</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
+<span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
+<span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.260        0.271      0.470</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.514        0.268      0.217</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.514        0.268      0.217</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.230        0.258      0.512</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.195        0.240      0.565</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.506        0.271      0.223</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.428        0.286      0.286</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.428        0.286      0.286</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.304        0.283      0.414</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.176        0.227      0.597</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.176        0.227      0.597</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.557        0.255      0.188</span></span></code></pre>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"linear_pred"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_linear_pred</span></span>
+<span><span class="co">##                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>             0.517</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>            -<span style="color: #BB0000;">0.537</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>            -<span style="color: #BB0000;">0.537</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>             0.676</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>             0.877</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>            -<span style="color: #BB0000;">0.508</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>            -<span style="color: #BB0000;">0.210</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>            -<span style="color: #BB0000;">0.210</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>             0.307</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>             1.00 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>             1.00 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>            -<span style="color: #BB0000;">0.698</span></span></span></code></pre>
+</details><details id="ordinal-reg-lrm"><summary>
+With the <code>"lrm"</code> engine
+</summary><p>We’ll model satisfaction of householders under varying
+conditions.</p>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">house_data</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">)</span><span class="op">)</span>, <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">$</span><span class="va">Freq</span><span class="op">)</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span></span>
+<span><span class="va">house_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">house_data</span><span class="op">)</span>, <span class="fl">12L</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">house_train</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="op">-</span><span class="va">house_sample</span>, <span class="op">]</span></span>
+<span><span class="va">house_test</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="va">house_sample</span>, <span class="op">]</span></span></code></pre></div>
+<p>We can define the model with specific parameters:</p>
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">or_spec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fl">.001</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"lrm"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
+<span><span class="va">or_spec</span></span></code></pre></div>
+<pre><code><span><span class="co">## Ordinal Regression Model Specification (classification)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Main Arguments:</span></span>
+<span><span class="co">##   penalty = 0.001</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Computational engine: lrm</span></span></code></pre>
+<p>Now we create the model fit object:</p>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">or_fit</span> <span class="op">&lt;-</span> <span class="va">or_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span>
+<span><span class="va">or_fit</span></span></code></pre></div>
+<pre><code><span><span class="co">## parsnip model object</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Logistic Regression Model</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## rms::lrm(formula = Sat ~ Infl + Type + Cont, data = data, penalty = 0.001)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Penalty factors</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##  simple nonlinear interaction nonlinear.interaction</span></span>
+<span><span class="co">##   0.001     0.001       0.001                 0.001</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##                        Model Likelihood       Discrimination    Rank Discrim.    </span></span>
+<span><span class="co">##                              Ratio Test              Indexes          Indexes    </span></span>
+<span><span class="co">## Obs           1669     LR chi2   167.49       R2       0.108    C       0.650    </span></span>
+<span><span class="co">##  Low           563     d.f.           6      R2(6,1669)0.092    Dxy     0.299    </span></span>
+<span><span class="co">##  Medium        443    Pr(&gt; chi2)&lt;0.0001    R2(6,1469.1)0.104    gamma   0.316    </span></span>
+<span><span class="co">##  High          663     Penalty     0.00       Brier    0.207    tau-a   0.197    </span></span>
+<span><span class="co">## max |deriv| 0.0001                                                               </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##                Coef    S.E.   Wald Z Pr(&gt;|Z|) Penalty Scale</span></span>
+<span><span class="co">## y&gt;=Medium       0.5000 0.1251  4.00  &lt;0.0001  0.0000       </span></span>
+<span><span class="co">## y&gt;=High        -0.6867 0.1257 -5.46  &lt;0.0001  0.0000       </span></span>
+<span><span class="co">## Infl=Medium     0.5507 0.1049  5.25  &lt;0.0001  0.0258       </span></span>
+<span><span class="co">## Infl=High       1.2851 0.1278 10.06  &lt;0.0001  0.0258       </span></span>
+<span><span class="co">## Type=Apartment -0.5696 0.1195 -4.77  &lt;0.0001  0.0274       </span></span>
+<span><span class="co">## Type=Atrium    -0.3499 0.1553 -2.25  0.0243   0.0274       </span></span>
+<span><span class="co">## Type=Terrace   -1.0901 0.1518 -7.18  &lt;0.0001  0.0274       </span></span>
+<span><span class="co">## Cont=High       0.3573 0.0959  3.73  0.0002   0.0224</span></span></code></pre>
+<p>The holdout data can be predicted for the most likely class, all
+class probabilities, or the linear predictor:</p>
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_class</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
+<span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
+<span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.259        0.275      0.466</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.517        0.261      0.222</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.517        0.261      0.222</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.229        0.264      0.507</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.192        0.246      0.562</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.510        0.263      0.227</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.429        0.282      0.289</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.429        0.282      0.289</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.302        0.284      0.414</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.172        0.233      0.595</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.172        0.233      0.595</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.558        0.247      0.195</span></span></code></pre>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"linear_pred"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_linear_pred</span></span>
+<span><span class="co">##                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>             0.551</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>            -<span style="color: #BB0000;">0.570</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>            -<span style="color: #BB0000;">0.570</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>             0.715</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>             0.935</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>            -<span style="color: #BB0000;">0.539</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>            -<span style="color: #BB0000;">0.212</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>            -<span style="color: #BB0000;">0.212</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>             0.338</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>             1.07 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>             1.07 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>            -<span style="color: #BB0000;">0.733</span></span></span></code></pre>
+</details><details id="ordinal-reg-orm"><summary>
+With the <code>"orm"</code> engine
+</summary><p>We’ll model satisfaction of householders under varying
+conditions.</p>
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">house_data</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">)</span><span class="op">)</span>, <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">$</span><span class="va">Freq</span><span class="op">)</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span></span>
+<span><span class="va">house_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">house_data</span><span class="op">)</span>, <span class="fl">12L</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">house_train</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="op">-</span><span class="va">house_sample</span>, <span class="op">]</span></span>
+<span><span class="va">house_test</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="va">house_sample</span>, <span class="op">]</span></span></code></pre></div>
+<p>We can define the model with specific parameters:</p>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">or_spec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span>ordinal_link <span class="op">=</span> <span class="st">"cauchit"</span>, penalty <span class="op">=</span> <span class="fl">.001</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"orm"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
+<span><span class="va">or_spec</span></span></code></pre></div>
+<pre><code><span><span class="co">## Ordinal Regression Model Specification (classification)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Main Arguments:</span></span>
+<span><span class="co">##   ordinal_link = cauchit</span></span>
+<span><span class="co">##   penalty = 0.001</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Computational engine: orm</span></span></code></pre>
+<p>Now we create the model fit object:</p>
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">or_fit</span> <span class="op">&lt;-</span> <span class="va">or_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span>
+<span><span class="va">or_fit</span></span></code></pre></div>
+<pre><code><span><span class="co">## parsnip model object</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Cauchy Ordinal Regression Model</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## rms::orm(formula = Sat ~ Infl + Type + Cont, data = data, family = "cauchit", </span></span>
+<span><span class="co">##     penalty = 0.001)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Penalty factors</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##  simple nonlinear interaction nonlinear.interaction</span></span>
+<span><span class="co">##   0.001     0.001       0.001                 0.001</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##                        Model Likelihood               Discrimination    Rank Discrim.    </span></span>
+<span><span class="co">##                              Ratio Test                      Indexes          Indexes    </span></span>
+<span><span class="co">## Obs           1669     LR chi2   162.10    R2                  0.104    rho     0.311    </span></span>
+<span><span class="co">##  Low           563     d.f.           6    R2(6,1669)          0.089    Dxy     0.298    </span></span>
+<span><span class="co">##  Medium        443    Pr(&gt; chi2)&lt;0.0001    R2(6,1469.1)        0.101                     </span></span>
+<span><span class="co">##  High          663     Score chi2177.32    |Pr(Y&gt;=median)-0.5| 0.174                     </span></span>
+<span><span class="co">## ESS         1469.1    Pr(&gt; chi2)&lt;0.0001                                                  </span></span>
+<span><span class="co">## Distinct Y       3     Penalty     0.00                                                  </span></span>
+<span><span class="co">## Median Y         2                                                                       </span></span>
+<span><span class="co">## max |deriv|  2e-09                                                                       </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##                Coef    S.E.   Wald Z Pr(&gt;|Z|) Penalty Scale</span></span>
+<span><span class="co">## y&gt;=Medium       0.4656 0.1125  4.14  &lt;0.0001  0.0000       </span></span>
+<span><span class="co">## y&gt;=High        -0.5963 0.1143 -5.22  &lt;0.0001  0.0000       </span></span>
+<span><span class="co">## Infl=Medium     0.4938 0.0944  5.23  &lt;0.0001  0.0258       </span></span>
+<span><span class="co">## Infl=High       1.1229 0.1193  9.41  &lt;0.0001  0.0258       </span></span>
+<span><span class="co">## Type=Apartment -0.4964 0.1087 -4.57  &lt;0.0001  0.0274       </span></span>
+<span><span class="co">## Type=Atrium    -0.3464 0.1352 -2.56  0.0104   0.0274       </span></span>
+<span><span class="co">## Type=Terrace   -0.9260 0.1361 -6.81  &lt;0.0001  0.0274       </span></span>
+<span><span class="co">## Cont=High       0.2802 0.0846  3.31  0.0009   0.0224</span></span></code></pre>
+<p>The holdout data can be predicted for the most likely class, all
+class probabilities, or the linear predictor:</p>
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_class</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
+<span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
+<span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.257        0.276      0.467</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.510        0.254      0.236</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.510        0.254      0.236</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.236        0.254      0.510</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.216        0.228      0.557</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.489        0.265      0.246</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.422        0.295      0.283</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.422        0.295      0.283</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.297        0.302      0.402</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.200        0.204      0.596</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.200        0.204      0.596</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.557        0.227      0.216</span></span></code></pre>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"linear_pred"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_linear_pred</span></span>
+<span><span class="co">##                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>             0.494</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>            -<span style="color: #BB0000;">0.496</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>            -<span style="color: #BB0000;">0.496</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>             0.626</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>             0.776</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>            -<span style="color: #BB0000;">0.432</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>            -<span style="color: #BB0000;">0.216</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>            -<span style="color: #BB0000;">0.216</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>             0.278</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>             0.907</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>             0.907</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>            -<span style="color: #BB0000;">0.646</span></span></span></code></pre>
+</details><details id="ordinal-reg-vglm"><summary>
+With the <code>"vglm"</code> engine
+</summary><p>We’ll model satisfaction of householders under varying
+conditions.</p>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">house_data</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">)</span><span class="op">)</span>, <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">$</span><span class="va">Freq</span><span class="op">)</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span></span>
+<span><span class="va">house_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">house_data</span><span class="op">)</span>, <span class="fl">12L</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">house_train</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="op">-</span><span class="va">house_sample</span>, <span class="op">]</span></span>
+<span><span class="va">house_test</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="va">house_sample</span>, <span class="op">]</span></span></code></pre></div>
+<p>We can define the model with specific parameters:</p>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">or_spec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span>odds_link <span class="op">=</span> <span class="st">"continuation_ratio"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"vglm"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
+<span><span class="va">or_spec</span></span></code></pre></div>
+<pre><code><span><span class="co">## Ordinal Regression Model Specification (classification)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Main Arguments:</span></span>
+<span><span class="co">##   odds_link = continuation_ratio</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Computational engine: vglm</span></span></code></pre>
+<p>Now we create the model fit object:</p>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">or_fit</span> <span class="op">&lt;-</span> <span class="va">or_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span>
+<span><span class="va">or_fit</span></span></code></pre></div>
+<pre><code><span><span class="co">## parsnip model object</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Call:</span></span>
+<span><span class="co">## VGAM::vglm(formula = formula, family = VGAM::cratio(link = "logitlink", </span></span>
+<span><span class="co">##     parallel = FALSE, Thresh = NULL), data = data)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Coefficients:</span></span>
+<span><span class="co">##   (Intercept):1   (Intercept):2    InflMedium:1    InflMedium:2      InflHigh:1 </span></span>
+<span><span class="co">##      0.44469787      0.30710093      0.59054309      0.28904209      1.24398695 </span></span>
+<span><span class="co">##      InflHigh:2 TypeApartment:1 TypeApartment:2    TypeAtrium:1    TypeAtrium:2 </span></span>
+<span><span class="co">##      0.95139232     -0.61831533     -0.30826947     -0.15913107     -0.52428810 </span></span>
+<span><span class="co">##   TypeTerrace:1   TypeTerrace:2      ContHigh:1      ContHigh:2 </span></span>
+<span><span class="co">##     -1.07873451     -0.78038044      0.43066868      0.08359363 </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Degrees of Freedom: 3338 Total; 3324 Residual</span></span>
+<span><span class="co">## Residual deviance: 3445.09 </span></span>
+<span><span class="co">## Log-likelihood: -1722.545</span></span></code></pre>
+<p>The holdout data can be predicted for the most likely class, all
+class probabilities, or the linear predictor:</p>
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_class</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
+<span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
+<span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.262        0.262      0.476</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.543        0.228      0.228</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.543        0.228      0.228</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.255        0.208      0.537</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.178        0.267      0.555</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.511        0.267      0.222</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.436        0.270      0.294</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.436        0.270      0.294</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.300        0.286      0.414</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.182        0.215      0.603</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.182        0.215      0.603</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.551        0.268      0.181</span></span></code></pre>
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"linear_pred"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_linear_pred</span></span>
+<span><span class="co">##                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>            -<span style="color: #BB0000;">0.591</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>             0.618</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>             0.618</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>            -<span style="color: #BB0000;">0.626</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>            -<span style="color: #BB0000;">1.08</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>             0.488</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>             0.188</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>             0.188</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>            -<span style="color: #BB0000;">0.403</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>            -<span style="color: #BB0000;">1.06</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>            -<span style="color: #BB0000;">1.06</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>             0.648</span></span></code></pre>
+</details><details id="ordinal-reg-ordinalNet"><summary>
+With the <code>"ordinalNet"</code> engine
+</summary><p>We’ll model satisfaction of householders under varying
+conditions.</p>
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">house_data</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">)</span><span class="op">)</span>, <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">$</span><span class="va">Freq</span><span class="op">)</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span></span>
+<span><span class="va">house_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">house_data</span><span class="op">)</span>, <span class="fl">12L</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">house_train</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="op">-</span><span class="va">house_sample</span>, <span class="op">]</span></span>
+<span><span class="va">house_test</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="va">house_sample</span>, <span class="op">]</span></span></code></pre></div>
+<p>We can define the model with specific parameters:</p>
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">or_spec</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fl">.001</span>, mixture <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ordinalNet"</span>, includeLambda0 <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -355,7 +818,7 @@ conditions.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Computational engine: ordinalNet</span></span></code></pre>
 <p>Now we create the model fit object:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">or_fit</span> <span class="op">&lt;-</span> <span class="va">or_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span>
 <span><span class="va">or_fit</span></span></code></pre></div>
@@ -386,9 +849,9 @@ conditions.</p>
 <span><span class="co">## 19 0.002883665        9 -1727.803 0.046201549 3473.606 3522.386</span></span>
 <span><span class="co">## 20 0.002262985        9 -1727.782 0.046212840 3473.565 3522.345</span></span>
 <span><span class="co">## 21 0.000000000       11 -1727.749 0.046231083 3477.499 3537.119</span></span></code></pre>
-<p>The holdout data can be predicted for the most likely class or all
-class probabilities:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<p>The holdout data can be predicted for the most likely class, all
+class probabilities, or the linear predictor:</p>
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
 <span><span class="co">##    .pred_class</span></span>
@@ -405,7 +868,7 @@ class probabilities:</p>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
 <span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
@@ -422,11 +885,28 @@ class probabilities:</p>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.173        0.233      0.594</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.173        0.233      0.594</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.557        0.248      0.196</span></span></code></pre>
-</details><details id="ordinal-reg-vglm"><summary>
-With the <code>"vglm"</code> engine
+<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"linear_pred"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_linear_pred</span></span>
+<span><span class="co">##                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>             0.369</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>            -<span style="color: #BB0000;">0.727</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>            -<span style="color: #BB0000;">0.727</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>             0.538</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>             0.744</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>            -<span style="color: #BB0000;">0.698</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>            -<span style="color: #BB0000;">0.382</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>            -<span style="color: #BB0000;">0.382</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>             0.161</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>             0.883</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>             0.883</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>            -<span style="color: #BB0000;">0.896</span></span></span></code></pre>
+</details><details id="ordinal-reg-glmnetcr"><summary>
+With the <code>"glmnetcr"</code> engine
 </summary><p>We’ll model satisfaction of householders under varying
 conditions.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
 <span></span>
@@ -436,45 +916,94 @@ conditions.</p>
 <span><span class="va">house_train</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="op">-</span><span class="va">house_sample</span>, <span class="op">]</span></span>
 <span><span class="va">house_test</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="va">house_sample</span>, <span class="op">]</span></span></code></pre></div>
 <p>We can define the model with specific parameters:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">or_spec</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span>odds_link <span class="op">=</span> <span class="st">"continuation_ratio"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"vglm"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/ordinal_reg.html" class="external-link">ordinal_reg</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fl">.001</span>, mixture <span class="op">=</span> <span class="fl">.5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"glmnetcr"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
 <span><span class="va">or_spec</span></span></code></pre></div>
 <pre><code><span><span class="co">## Ordinal Regression Model Specification (classification)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Main Arguments:</span></span>
-<span><span class="co">##   odds_link = continuation_ratio</span></span>
+<span><span class="co">##   penalty = 0.001</span></span>
+<span><span class="co">##   mixture = 0.5</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Computational engine: vglm</span></span></code></pre>
+<span><span class="co">## Computational engine: glmnetcr</span></span></code></pre>
 <p>Now we create the model fit object:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">or_fit</span> <span class="op">&lt;-</span> <span class="va">or_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span>
-<span><span class="va">or_fit</span></span></code></pre></div>
+<span><span class="va">or_fit</span> <span class="op">&lt;-</span> <span class="va">or_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in .resolve_control(control = control, nvars = nvars, deprecated =</span></span>
+<span><span class="co">## list(thresh = if (!missing(thresh)) thresh, : Passing 'thresh' to glmnet() is</span></span>
+<span><span class="co">## deprecated. Use control = list(thresh = ...) instead.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in .resolve_control(control = control, nvars = nvars, deprecated =</span></span>
+<span><span class="co">## list(thresh = if (!missing(thresh)) thresh, : Passing 'maxit' to glmnet() is</span></span>
+<span><span class="co">## deprecated. Use control = list(maxit = ...) instead.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in .resolve_control(control = control, nvars = nvars, deprecated =</span></span>
+<span><span class="co">## list(thresh = if (!missing(thresh)) thresh, : Passing 'dfmax' to glmnet() is</span></span>
+<span><span class="co">## deprecated. Use control = list(dfmax = ...) instead.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in .resolve_control(control = control, nvars = nvars, deprecated =</span></span>
+<span><span class="co">## list(thresh = if (!missing(thresh)) thresh, : Passing 'pmax' to glmnet() is</span></span>
+<span><span class="co">## deprecated. Use control = list(pmax = ...) instead.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in .resolve_control(control = control, nvars = nvars, deprecated =</span></span>
+<span><span class="co">## list(thresh = if (!missing(thresh)) thresh, : Passing 'trace.it' to glmnet() is</span></span>
+<span><span class="co">## deprecated. Use control = list(trace.it = ...) instead.</span></span></code></pre>
+<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">or_fit</span></span></code></pre></div>
 <pre><code><span><span class="co">## parsnip model object</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Call:</span></span>
-<span><span class="co">## VGAM::vglm(formula = formula, family = VGAM::cratio(link = "logitlink", </span></span>
-<span><span class="co">##     parallel = FALSE, Thresh = NULL), data = data)</span></span>
+<span><span class="co">## Call:  glmnet(x = glmnet.data$x, y = glmnet.data$y, family = "binomial",      weights = glmnet.data$weights, offset = offset, alpha = alpha,      nlambda = nlambda, lambda.min.ratio = lambda.min.ratio, lambda = lambda,      standardize = standardize, thresh = thresh, dfmax = dfmax,      pmax = pmax, exclude = exclude, penalty.factor = c(penalty.factor,          rep(0, k - 1)), maxit = maxit, type.gaussian = ifelse(nvars &lt;          500, "covariance", "naive"), type.logistic = type.logistic,      trace.it = trace.it) </span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##   (Intercept):1   (Intercept):2    InflMedium:1    InflMedium:2      InflHigh:1 </span></span>
-<span><span class="co">##      0.44469787      0.30710093      0.59054309      0.28904209      1.24398695 </span></span>
-<span><span class="co">##      InflHigh:2 TypeApartment:1 TypeApartment:2    TypeAtrium:1    TypeAtrium:2 </span></span>
-<span><span class="co">##      0.95139232     -0.61831533     -0.30826947     -0.15913107     -0.52428810 </span></span>
-<span><span class="co">##   TypeTerrace:1   TypeTerrace:2      ContHigh:1      ContHigh:2 </span></span>
-<span><span class="co">##     -1.07873451     -0.78038044      0.43066868      0.08359363 </span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## Degrees of Freedom: 3338 Total; 3324 Residual</span></span>
-<span><span class="co">## Residual deviance: 3445.09 </span></span>
-<span><span class="co">## Log-likelihood: -1722.545</span></span></code></pre>
+<span><span class="co">##       Df     %Dev   Lambda</span></span>
+<span><span class="co">##  [1,]  2 0.001323 0.128900</span></span>
+<span><span class="co">##  [2,]  4 0.004632 0.117500</span></span>
+<span><span class="co">##  [3,]  4 0.007936 0.107000</span></span>
+<span><span class="co">##  [4,]  4 0.010790 0.097520</span></span>
+<span><span class="co">##  [5,]  4 0.013270 0.088860</span></span>
+<span><span class="co">##  [6,]  5 0.016280 0.080970</span></span>
+<span><span class="co">##  [7,]  6 0.019590 0.073770</span></span>
+<span><span class="co">##  [8,]  6 0.022540 0.067220</span></span>
+<span><span class="co">##  [9,]  6 0.025060 0.061250</span></span>
+<span><span class="co">## [10,]  6 0.027220 0.055810</span></span>
+<span><span class="co">## [11,]  6 0.029070 0.050850</span></span>
+<span><span class="co">## [12,]  8 0.030740 0.046330</span></span>
+<span><span class="co">## [13,]  8 0.032670 0.042220</span></span>
+<span><span class="co">## [14,]  8 0.034460 0.038470</span></span>
+<span><span class="co">## [15,]  8 0.035980 0.035050</span></span>
+<span><span class="co">## [16,]  8 0.037270 0.031930</span></span>
+<span><span class="co">## [17,]  9 0.038410 0.029100</span></span>
+<span><span class="co">## [18,]  9 0.039460 0.026510</span></span>
+<span><span class="co">## [19,]  9 0.040370 0.024160</span></span>
+<span><span class="co">## [20,]  9 0.041150 0.022010</span></span>
+<span><span class="co">## [21,]  9 0.041810 0.020060</span></span>
+<span><span class="co">## [22,]  9 0.042360 0.018270</span></span>
+<span><span class="co">## [23,]  9 0.042830 0.016650</span></span>
+<span><span class="co">## [24,]  9 0.043230 0.015170</span></span>
+<span><span class="co">## [25,]  9 0.043560 0.013820</span></span>
+<span><span class="co">## [26,]  9 0.043840 0.012600</span></span>
+<span><span class="co">## [27,]  9 0.044070 0.011480</span></span>
+<span><span class="co">## [28,]  9 0.044270 0.010460</span></span>
+<span><span class="co">## [29,]  9 0.044430 0.009528</span></span>
+<span><span class="co">## [30,]  9 0.044570 0.008682</span></span>
+<span><span class="co">## [31,]  9 0.044690 0.007910</span></span>
+<span><span class="co">## [32,]  9 0.044780 0.007208</span></span>
+<span><span class="co">## [33,]  9 0.044870 0.006567</span></span>
+<span><span class="co">## [34,]  9 0.044930 0.005984</span></span>
+<span><span class="co">## [35,]  9 0.044990 0.005452</span></span>
+<span><span class="co">## [36,]  9 0.045040 0.004968</span></span>
+<span><span class="co">## [37,]  9 0.045080 0.004527</span></span>
+<span><span class="co">## [38,]  9 0.045110 0.004125</span></span>
+<span><span class="co">## [39,]  9 0.045140 0.003758</span></span>
+<span><span class="co">## [40,]  9 0.045160 0.003424</span></span>
+<span><span class="co">## [41,]  9 0.045180 0.003120</span></span>
+<span><span class="co">## [42,]  9 0.045190 0.002843</span></span>
+<span><span class="co">## [43,]  9 0.045210 0.002590</span></span>
+<span><span class="co">## [44,]  9 0.045220 0.002360</span></span>
+<span><span class="co">## [45,]  9 0.045230 0.002151</span></span></code></pre>
 <p>The holdout data can be predicted for the most likely class or all
 class probabilities:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
 <span><span class="co">##    .pred_class</span></span>
@@ -491,23 +1020,23 @@ class probabilities:</p>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb99"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">or_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
 <span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
 <span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.262        0.262      0.476</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.543        0.228      0.228</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.543        0.228      0.228</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.255        0.208      0.537</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.178        0.267      0.555</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.511        0.267      0.222</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.436        0.270      0.294</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.436        0.270      0.294</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.300        0.286      0.414</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.182        0.215      0.603</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.182        0.215      0.603</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.551        0.268      0.181</span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.261        0.289      0.450</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.525        0.230      0.245</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.525        0.230      0.245</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.230        0.289      0.481</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.181        0.283      0.536</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.514        0.234      0.251</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.430        0.261      0.309</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.430        0.261      0.309</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.299        0.287      0.414</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.161        0.278      0.561</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.161        0.278      0.561</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.553        0.220      0.227</span></span></code></pre>
 </details>
 </div>
 <div class="section level2">
@@ -518,7 +1047,7 @@ class probabilities:</p>
 With the <code>"ordinalForest"</code> engine
 </summary><p>We’ll model satisfaction of householders under varying
 conditions.</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
 <span></span>
@@ -528,7 +1057,7 @@ conditions.</p>
 <span><span class="va">house_train</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="op">-</span><span class="va">house_sample</span>, <span class="op">]</span></span>
 <span><span class="va">house_test</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="va">house_sample</span>, <span class="op">]</span></span></code></pre></div>
 <p>We can define the model with specific parameters:</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb102"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rf_spec</span> <span class="op">&lt;-</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>trees <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ordinalForest"</span>, nsets <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -544,7 +1073,7 @@ conditions.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Computational engine: ordinalForest</span></span></code></pre>
 <p>Now we create the model fit object:</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">rf_fit</span> <span class="op">&lt;-</span> <span class="va">rf_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span>
 <span><span class="va">rf_fit</span></span></code></pre></div>
@@ -566,7 +1095,7 @@ conditions.</p>
 <span><span class="co">## Performance function: "probability"</span></span></code></pre>
 <p>The holdout data can be predicted for the most likely class or all
 class probabilities:</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">rf_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
 <span><span class="co">##    .pred_class</span></span>
@@ -583,7 +1112,7 @@ class probabilities:</p>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">11</span> High       </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">rf_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
 <span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
@@ -600,6 +1129,88 @@ class probabilities:</p>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.214        0.251      0.535</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.214        0.251      0.535</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.486        0.272      0.241</span></span></code></pre>
+</details><details id="rand-forest-orf"><summary>
+With the <code>"orf"</code> engine
+</summary><p>We’ll model satisfaction of householders under varying
+conditions.</p>
+<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://corybrunson.github.io/ordered/">ordered</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">house_data</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">)</span><span class="op">)</span>, <span class="fu">MASS</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/MASS/man/housing.html" class="external-link">housing</a></span><span class="op">$</span><span class="va">Freq</span><span class="op">)</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span></span>
+<span><span class="va">house_sample</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">house_data</span><span class="op">)</span>, <span class="fl">12L</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">house_train</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="op">-</span><span class="va">house_sample</span>, <span class="op">]</span></span>
+<span><span class="va">house_test</span> <span class="op">&lt;-</span> <span class="va">house_data</span><span class="op">[</span><span class="va">house_sample</span>, <span class="op">]</span></span></code></pre></div>
+<p>We can define the model with specific parameters:</p>
+<div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rf_spec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>trees <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"orf"</span>, sample.fraction <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
+<span><span class="va">rf_spec</span></span></code></pre></div>
+<pre><code><span><span class="co">## Random Forest Model Specification (classification)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Main Arguments:</span></span>
+<span><span class="co">##   trees = 1000</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Engine-Specific Arguments:</span></span>
+<span><span class="co">##   sample.fraction = 1</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Computational engine: orf</span></span></code></pre>
+<p>Now we create the model fit object:</p>
+<div class="sourceCode" id="cb113"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">rf_fit</span> <span class="op">&lt;-</span> <span class="va">rf_spec</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Sat</span> <span class="op">~</span> <span class="va">Infl</span> <span class="op">+</span> <span class="va">Type</span> <span class="op">+</span> <span class="va">Cont</span>, data <span class="op">=</span> <span class="va">house_train</span><span class="op">)</span></span>
+<span><span class="va">rf_fit</span></span></code></pre></div>
+<pre><code><span><span class="co">## parsnip model object</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Ordered Forest object of class orf </span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## Number of Categories:             3 </span></span>
+<span><span class="co">## Sample Size:                      1669 </span></span>
+<span><span class="co">## Number of Trees:                  1000 </span></span>
+<span><span class="co">## Build:                            Subsampling </span></span>
+<span><span class="co">## Mtry:                             3 </span></span>
+<span><span class="co">## Minimum Node Size:                5 </span></span>
+<span><span class="co">## Honest Forest:                    TRUE </span></span>
+<span><span class="co">## Weight-Based Inference:           FALSE</span></span></code></pre>
+<p>The holdout data can be predicted for the most likely class or all
+class probabilities:</p>
+<div class="sourceCode" id="cb115"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">rf_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"class"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 1</span></span></span>
+<span><span class="co">##    .pred_class</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;ord&gt;</span>      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Medium     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Low        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> High       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span> Medium     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span> Low</span></span></code></pre>
+<div class="sourceCode" id="cb117"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">rf_fit</span>, <span class="va">house_test</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 12 × 3</span></span></span>
+<span><span class="co">##    .pred_Low .pred_Medium .pred_High</span></span>
+<span><span class="co">##        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     0.342        0.285      0.372</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     0.342        0.285      0.372</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>     0.336        0.373      0.291</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>     0.442        0.298      0.260</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>     0.308        0.260      0.432</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>     0.235        0.256      0.509</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>     0.235        0.256      0.509</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>     0.499        0.256      0.246</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>     0.316        0.234      0.450</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>     0.316        0.234      0.450</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span>     0.289        0.381      0.330</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span>     0.465        0.318      0.218</span></span></code></pre>
 </details>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
