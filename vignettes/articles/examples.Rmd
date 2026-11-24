@@ -52,7 +52,7 @@ We can define the model with specific parameters:
 
 ```{r}
 dt_spec <-
-  decision_tree() |>
+  decision_tree(tree_depth = 3) |>
   set_engine("rpartScore", split = "quad") |>
   set_mode("classification")
 dt_spec
@@ -111,11 +111,12 @@ gam_fit <- gam_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
 gam_fit
 ```
 
-The holdout data can be predicted for the most likely class or all class probabilities:
+The holdout data can be predicted for the most likely class, all class probabilities, or the linear predictor:
 
 ```{r}
 predict(gam_fit, house_test, type = "class")
 predict(gam_fit, house_test, type = "prob")
+predict(gam_fit, house_test, type = "linear_pred")
 ```
 
 </details>
@@ -166,6 +167,186 @@ predict(or_fit, house_test, type = "prob")
 
 </details>
 
+<details id="ordinal-reg-clm">
+
+<summary>With the `"clm"` engine</summary>
+
+We'll model satisfaction of householders under varying conditions.
+
+```{r}
+library(parsnip)
+library(ordered)
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+or_spec <-
+  ordinal_reg(ordinal_link = "Aranda-Ordaz") |>
+  set_engine("clm") |>
+  set_mode("classification")
+or_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+or_fit
+```
+
+The holdout data can be predicted for the most likely class, all class probabilities, or the linear predictor:
+
+```{r}
+predict(or_fit, house_test, type = "class")
+predict(or_fit, house_test, type = "prob")
+predict(or_fit, house_test, type = "linear_pred")
+```
+
+</details>
+
+<details id="ordinal-reg-lrm">
+
+<summary>With the `"lrm"` engine</summary>
+
+We'll model satisfaction of householders under varying conditions.
+
+```{r}
+library(parsnip)
+library(ordered)
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+or_spec <-
+  ordinal_reg(penalty = .001) |>
+  set_engine("lrm") |>
+  set_mode("classification")
+or_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+or_fit
+```
+
+The holdout data can be predicted for the most likely class, all class probabilities, or the linear predictor:
+
+```{r}
+predict(or_fit, house_test, type = "class")
+predict(or_fit, house_test, type = "prob")
+predict(or_fit, house_test, type = "linear_pred")
+```
+
+</details>
+
+<details id="ordinal-reg-orm">
+
+<summary>With the `"orm"` engine</summary>
+
+We'll model satisfaction of householders under varying conditions.
+
+```{r}
+library(parsnip)
+library(ordered)
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+or_spec <-
+  ordinal_reg(ordinal_link = "cauchit", penalty = .001) |>
+  set_engine("orm") |>
+  set_mode("classification")
+or_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+or_fit
+```
+
+The holdout data can be predicted for the most likely class, all class probabilities, or the linear predictor:
+
+```{r}
+predict(or_fit, house_test, type = "class")
+predict(or_fit, house_test, type = "prob")
+predict(or_fit, house_test, type = "linear_pred")
+```
+
+</details>
+
+<details id="ordinal-reg-vglm">
+
+<summary>With the `"vglm"` engine</summary>
+
+We'll model satisfaction of householders under varying conditions.
+
+```{r}
+library(parsnip)
+library(ordered)
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+or_spec <-
+  ordinal_reg(odds_link = "continuation_ratio") |>
+  set_engine("vglm") |>
+  set_mode("classification")
+or_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+or_fit
+```
+
+The holdout data can be predicted for the most likely class, all class probabilities, or the linear predictor:
+
+```{r}
+predict(or_fit, house_test, type = "class")
+predict(or_fit, house_test, type = "prob")
+predict(or_fit, house_test, type = "linear_pred")
+```
+
+</details>
+
 <details id="ordinal-reg-ordinalNet">
 
 <summary>With the `"ordinalNet"` engine</summary>
@@ -201,18 +382,19 @@ or_fit <- or_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
 or_fit
 ```
 
-The holdout data can be predicted for the most likely class or all class probabilities:
+The holdout data can be predicted for the most likely class, all class probabilities, or the linear predictor:
 
 ```{r}
 predict(or_fit, house_test, type = "class")
 predict(or_fit, house_test, type = "prob")
+predict(or_fit, house_test, type = "linear_pred")
 ```
 
 </details>
 
-<details id="ordinal-reg-vglm">
+<details id="ordinal-reg-glmnetcr">
 
-<summary>With the `"vglm"` engine</summary>
+<summary>With the `"glmnetcr"` engine</summary>
 
 We'll model satisfaction of householders under varying conditions.
 
@@ -231,8 +413,8 @@ We can define the model with specific parameters:
 
 ```{r}
 or_spec <-
-  ordinal_reg(odds_link = "continuation_ratio") |>
-  set_engine("vglm") |>
+  ordinal_reg(penalty = .001, mixture = .5) |>
+  set_engine("glmnetcr") |>
   set_mode("classification")
 or_spec
 ```
@@ -279,6 +461,50 @@ We can define the model with specific parameters:
 rf_spec <-
   rand_forest(trees = 1000) |>
   set_engine("ordinalForest", nsets = 100) |>
+  set_mode("classification")
+rf_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+rf_fit <- rf_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+rf_fit
+```
+
+The holdout data can be predicted for the most likely class or all class probabilities:
+
+```{r}
+predict(rf_fit, house_test, type = "class")
+predict(rf_fit, house_test, type = "prob")
+```
+
+</details>
+
+<details id="rand-forest-orf">
+
+<summary>With the `"orf"` engine</summary>
+
+We'll model satisfaction of householders under varying conditions.
+
+```{r}
+library(parsnip)
+library(ordered)
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+rf_spec <-
+  rand_forest(trees = 1000) |>
+  set_engine("orf", sample.fraction = 1) |>
   set_mode("classification")
 rf_spec
 ```

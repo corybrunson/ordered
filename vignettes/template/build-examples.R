@@ -26,24 +26,42 @@ ordered_specs |>
 
 # values must be character-ized
 list(
-  polr = list(ordinal_link = "\"probit\""),
-  ordinalNet = list(penalty = ".001", mixture = ".5"),
-  vglm = list(odds_link = "\"continuation_ratio\""),
+  # `decision_tree`
+  rpartScore = list(tree_depth = "3"),
+  # `gen_additive_mod`
   vgam = list(),
-  rpartScore = list(),
-  ordinalForest = list(trees = "1000")
+  # `ordinal_reg`
+  polr = list(ordinal_link = "\"probit\""),
+  clm = list(ordinal_link = "\"Aranda-Ordaz\""),
+  lrm = list(penalty = ".001"),
+  orm = list(ordinal_link = "\"cauchit\"", penalty = ".001"),
+  vglm = list(odds_link = "\"continuation_ratio\""),
+  ordinalNet = list(penalty = ".001", mixture = ".5"),
+  glmnetcr = list(penalty = ".001", mixture = ".5"),
+  # `rand_forest`
+  ordinalForest = list(trees = "1000"),
+  orf = list(trees = "1000")
 ) |>
   enframe(name = "engine", value = "args") |>
   print() -> spec_args
 
 # values must be character-ized
 list(
-  polr = list(),
-  ordinalNet = list(includeLambda0 = "TRUE"),
-  vglm = list(),
-  vgam = list(family = "\"stopping_ratio\""),
+  # `decision_tree`
   rpartScore = list(split = "\"quad\""),
-  ordinalForest = list(nsets = "100")
+  # `gen_additive_mod`
+  vgam = list(family = "\"stopping_ratio\""),
+  # `ordinal_reg`
+  polr = list(),
+  clm = list(),
+  lrm = list(),
+  orm = list(),
+  vglm = list(),
+  ordinalNet = list(includeLambda0 = "TRUE"),
+  glmnetcr = list(),
+  # `rand_forest`
+  ordinalForest = list(nsets = "100"),
+  orf = list(sample.fraction = "1")
 ) |>
   enframe(name = "engine", value = "args") |>
   print() -> eng_args
