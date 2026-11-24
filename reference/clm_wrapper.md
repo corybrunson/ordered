@@ -106,7 +106,7 @@ house_data <-
 #> data:    house_data
 #> 
 #>  link  threshold nobs logLik   AIC     niter max.grad cond.H 
-#>  logit flexible  1681 -1766.19 3548.37 5(0)  4.75e-13 6.9e+01
+#>  logit flexible  1681 -1766.19 3548.37 5(0)  5.28e-13 6.9e+01
 #> 
 #> Threshold coefficients:
 #>             Low|Medium Medium|High
@@ -123,7 +123,7 @@ house_data <-
 #> data:    data
 #> 
 #>  link  threshold nobs logLik   AIC     niter max.grad cond.H 
-#>  logit flexible  1681 -1766.19 3548.37 5(0)  4.75e-13 6.9e+01
+#>  logit flexible  1681 -1766.19 3548.37 5(0)  5.28e-13 6.9e+01
 #> 
 #> Threshold coefficients:
 #>             Low|Medium Medium|High
