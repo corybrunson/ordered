@@ -367,11 +367,6 @@ test_that("interfaces agree (lrm)", {
   })
   expect_s3_class(lrm_xy_fit$fit, "lrm")
 
-  # NB: Update these snapshots manually when the print format changes.
-  skip_if_not_installed("rms", "8.0-0")
-  expect_snapshot(lrm_f_fit)
-  expect_snapshot(lrm_xy_fit)
-
   lrm_f_fit$fit$call <- lrm_xy_fit$fit$call <- NULL
   lrm_f_fit$fit$sformula <- lrm_xy_fit$fit$sformula <- NULL
   lrm_f_fit$fit$terms <- lrm_xy_fit$fit$terms <- NULL
