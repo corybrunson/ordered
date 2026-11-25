@@ -3,8 +3,8 @@
 ^\.github$
 
 ^\.opencode$
-^AGENTS\.md$
 ^opencode\.json$
+^AGENTS\.md$
 
 ^codecov\.yml$
 ^CODE_OF_CONDUCT\.md$
