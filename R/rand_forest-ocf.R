@@ -22,11 +22,16 @@
 #' house_data <- house_data[sample(nrow(house_data), 50), ]
 #' X_mat <- model.matrix(~ Infl + Type + Cont - 1, data = house_data)
 #' # fit wrapper
-#' ( ocf_wrapper(
+#' ocf(
+#'   Y = house_data$Sat,
 #'   X = X_mat,
-#'    Y = house_data$Sat,
-#'    n.trees = 10
-#'  ) )
+#'   n.trees = 10
+#' )
+#' ocf_wrapper(
+#'   X = X_mat,
+#'   Y = house_data$Sat,
+#'   n.trees = 10
+#' )
 #' @export
 ocf_wrapper <- function(X, Y, ...) {
   rlang::check_installed("ocf")
