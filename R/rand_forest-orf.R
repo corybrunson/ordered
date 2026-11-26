@@ -29,8 +29,11 @@ orf_wrapper <- function(X, Y, ...) {
 
   # execute call on modified inputs
   cl <- rlang::call2(
-    .fn = "orf", .ns = "orf",
-    X = X, Y = Y, ...
+    .fn = "orf",
+    .ns = "orf",
+    X = X,
+    Y = Y,
+    ...
   )
   rlang::eval_tidy(cl)
 }

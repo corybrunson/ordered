@@ -150,14 +150,29 @@ test_that("arguments agree", {
   # `split` and `prune` specify `split` and `eval` functions.
   odt_def_funs <- odt_def_fit$fit$functions
   odt_arg_funs <- odt_arg_fit$fit$functions
-  expect_true(identical(odt_def_funs$summary, odt_arg_funs$summary,
-                        ignore.environment = TRUE))
-  expect_true(identical(odt_def_funs$text, odt_arg_funs$text,
-                        ignore.environment = TRUE))
-  expect_false(identical(odt_def_funs$eval, odt_arg_funs$eval,
-                         ignore.environment = TRUE))
-  expect_false(identical(odt_def_funs$split, odt_arg_funs$split,
-                         ignore.environment = TRUE))
-  expect_true(identical(odt_def_funs$init, odt_arg_funs$init,
-                        ignore.environment = TRUE))
+  expect_true(identical(
+    odt_def_funs$summary,
+    odt_arg_funs$summary,
+    ignore.environment = TRUE
+  ))
+  expect_true(identical(
+    odt_def_funs$text,
+    odt_arg_funs$text,
+    ignore.environment = TRUE
+  ))
+  expect_false(identical(
+    odt_def_funs$eval,
+    odt_arg_funs$eval,
+    ignore.environment = TRUE
+  ))
+  expect_false(identical(
+    odt_def_funs$split,
+    odt_arg_funs$split,
+    ignore.environment = TRUE
+  ))
+  expect_true(identical(
+    odt_def_funs$init,
+    odt_arg_funs$init,
+    ignore.environment = TRUE
+  ))
 })

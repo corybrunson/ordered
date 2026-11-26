@@ -455,8 +455,12 @@ test_that("arguments agree (lrm)", {
   expect_s3_class(lrm_arg_fit$fit, "lrm")
   expect_equal(
     lrm_arg_fit$fit$penalty,
-    list(simple = 0.1, nonlinear = 0.1,
-         interaction = 0.1, nonlinear.interaction = 0.1)
+    list(
+      simple = 0.1,
+      nonlinear = 0.1,
+      interaction = 0.1,
+      nonlinear.interaction = 0.1
+    )
   )
   expect_true(is.finite(lrm_arg_fit$fit$stats[["Model L.R."]]))
 })
@@ -479,8 +483,12 @@ test_that("arguments agree (orm)", {
   expect_equal(orm_arg_fit$fit$family, "cauchit")
   expect_equal(
     orm_arg_fit$fit$penalty,
-    list(simple = 0.1, nonlinear = 0.1,
-         interaction = 0.1, nonlinear.interaction = 0.1)
+    list(
+      simple = 0.1,
+      nonlinear = 0.1,
+      interaction = 0.1,
+      nonlinear.interaction = 0.1
+    )
   )
   expect_true(is.finite(orm_arg_fit$fit$stats[["Model L.R."]]))
 })

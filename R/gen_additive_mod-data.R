@@ -12,7 +12,6 @@
 # `VGAM::vgam` components
 
 make_gen_additive_mod_vgam <- function() {
-
   parsnip::set_model_engine("gen_additive_mod", "classification", "vgam")
   parsnip::set_dependency(
     "gen_additive_mod",
@@ -94,12 +93,11 @@ make_gen_additive_mod_vgam <- function() {
       pre = NULL,
       post = predict_VGAM_class_post,
       func = c(fun = "predict", pkg = "VGAM"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "response"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "response"
+      )
     )
   )
 
@@ -112,12 +110,11 @@ make_gen_additive_mod_vgam <- function() {
       pre = NULL,
       post = predict_VGAM_prob_post,
       func = c(fun = "predict", pkg = "VGAM"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "response"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "response"
+      )
     )
   )
 
@@ -133,15 +130,13 @@ make_gen_additive_mod_vgam <- function() {
         tibble::tibble(.pred_linear_pred = unname(beta_x))
       },
       func = c(fun = "predict", pkg = "VGAM"),
-      args =
-        list(
-          object = quote(object$fit),
-          newdata = quote(new_data),
-          type = "link"
-        )
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data),
+        type = "link"
+      )
     )
   )
-
 }
 
 # nocov end

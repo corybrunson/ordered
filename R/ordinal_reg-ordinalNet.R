@@ -75,13 +75,17 @@
 #' )
 #' @export
 ordinalNet_wrapper <- function(
-    x, y, weights = NULL,
-    family = "cumulative",
-    link = "logit",
-    parallel_reg = NULL,
-    parallelTerms = TRUE, nonparallelTerms = FALSE, parallelPenaltyFactor = 1,
-    ...,
-    call = rlang::caller_env()
+  x,
+  y,
+  weights = NULL,
+  family = "cumulative",
+  link = "logit",
+  parallel_reg = NULL,
+  parallelTerms = TRUE,
+  nonparallelTerms = FALSE,
+  parallelPenaltyFactor = 1,
+  ...,
+  call = rlang::caller_env()
 ) {
   rlang::check_installed("ordinalNet")
 
@@ -94,14 +98,14 @@ ordinalNet_wrapper <- function(
   }
 
   # throw error if penalty factor would go unused
-  if (! parallelTerms && parallelPenaltyFactor != 1) {
+  if (!parallelTerms && parallelPenaltyFactor != 1) {
     cli::cli_abort(
       "{.arg parallelPenaltyFactor} cannot be used without parallel terms."
     )
   }
 
   # restructure based on weights (requires `y` to be a factor)
-  if (! is.null(weights)) {
+  if (!is.null(weights)) {
     y_levs <- levels(y)
     y <- lapply(y_levs, function(u) (y == u) * weights)
     y <- do.call(cbind, y)
@@ -110,9 +114,12 @@ ordinalNet_wrapper <- function(
 
   # execute call on modified inputs
   cl <- rlang::call2(
-    .fn = "ordinalNet", .ns = "ordinalNet",
-    x = rlang::expr(x), y = rlang::expr(y),
-    family = rlang::expr(family), link = rlang::expr(link),
+    .fn = "ordinalNet",
+    .ns = "ordinalNet",
+    x = rlang::expr(x),
+    y = rlang::expr(y),
+    family = rlang::expr(family),
+    link = rlang::expr(link),
     parallelTerms = parallelTerms,
     nonparallelTerms = nonparallelTerms,
     parallelPenaltyFactor = parallelPenaltyFactor,
@@ -122,7 +129,7 @@ ordinalNet_wrapper <- function(
 }
 
 match_ordinal_link_ordinalNet <- function(link, call = rlang::caller_env()) {
-  if (! is.character(link)) {
+  if (!is.character(link)) {
     return(link)
   }
   check_string(link, arg = "ordinal_link", call = call)
@@ -154,7 +161,11 @@ match_ordinal_link_ordinalNet <- function(link, call = rlang::caller_env()) {
 #' @rdname ordinalNet_wrapper
 #' @export
 predict_ordinalNet_wrapper <- function(
-    object, newx, type, lambda, criteria = c("aic", "bic")
+  object,
+  newx,
+  type,
+  lambda,
+  criteria = c("aic", "bic")
 ) {
   # REVIEW: This is necessary in order to prevent requiring the user to pass
   # a `penalty` value and nevertheless ignoring it.
@@ -210,7 +221,6 @@ predict_ordinalNet_wrapper <- function(
 # return 1 or 2 (adjacent) penalty path indices:
 # if 1, it is used; if 2, predictions are interpolated
 adjacent_penalties <- function(object, penalty) {
-
   # NB: `$lambdaVals` must be unique and decreasing.
   len <- length(object$lambdaVals)
   if (penalty < object$lambdaVals[len]) {
@@ -271,15 +281,15 @@ approx_prediction_row <- function(values, adjacent, penalty) {
 #' @rdname ordinalNet_wrapper
 #' @export
 predict._ordinalNet <- function(
-    object,
-    new_data,
-    type = NULL,
-    opts = list(),
-    penalty = NULL,
-    multi = FALSE,
-    ...
+  object,
+  new_data,
+  type = NULL,
+  opts = list(),
+  penalty = NULL,
+  multi = FALSE,
+  ...
 ) {
-  if (is.null(penalty) && ! is.null(object$spec$args$penalty)) {
+  if (is.null(penalty) && !is.null(object$spec$args$penalty)) {
     penalty <- object$spec$args$penalty
   }
 
@@ -294,12 +304,12 @@ predict._ordinalNet <- function(
 #' @rdname ordinalNet_wrapper
 #' @export
 multi_predict._ordinalNet <- function(
-    object,
-    new_data,
-    type = NULL,
-    opts = list(),
-    penalty = NULL,
-    ...
+  object,
+  new_data,
+  type = NULL,
+  opts = list(),
+  penalty = NULL,
+  ...
 ) {
   type <- check_pred_type(object, type)
   check_spec_pred_type(object, type)
@@ -311,7 +321,7 @@ multi_predict._ordinalNet <- function(
 
   if (is.null(penalty)) {
     # See discussion in https://github.com/tidymodels/parsnip/issues/195
-    if (! is.null(object$spec$args$penalty)) {
+    if (!is.null(object$spec$args$penalty)) {
       penalty <- object$spec$args$penalty
     } else {
       penalty <- object$fit$lambdaVals
@@ -332,14 +342,22 @@ multi_predict._ordinalNet <- function(
   pred <- switch(
     type,
     "prob" = multi_predict_classprob_ordinal_net(
-      object, new_data = new_data, penalty = penalty
+      object,
+      new_data = new_data,
+      penalty = penalty
     ),
     "class" = multi_predict_class_ordinal_net(
-      object, new_data = new_data, penalty = penalty
+      object,
+      new_data = new_data,
+      penalty = penalty
     ),
     "raw" = predict(
-      object, new_data = new_data, type = "raw",
-      opts = opts, penalty = penalty, multi = TRUE
+      object,
+      new_data = new_data,
+      type = "raw",
+      opts = opts,
+      penalty = penalty,
+      multi = TRUE
     )
   )
 
@@ -348,7 +366,7 @@ multi_predict._ordinalNet <- function(
 
 #' @rdname ordinalNet_wrapper
 #' @export
-predict_raw._ordinalNet <- function(object, new_data, opts = list(), ...)  {
+predict_raw._ordinalNet <- function(object, new_data, opts = list(), ...) {
   object$spec <- eval_args(object$spec)
 
   opts$whichLambda <- object$spec$args$penalty
@@ -372,10 +390,10 @@ predict_class._ordinalNet <- function(object, new_data, ...) {
 
 # adapted from `parsnip:::.check_glmnet_penalty_predict()`
 check_penalty_predict <- function(
-    penalty = NULL,
-    object,
-    multi = FALSE,
-    call = rlang::caller_env()
+  penalty = NULL,
+  object,
+  multi = FALSE,
+  call = rlang::caller_env()
 ) {
   engine <- object$spec$engine
   penalty_path_arg <- switch(
@@ -389,7 +407,7 @@ check_penalty_predict <- function(
   }
 
   # when using `predict()`, allow for a single lambda
-  if (! multi) {
+  if (!multi) {
     if (length(penalty) != 1) {
       cli::cli_abort(
         c(
@@ -402,8 +420,10 @@ check_penalty_predict <- function(
     }
   }
 
-  if (length(object$fit[[penalty_path_arg]]) == 1L &&
-      penalty != object$fit[[penalty_path_arg]]) {
+  if (
+    length(object$fit[[penalty_path_arg]]) == 1L &&
+      penalty != object$fit[[penalty_path_arg]]
+  ) {
     cli::cli_abort(
       c(
         "The {.val {engine}} model was fit with a single penalty value of
