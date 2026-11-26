@@ -93,12 +93,12 @@ rpart_spec <-
   set_mode("classification") |>
   set_args(split = tune(), prune = tune())
 
-# partykit: tree_depth + mincriterion (using ctree via bonsai)
+# partykit: tree_depth + min_n (using ctree via bonsai)
 ctree_spec <-
   decision_tree() |>
   set_engine("partykit") |>
   set_mode("classification") |>
-  set_args(tree_depth = tune(), mincriterion = tune())
+  set_args(tree_depth = tune(), min_n = tune())
 
 # --- rand_forest engines ---
 
@@ -116,12 +116,19 @@ orf_spec <-
   set_mode("classification") |>
   set_args(min_n = tune(), trees = 50, honesty = tune())
 
-# partykit: mtry + trees + mincriterion (using cforest via bonsai)
+# ocf: min_n + sample.fraction + alpha (short runtime via small trees)
+ocf_spec <-
+  rand_forest() |>
+  set_engine("ocf") |>
+  set_mode("classification") |>
+  set_args(min_n = tune(), trees = 50, sample.fraction = tune(), alpha = tune())
+
+# partykit: trees + min_n (using cforest via bonsai)
 cforest_spec <-
   rand_forest() |>
   set_engine("partykit") |>
   set_mode("classification") |>
-  set_args(trees = tune(), mincriterion = tune())
+  set_args(trees = tune(), min_n = tune())
 
 # --- tuning grids (all small to limit runtime) ---
 
@@ -164,6 +171,9 @@ ordfor_tune <- extract_parameter_set_dials(ordfor_spec)
 orf_tune <- extract_parameter_set_dials(orf_spec)
 ( orf_grid <- grid_regular(orf_tune, levels = 2) )
 
+ocf_tune <- extract_parameter_set_dials(ocf_spec)
+( ocf_grid <- grid_regular(ocf_tune, levels = 2) )
+
 cforest_tune <- extract_parameter_set_dials(cforest_spec)
 ( cforest_grid <- grid_regular(cforest_tune, levels = 2) )
 
@@ -183,6 +193,7 @@ workflow_set(
     ctree = ctree_spec,
     ordfor = ordfor_spec,
     orf = orf_spec,
+    ocf = ocf_spec,
     cforest = cforest_spec
   )
 ) |>
@@ -198,6 +209,7 @@ workflow_set(
   option_add(grid = ctree_grid, id = "formula_ctree") |>
   option_add(grid = ordfor_grid, id = "formula_ordfor") |>
   option_add(grid = orf_grid, id = "formula_orf") |>
+  option_add(grid = ocf_grid, id = "formula_ocf") |>
   option_add(grid = cforest_grid, id = "formula_cforest") |>
   # for `fit_best()`
   option_add(control = control_grid(save_workflow = TRUE)) |>

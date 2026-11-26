@@ -23,6 +23,7 @@ reference:
   - '`rpartScore_wrapper`'
   - '`ordinalForest_wrapper`'
   - '`orf_wrapper`'
+  - '`ocf_wrapper`'
 - title: "Parameters"
   desc: >
     Tunable Engine Parameters

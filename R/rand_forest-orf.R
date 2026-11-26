@@ -4,6 +4,7 @@
 #' matrix `X` and the outcome vector `Y` as separate arguments, with `Y` as a
 #' numeric vector. This wrapper converts the parsnip-standard data.frame (`X`)
 #' and factor (`Y`) to the required formats before calling [orf::orf()].
+#'
 #' @param X The predictor data (data.frame).
 #' @param Y The outcome factor.
 #' @param ... Additional arguments to pass.

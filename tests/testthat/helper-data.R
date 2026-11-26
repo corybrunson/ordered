@@ -30,3 +30,10 @@ get_house <- function() {
     subset(select = -Freq)
   list(data = house_data, sub = house_sub)
 }
+
+# one-hot encoding without tests depending on {hardhat}
+contr_onehot <- function(x) {
+  m <- diag(nlevels(x))
+  dimnames(m) <- list(levels(x), levels(x))
+  m
+}

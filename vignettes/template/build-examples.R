@@ -40,7 +40,8 @@ list(
   glmnetcr = list(penalty = ".001", mixture = ".5"),
   # `rand_forest`
   ordinalForest = list(trees = "1000"),
-  orf = list(trees = "1000")
+  orf = list(trees = "1000"),
+  ocf = list(trees = "1000")
 ) |>
   enframe(name = "engine", value = "args") |>
   print() -> spec_args
@@ -61,7 +62,8 @@ list(
   glmnetcr = list(),
   # `rand_forest`
   ordinalForest = list(nsets = "100"),
-  orf = list(sample.fraction = "1")
+  orf = list(sample.fraction = "1"),
+  ocf = list(sample.fraction = "1")
 ) |>
   enframe(name = "engine", value = "args") |>
   print() -> eng_args

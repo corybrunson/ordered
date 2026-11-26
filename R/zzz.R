@@ -19,6 +19,7 @@
   # `rand_forest`
   make_rand_forest_ordinalForest()
   make_rand_forest_orf()
+  make_rand_forest_ocf()
 }
 
 # nocov end

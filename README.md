@@ -44,6 +44,8 @@ combinations in the parsnip package that can be used, this package adds:
   ([Hornung, 2020](https://doi.org/10.1007/s00357-018-9302-x))
 - conditional probability ordered forests via `orf::orf()` ([Lechner and
   Okasa, 2025](https://doi.org/10.1007/s00181-024-02646-4))
+- ordered correlation forests via `ocf::ocf()` ([Di Francesco,
+  2025](https://doi.org/10.1080/07474938.2024.2429596))
 
 Some features in other tidymodels packages are useful for ordinal
 outcomes:
@@ -99,6 +101,7 @@ for `ordinal_reg()`:
 | `ordinal_reg`      | `glmnetcr`      | ✔     | ✔    | ✖           |
 | `rand_forest`      | `ordinalForest` | ✔     | ✔    | ✖           |
 | `rand_forest`      | `orf`           | ✔     | ✔    | ✖           |
+| `rand_forest`      | `ocf`           | ✔     | ✔    | ✖           |
 
 ## Tunable model arguments
 

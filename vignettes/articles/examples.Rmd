@@ -525,3 +525,47 @@ predict(rf_fit, house_test, type = "prob")
 ```
 
 </details>
+
+<details id="rand-forest-ocf">
+
+<summary>With the `"ocf"` engine</summary>
+
+We'll model satisfaction of householders under varying conditions.
+
+```{r}
+library(parsnip)
+library(ordered)
+
+house_data <-
+  MASS::housing[rep(seq(nrow(MASS::housing)), MASS::housing$Freq), -5]
+house_sample <- sort(sample(nrow(house_data), 12L))
+house_train <- house_data[-house_sample, ]
+house_test <- house_data[house_sample, ]
+```
+
+We can define the model with specific parameters:
+
+```{r}
+rf_spec <-
+  rand_forest(trees = 1000) |>
+  set_engine("ocf", sample.fraction = 1) |>
+  set_mode("classification")
+rf_spec
+```
+
+Now we create the model fit object:
+
+```{r}
+set.seed(1)
+rf_fit <- rf_spec |> fit(Sat ~ Infl + Type + Cont, data = house_train)
+rf_fit
+```
+
+The holdout data can be predicted for the most likely class or all class probabilities:
+
+```{r}
+predict(rf_fit, house_test, type = "class")
+predict(rf_fit, house_test, type = "prob")
+```
+
+</details>

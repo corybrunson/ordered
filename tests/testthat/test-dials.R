@@ -44,3 +44,11 @@ test_that("`ordinalForest::ordfor` dial customization", {
   expect_equal(num_scores_best(1:2)$range, list(lower = 1L, upper = 2L))
   expect_equal(ord_metric(letters[3:5])$values, letters[3:5])
 })
+
+test_that("`ocf::ocf` dial customization", {
+  expect_equal(
+    alpha_balance(range = c(0.1, 0.4))$range,
+    list(lower = 0.1, upper = 0.4)
+  )
+  expect_equal(replace_samples(TRUE)$values, TRUE)
+})

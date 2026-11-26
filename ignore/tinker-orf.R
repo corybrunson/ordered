@@ -38,11 +38,9 @@ house_spec |>
   print() -> house_grid
 
 # fitted model — formula interface; parsnip applies traditional dummy encoding
-fit(
-  set_args(house_spec, trees = 200, sample.fraction = 0.5, honesty = FALSE),
-  Sat ~ Infl + Type + Cont,
-  data = house_train
-)
+house_spec |>
+  set_args(trees = 200, sample.fraction = 0.5, honesty = FALSE) |>
+  fit(Sat ~ Infl + Type + Cont, data = house_train)
 
 # hyperparameter optimization — 2 folds, 4 grid pts, 8 fits total
 # NOTE: tune_grid with formula interface works because parsnip's

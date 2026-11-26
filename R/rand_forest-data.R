@@ -318,4 +318,155 @@ make_rand_forest_orf <- function() {
   )
 }
 
+# ------------------------------------------------------------------------------
+# `ocf::ocf` components
+
+make_rand_forest_ocf <- function() {
+  parsnip::set_model_engine("rand_forest", "classification", "ocf")
+  parsnip::set_dependency(
+    "rand_forest",
+    eng = "ocf",
+    pkg = "ocf",
+    mode = "classification"
+  )
+  parsnip::set_dependency(
+    "rand_forest",
+    eng = "ocf",
+    pkg = "ordered",
+    mode = "classification"
+  )
+
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ocf",
+    parsnip = "mtry",
+    original = "mtry",
+    func = list(pkg = "dials", fun = "mtry"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ocf",
+    parsnip = "trees",
+    original = "n.trees",
+    func = list(pkg = "dials", fun = "trees"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ocf",
+    parsnip = "min_n",
+    original = "min.node.size",
+    func = list(pkg = "dials", fun = "min_n"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ocf",
+    parsnip = "sample.fraction",
+    original = "sample.fraction",
+    func = list(pkg = "ordered", fun = "sample_fraction"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ocf",
+    parsnip = "honesty",
+    original = "honesty",
+    func = list(pkg = "ordered", fun = "honesty"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ocf",
+    parsnip = "honesty.fraction",
+    original = "honesty.fraction",
+    func = list(pkg = "ordered", fun = "honesty_fraction"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ocf",
+    parsnip = "replace",
+    original = "replace",
+    func = list(pkg = "ordered", fun = "replace_samples"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ocf",
+    parsnip = "alpha",
+    original = "alpha",
+    func = list(pkg = "ordered", fun = "alpha_balance"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "rand_forest",
+    eng = "ocf",
+    parsnip = "max.depth",
+    original = "max.depth",
+    func = list(pkg = "dials", fun = "tree_depth"),
+    has_submodel = FALSE
+  )
+
+  parsnip::set_fit(
+    model = "rand_forest",
+    eng = "ocf",
+    mode = "classification",
+    value = list(
+      interface = "matrix",
+      data = c(x = "X", y = "Y"),
+      protect = c("X", "Y"),
+      func = c(pkg = "ordered", fun = "ocf_wrapper"),
+      defaults = list(n.threads = 1)
+    )
+  )
+
+  parsnip::set_encoding(
+    model = "rand_forest",
+    eng = "ocf",
+    mode = "classification",
+    options = list(
+      predictor_indicators = "one_hot",
+      compute_intercept = FALSE,
+      remove_intercept = TRUE,
+      allow_sparse_x = FALSE
+    )
+  )
+
+  parsnip::set_pred(
+    model = "rand_forest",
+    eng = "ocf",
+    mode = "classification",
+    type = "class",
+    value = list(
+      pre = NULL,
+      post = ocf_class_post,
+      func = c(fun = "predict"),
+      args = list(
+        object = quote(object$fit),
+        data = quote(new_data),
+        type = "response"
+      )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "rand_forest",
+    eng = "ocf",
+    mode = "classification",
+    type = "prob",
+    value = list(
+      pre = NULL,
+      post = ocf_prob_post,
+      func = c(fun = "predict"),
+      args = list(
+        object = quote(object$fit),
+        data = quote(new_data),
+        type = "response"
+      )
+    )
+  )
+}
+
 # nocov end
