@@ -16,7 +16,7 @@ combinations in the parsnip package that can be used, this package adds:
   stopping ratio families via
   [`VGAM::vglm()`](https://rdrr.io/pkg/VGAM/man/vglm.html) and
   [`VGAM::vgam()`](https://rdrr.io/pkg/VGAM/man/vgam.html) ([Yee,
-  2015](https://doi.org/10.18637/jss.v032.i10))
+  2010](https://doi.org/10.18637/jss.v032.i10))
 - regularized elastic net ordinal regression models of cumulative link,
   adjacent categories, continuation ratio, and stopping ratio families
   via
