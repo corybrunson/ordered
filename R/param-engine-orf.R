@@ -5,7 +5,7 @@
 #' specified using `set_engine("orf", ...)`.
 #'
 #' @name orf_parameters
-#' @param values A logical vector of possible values. See `values_ord_metric`.
+#' @param values A logical vector of possible values.
 #' @param range A two-element vector holding the _defaults_ for the smallest and
 #'   largest possible values, respectively. If a transformation is specified,
 #'   these values should be in the _transformed units_.

@@ -9,6 +9,10 @@
 #' @param weights An optional vector of case weights to pass.
 #' @param parallel_reg Logical; whether predictor effects are shared across
 #'   thresholds. When `FALSE`, every predictor is moved to a `nominal` formula.
+#' @param link A character string for the link function, translated to a native
+#'   [ordinal::clm()] link.
+#' @param threshold A character string for the threshold structure, translated
+#'   to a native [ordinal::clm()] threshold.
 #' @param ... Additional arguments to pass.
 #' @param call The execution environment of a currently running function.
 #' @keywords internal

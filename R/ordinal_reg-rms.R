@@ -1,11 +1,12 @@
-#' Fit and predict wrappers for `lrm` and `orm`
+#' Fit and prediction helpers for `rms` engines `lrm` and `orm`
 #'
-#' `rms::orm()` did not support case weights or `penalty` before version 7.0-0.
-#' The fit wrapper errs or warns informatively when either is requested from an
-#' older version. Both `rms::lrm()` and `rms::orm()` use [rms::predictrms()]
-#' internally, which does not accept tibble inputs. The predict wrapper ensures
-#' that `newdata` is converted to a plain data frame before the S3 method is
-#' dispatched.
+#' The `lrm` engine calls [rms::lrm()] directly, while the `orm` engine calls
+#' `rms_orm_wrapper()`. `rms::orm()` did not support case weights or `penalty`
+#' before version 7.0-0; the fit wrapper errs or warns informatively when either
+#' is requested from an older version. Both `rms::lrm()` and `rms::orm()` use
+#' [rms::predictrms()] internally, which does not accept tibble inputs;
+#' `predict_lrm_wrapper()` ensures that `newdata` is converted to a plain data
+#' frame before the S3 method is dispatched.
 #'
 #' @param formula The formula to pass.
 #' @param data The data frame to pass.
@@ -17,8 +18,8 @@
 #' @param ... Additional arguments passed to the underlying method.
 #' @keywords internal
 #' @returns `rms_orm_wrapper()` returns an object of class `orm` as returned by
-#'   [rms::orm()]. `predict_lrm_wrapper()` returns the result of
-#'   [stats::predict()] dispatched on `object`.
+#'   [rms::orm()]. `predict_lrm_wrapper()` returns the prediction result from
+#'   `object`.
 
 #' @examplesIf rlang::is_installed("rms (>= 7.0.0)") && rlang::is_installed("MASS")
 #' house_data <-
