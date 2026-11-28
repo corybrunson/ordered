@@ -26,7 +26,7 @@ combinations in the parsnip package that can be used, this package adds:
 - generalized linear and generalized additive ordinal regression models
   of cumulative link, adjacent categories, continuation ratio, and
   stopping ratio families via `VGAM::vglm()` and `VGAM::vgam()` ([Yee,
-  2015](https://doi.org/10.18637/jss.v032.i10))
+  2010](https://doi.org/10.18637/jss.v032.i10))
 - regularized elastic net ordinal regression models of cumulative link,
   adjacent categories, continuation ratio, and stopping ratio families
   via `ordinalNet::ordinalNet()` ([Wurm, Hanlon, and Rathouz,
