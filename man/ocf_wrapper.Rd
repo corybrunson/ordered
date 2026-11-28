@@ -36,7 +36,7 @@ house_data <-
 house_data <- house_data[sample(nrow(house_data), 50), ]
 X_mat <- model.matrix(~ Infl + Type + Cont - 1, data = house_data)
 # fit wrapper
-ocf(
+ocf::ocf(
   Y = house_data$Sat,
   X = X_mat,
   n.trees = 10
