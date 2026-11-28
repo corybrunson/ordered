@@ -5,7 +5,7 @@
     Condition
       Error in `fit()`:
       ! The "clm" engine supports only the cumulative odds link.
-      i Use the "vglm" or "ordinalNet" engine for alternative odds links.
+      i Use the "vglm", "ordinalNet", or "ordinalgmifs" engine for alternative odds links.
 
 # interfaces agree
 

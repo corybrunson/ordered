@@ -8,14 +8,32 @@ test_that("`threshold_structure` dial values and customization", {
 
 test_that("VGAM `ordinal_link` values extend the bundled dial", {
   expect_true(all(dials::values_ordinal_link %in% values_ordinal_link_VGAM))
-  expect_true(all(c("foldsqrt", "logc", "gord", "pord", "nbord") %in%
-    values_ordinal_link_VGAM))
+  expect_true(all(
+    c("foldsqrt", "logc", "gord", "pord", "nbord") %in%
+      values_ordinal_link_VGAM
+  ))
 })
 
 test_that("VGAM `threshold_structure` values extend the bundled dial", {
-  expect_true(all(dials::values_threshold_structure %in%
-    values_threshold_structure_VGAM))
+  expect_true(all(
+    dials::values_threshold_structure %in%
+      values_threshold_structure_VGAM
+  ))
   expect_true("qnorm" %in% values_threshold_structure_VGAM)
+})
+
+test_that("ordinalgmifs `odds_link` values extend the bundled dial", {
+  expect_setequal(
+    values_odds_link_ordinalgmifs,
+    c(setdiff(dials::values_odds_link, "continuation_ratio"), "stereotype")
+  )
+})
+
+test_that("ordinalgmifs `ordinal_link` values restrict the bundled dial", {
+  expect_setequal(
+    values_ordinal_link_ordinalgmifs,
+    c("logistic", "probit", "cloglog", "loge")
+  )
 })
 
 test_that("`parallel_reg` dial values and customization", {
@@ -27,8 +45,10 @@ test_that("`parallel_reg` dial values and customization", {
 })
 
 test_that("`ordinalNet::ordinalNet` dial customization", {
-  expect_equal(parallel_penalty_factor(range = c(-2, 2))$range,
-               list(lower = -2, upper = 2))
+  expect_equal(
+    parallel_penalty_factor(range = c(-2, 2))$range,
+    list(lower = -2, upper = 2)
+  )
 })
 
 test_that("`rpartScore::rpartScore` dial customization", {

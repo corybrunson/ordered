@@ -1,3 +1,11 @@
+# ordered (development version)
+
+This version introduces source code and unit tests for new engines and dials:
+* `ordinalgmifs` from the **ordinalgmifs** package
+  - generalized monotone incremental forward stagewise regularized ordinal regression
+  - fit and prediction wrappers
+  - additional and subtractional `ordinal_link` and `odds_link` options
+
 # ordered 0.2.1
 
 Despite seed-setting, some `ordinalNet` model fits (on some systems) initialize penalty paths differently.

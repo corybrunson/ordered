@@ -12,6 +12,7 @@
   make_ordinal_reg_vglm()
   make_ordinal_reg_ordinalNet()
   make_ordinal_reg_glmnetcr()
+  make_ordinal_reg_ordinalgmifs()
   # `gen_additive_mod`
   make_gen_additive_mod_vgam()
   # `decision_tree`

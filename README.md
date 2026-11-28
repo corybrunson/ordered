@@ -37,6 +37,10 @@ combinations in the parsnip package that can be used, this package adds:
 - regularized elastic net continuation ratio ordinal regression via
   `glmnetcr::glmnetcr()` ([Archer and Williams,
   2012](https://doi.org/10.1002/sim.4484))
+  - regularized cumulative link, adjacent category, forward/backward
+    stopping ratio, and stereotype ordinal regression via
+    `ordinalgmifs::ordinalgmifs()` ([Archer, Hou, Zhou, Ferber, and Layne,
+    2014](https://doi.org/10.18637/jss.v060.i13))
 - ordinal classification trees via `rpartScore::rpartScore()`
   ([Galimberti, Soffritti, and Di Maso,
   2012](https://doi.org/10.18637/jss.v047.i10))
@@ -97,8 +101,10 @@ for `ordinal_reg()`:
 | `ordinal_reg`      | `vglm`          | ✔     | ✔    | ✔           |
 | `ordinal_reg`      | `ordinalNet`    | ✔     | ✔    | ✔           |
 | `ordinal_reg`      | `glmnetcr`      | ✔     | ✔    | ✖           |
+| `ordinal_reg`      | `ordinalgmifs`  | ✔     | ✔    | ✖           |
 | `rand_forest`      | `ordinalForest` | ✔     | ✔    | ✖           |
 | `rand_forest`      | `orf`           | ✔     | ✔    | ✖           |
+| `rand_forest`      | `ocf`           | ✔     | ✔    | ✖           |
 
 ## Tunable model arguments
 

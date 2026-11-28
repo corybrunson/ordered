@@ -20,6 +20,7 @@ reference:
   - '`predict_glmnetcr_wrapper`'
   - '`VGAM_vglm_wrapper`'
   - '`VGAM_vgam_wrapper`'
+  - '`ordinalgmifs_wrapper`'
   - '`rpartScore_wrapper`'
   - '`ordinalForest_wrapper`'
   - '`orf_wrapper`'
@@ -29,6 +30,7 @@ reference:
   contents:
   - '`clm_parameters`'
   - '`ordinalNet_parameters`'
+  - '`ordinalgmifs_parameters`'
   - '`rpartScore_parameters`'
   - '`ordinalForest_parameters`'
   - '`orf_parameters`'

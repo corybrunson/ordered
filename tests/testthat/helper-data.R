@@ -30,3 +30,20 @@ get_house <- function() {
     subset(select = -Freq)
   list(data = house_data, sub = house_sub)
 }
+
+get_ordinalgmifs_ex <- function() {
+  set.seed(seed)
+  d <- data.frame(
+    y = factor(
+      rep(c("low", "medium", "high"), each = 12),
+      levels = c("low", "medium", "high")
+    ),
+    x1 = rnorm(36),
+    x2 = rnorm(36),
+    z = rnorm(36)
+  )
+  x <- as.matrix(d[, c("x1", "x2"), drop = FALSE])
+  rownames(x) <- NULL
+  list(data = d, x = x)
+
+}

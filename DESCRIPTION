@@ -38,6 +38,7 @@ Suggests:
     MASS,
     ordinal,
     ordinalNet,
+    ordinalgmifs,
     rms (>= 6.8-0),
     glmnetcr,
     VGAM (>= 1.1-9),

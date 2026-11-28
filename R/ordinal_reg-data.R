@@ -765,6 +765,105 @@ make_ordinal_reg_glmnetcr <- function() {
 }
 
 # ------------------------------------------------------------------------------
+# `ordinalgmifs::ordinalgmifs` components
+
+make_ordinal_reg_ordinalgmifs <- function() {
+  parsnip::set_model_engine("ordinal_reg", "classification", "ordinalgmifs")
+  parsnip::set_dependency(
+    "ordinal_reg",
+    eng = "ordinalgmifs",
+    pkg = "ordered",
+    mode = "classification"
+  )
+  parsnip::set_dependency(
+    "ordinal_reg",
+    eng = "ordinalgmifs",
+    pkg = "ordinalgmifs",
+    mode = "classification"
+  )
+
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "ordinalgmifs",
+    parsnip = "ordinal_link",
+    original = "link",
+    func = list(pkg = "dials", fun = "ordinal_link"),
+    has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "ordinal_reg",
+    eng = "ordinalgmifs",
+    parsnip = "odds_link",
+    original = "probability.model",
+    func = list(pkg = "dials", fun = "odds_link"),
+    has_submodel = FALSE
+  )
+
+  parsnip::set_fit(
+    model = "ordinal_reg",
+    eng = "ordinalgmifs",
+    mode = "classification",
+    value = list(
+      interface = "formula",
+      protect = c("formula", "data", "weights"),
+      func = c(pkg = "ordered", fun = "ordinalgmifs_wrapper"),
+      defaults = list()
+    )
+  )
+
+  parsnip::set_encoding(
+    model = "ordinal_reg",
+    eng = "ordinalgmifs",
+    mode = "classification",
+    options = list(
+      predictor_indicators = "traditional",
+      compute_intercept = TRUE,
+      remove_intercept = TRUE,
+      allow_sparse_x = FALSE
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "ordinalgmifs",
+    mode = "classification",
+    type = "class",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        tibble::tibble(.pred_class = factor(x$class, levels = object$lvl))
+      },
+      func = c(pkg = "ordered", fun = "predict_ordinalgmifs_wrapper"),
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data)
+      )
+    )
+  )
+
+  parsnip::set_pred(
+    model = "ordinal_reg",
+    eng = "ordinalgmifs",
+    mode = "classification",
+    type = "prob",
+    value = list(
+      pre = NULL,
+      post = function(x, object) {
+        x <- x$predicted
+        colnames(x) <- object$lvl
+        x <- tibble::as_tibble(x)
+        set_names(x, paste0(".pred_", object$lvl))
+      },
+      func = c(pkg = "ordered", fun = "predict_ordinalgmifs_wrapper"),
+      args = list(
+        object = quote(object$fit),
+        newdata = quote(new_data)
+      )
+    )
+  )
+}
+
+# ------------------------------------------------------------------------------
 # `ordinal::clm` components
 
 make_ordinal_reg_clm <- function() {

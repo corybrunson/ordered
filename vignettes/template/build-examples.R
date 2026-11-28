@@ -38,6 +38,7 @@ list(
   vglm = list(odds_link = "\"continuation_ratio\""),
   ordinalNet = list(penalty = ".001", mixture = ".5"),
   glmnetcr = list(penalty = ".001", mixture = ".5"),
+  ordinalgmifs = list(odds_link = "\"stereotype\""),
   # `rand_forest`
   ordinalForest = list(trees = "1000"),
   orf = list(trees = "1000")
@@ -59,6 +60,7 @@ list(
   vglm = list(),
   ordinalNet = list(includeLambda0 = "TRUE"),
   glmnetcr = list(),
+  ordinalgmifs = list(x = "c(\"Cont\")"),
   # `rand_forest`
   ordinalForest = list(nsets = "100"),
   orf = list(sample.fraction = "1")
